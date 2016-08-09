@@ -84,6 +84,10 @@
       <Project>{91d7cea6-559e-47ce-9b32-03d39bd32f67}</Project>
       <Name>MailSenderLib</Name>
     </ProjectReference>
+    <ProjectReference Include="..\NetUtils\NetUtils.csproj">
+      <Project>{c1da06cb-2dd8-451e-afd7-e205b208f01a}</Project>
+      <Name>NetUtils</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RpgGridUserControls\RpgGridUserControls.csproj">
       <Project>{75eaa645-a279-47fb-be18-e28c70d4a0fb}</Project>
       <Name>RpgGridUserControls</Name>

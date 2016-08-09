@@ -2,15 +2,22 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace RpgGridUserControls
 {
-    public abstract class GridPawn : UserControl
+    [Serializable]
+    public abstract class GridPawn : UserControl, ISerializable
     {
-        private SizeF squareSize;
+        private const string ImageSerializationName = "img";
+        private const string SizeAtNoZoomSerializationName = "ctrlSize";
+        private const string PositionAtNoZoomSerializationName = "pos";
+
+        private const string ModSizeSerializationName = "rpgSize";
+        private const string IsSquaredSerializationName = "sqr";
 
         public enum RpgSize
         {
@@ -20,6 +27,23 @@ namespace RpgGridUserControls
             Large_Long,
             //...
         }
+
+        public GridPawn()
+        {
+
+        }
+
+        public GridPawn(SerializationInfo info, StreamingContext context)
+        {
+            Image = (Image)info.GetValue(ImageSerializationName, typeof(Image));
+            SizeAtNoZoom = (SizeF)info.GetValue(SizeAtNoZoomSerializationName, typeof(SizeF));
+            PositionAtNoZoom = (Point)info.GetValue(PositionAtNoZoomSerializationName, typeof(Point));
+
+            ModSize = (RpgSize)info.GetValue(ModSizeSerializationName, typeof(RpgSize));
+            IsSquared = (bool)info.GetValue(IsSquaredSerializationName, typeof(bool));
+        }
+
+        public event EventHandler Rotate90Degrees;
 
         public abstract Image Image { get; set; }
         public SizeF SizeAtNoZoom { get; private set; }
@@ -93,8 +117,6 @@ namespace RpgGridUserControls
             }
         }
 
-        public event EventHandler Rotate90Degrees;
-
         private void OnRotate90Degrees(EventArgs e)
         {
             var tmp = Rotate90Degrees;
@@ -102,6 +124,16 @@ namespace RpgGridUserControls
             {
                 tmp(this, e);
             }
+        }
+
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue(ImageSerializationName,Image,typeof(Image));
+            info.AddValue(SizeAtNoZoomSerializationName,SizeAtNoZoom,typeof(SizeF));
+            info.AddValue(PositionAtNoZoomSerializationName,PositionAtNoZoom,typeof(Point));
+
+            info.AddValue(ModSizeSerializationName,ModSize,typeof(RpgSize));
+            info.AddValue(IsSquaredSerializationName,IsSquared,typeof(bool));
         }
     }
 }

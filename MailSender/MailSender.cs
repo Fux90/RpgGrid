@@ -10,9 +10,7 @@ namespace MailSenderLib
 {
     public sealed class MailSender
     {
-        //TODO - MAke config file
         private const string smtpHost = "smtp.live.com";
-        private const string user = "";
 
         public string Pwd { get; set; }
 
@@ -57,24 +55,24 @@ namespace MailSenderLib
                 DeliveryMethod = SmtpDeliveryMethod.Network,
                 EnableSsl = true,
                 UseDefaultCredentials = false,
-                Credentials = new NetworkCredential(user, Pwd)
+                Credentials = new NetworkCredential(MyAddress, Pwd)
             })
             {
-                using (var mail = new MailMessage(MyAddress, receiverAddress)
+                try
                 {
-                    Subject = subject,
-                    Body = msg
-                })
-                {
-                    try
+                    using (var mail = new MailMessage(MyAddress, receiverAddress)
+                    {
+                        Subject = subject,
+                        Body = msg
+                    })
                     {
                         client.Send(mail);
                     }
-                    catch(Exception ex)
-                    {
-                        throw ex;
-                        return false;
-                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                    return false;
                 }
             }
 

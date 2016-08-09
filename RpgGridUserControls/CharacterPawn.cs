@@ -9,11 +9,17 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing.Imaging;
 using Utils;
+using System.Runtime.Serialization;
 
 namespace RpgGridUserControls
 {
     public partial class CharacterPawn : /*UserControl,*/ GridPawn
     {
+        private const string CurrentPfSerializationKey = "currPf";
+        private const string MaxPfSerializationKey = "maxPf";
+        private const string FacingSerializationKey = "face";
+        private const string NotesSerializationKey = "notes";
+
         private readonly Brush pfBrush = Brushes.Green;
         private readonly Brush damageBrush = Brushes.Red;
         private readonly Pen circlePen = new Pen(Brushes.Black, 2.0f);
@@ -35,18 +41,20 @@ namespace RpgGridUserControls
         }
 
         public GridDirections Facing { get; private set; }
+
         private int numGridDirections = -1;
         protected int NumGridDirections
         {
             get
             {
-                if(numGridDirections == -1)
+                if (numGridDirections == -1)
                 {
                     numGridDirections = Enum.GetValues(typeof(GridDirections)).Length;
                 }
                 return numGridDirections;
             }
         }
+
         private Dictionary<GridDirections, Rectangle> pointFace;
 
         private Image image;
@@ -121,6 +129,12 @@ namespace RpgGridUserControls
 
             Facing = GridDirections.North;
             pointFace = new Dictionary<GridDirections, Rectangle>();
+        }
+
+        public CharacterPawn(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+
         }
 
         public override void PerformRotate90Degrees()
@@ -214,6 +228,16 @@ namespace RpgGridUserControls
                     Y = PositionAtNoZoom.Y + rectImage.Y,
                 };
             }
+        }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+
+            info.AddValue(CurrentPfSerializationKey, CurrentPf, typeof(int));
+            info.AddValue(MaxPfSerializationKey, MaxPf, typeof(int));
+            info.AddValue(FacingSerializationKey, Facing, typeof(GridDirections));
+            info.AddValue(NotesSerializationKey, Notes, typeof(string));
         }
     }
 }
