@@ -134,59 +134,6 @@ namespace RpgGridUserControls
             }
         }
 
-        private void ResizeToFitImage(Image inputImage)
-        {
-            //TODO...   
-        }
-
-        public bool DrawGrid { get; set; }
-        private Rectangle GridRegion { get; set; }
-        private Image gridPawnImage;
-        private bool isGridPawnImageToRedraw;
-        private Image GridPawnImage
-        {
-            get
-            {
-                if(isGridPawnImageToRedraw)
-                {
-                    if (PawnsImage == null)
-                    {
-                        gridPawnImage = null;
-                    }
-                    else
-                    {
-                        //gridImage = (Image)Image.Clone();
-                        gridPawnImage = (Image)PawnsImage.Clone();
-                        var g = Graphics.FromImage(gridPawnImage);
-                        var p = new Pen(Brushes.YellowGreen, 1.0f);
-                        var numHorizontalLines = GridRegion.Height / PixelsInFiveFeet;
-                        var numVerticalLines = GridRegion.Width / PixelsInFiveFeet;
-
-                        var x1 = GridRegion.X;
-                        var x2 = GridRegion.Width;
-                        var yL = (float)GridRegion.Y;
-                        for (int y = 0; y < numHorizontalLines; y++)
-                        {
-                            g.DrawLine(p, new PointF(x1, yL), new PointF(x2, yL));
-                            yL += PixelsInFiveFeet;
-                        }
-
-                        var y1 = GridRegion.Y;
-                        var y2 = GridRegion.Height;
-                        var xL = (float)GridRegion.X;
-                        for (int x = 0; x < numVerticalLines; x++)
-                        {
-                            g.DrawLine(p, new PointF(xL, y1), new PointF(xL, y2));
-                            xL += PixelsInFiveFeet;
-                        }
-
-                        isGridPawnImageToRedraw = false;
-                    }
-                }
-                return gridPawnImage;
-            }
-        }
-
         private Image gridImage;
         private bool isGridImageToRedraw;
         private Image GridImage
@@ -195,7 +142,7 @@ namespace RpgGridUserControls
             {
                 if (isGridImageToRedraw)
                 {
-                    if (PawnsImage == null)
+                    if (Image == null)
                     {
                         gridImage = null;
                     }
@@ -232,40 +179,15 @@ namespace RpgGridUserControls
             }
         }
 
-        private Image pawnsImage;
-        private bool isPawnsImageToRedraw;
-        private Image PawnsImage
+        private void ResizeToFitImage(Image inputImage)
         {
-            get
-            {
-                if (isPawnsImageToRedraw)
-                {
-                    if (Image == null)
-                    {
-                        pawnsImage = null;
-                    }
-                    else
-                    {
-                        pawnsImage = (Image)Image.Clone();
-                        var g = Graphics.FromImage(pawnsImage);
-                        g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-                        for (int i = 0; i < Controls.Count; i++)
-                        {
-                            var ctrl = Controls[i];
-                            if (typeof(GridPawn).IsAssignableFrom(ctrl.GetType()))
-                            {
-                                var pawn = (GridPawn)ctrl;
-                                //g.DrawImage(pawn.Image, new RectangleF(pawn.PositionAtNoZoom, pawn.SizeAtNoZoom));
-                                g.DrawImage(pawn.Image, new RectangleF(pawn.PositionAtNoZoomNoMargin, pawn.SizeAtNoZoom));
-                            }
-                        }
-                        isPawnsImageToRedraw = false;
-                    }
-                }
-                return pawnsImage;
-            }
+            //TODO...   
         }
 
+        public bool DrawGrid { get; set; }
+        private Rectangle GridRegion { get; set; }
+        
+        
         // 1.5 m
         public float PixelsInFiveFeet
         {
@@ -297,13 +219,11 @@ namespace RpgGridUserControls
 
         private void InvalidateGridImage()
         {
-            isGridPawnImageToRedraw = true;
             isGridImageToRedraw = true;
         }
 
         private void InvalidatePawnsImage()
         {
-            isPawnsImageToRedraw = true;
             isGridImageToRedraw = true;
         }
 
@@ -728,7 +648,6 @@ namespace RpgGridUserControls
                 _translation.X = _translation.X / _xControlToPixel;
                 _translation.Y = _translation.Y / _yControlToPixel;
 
-                //this.SuspendLayout();
                 for (int i = 0; i < Controls.Count; i++)
                 {
                     var ctrl = Controls[i];
@@ -744,7 +663,6 @@ namespace RpgGridUserControls
                         g.DrawImage(pawn.Image, new Rectangle(ctrl.Location, ctrl.Size));
                     }
                 }
-                //this.ResumeLayout();
 
                 translation = null;
             }
@@ -754,17 +672,17 @@ namespace RpgGridUserControls
         {
             var g = e.Graphics;
 
-            if (PawnsImage != null)
+            if (Image != null)
             {
                 if(DrawGrid)
                 {
                     //g.DrawImage(GridPawnImage, ClientRectangle, Viewport, GraphicsUnit.Pixel);
-                    g.DrawImage(isPanning ? GridPawnImage : GridImage, ClientRectangle, Viewport, GraphicsUnit.Pixel);
+                    g.DrawImage(GridImage, ClientRectangle, Viewport, GraphicsUnit.Pixel);
                 }
                 else
                 {
                     //g.DrawImage(Image, ClientRectangle, Viewport, GraphicsUnit.Pixel);
-                    g.DrawImage(isPanning ? PawnsImage : Image, ClientRectangle, Viewport, GraphicsUnit.Pixel);
+                    g.DrawImage(Image, ClientRectangle, Viewport, GraphicsUnit.Pixel);
                 }
             }
         }
