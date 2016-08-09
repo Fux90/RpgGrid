@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Net;
 using System.ComponentModel;
 using System.Windows.Forms;
+using System.Reflection;
 
 namespace NetUtils
 {
@@ -20,6 +21,16 @@ namespace NetUtils
 
     public sealed class Connections
     {
+        private class CommandBehaviour : Attribute
+        {
+            public Commands Command { get; private set; }
+
+            public CommandBehaviour(Commands command)
+            {
+                Command = command;
+            }
+        }
+
         public enum Commands : byte
         {
             Ping,
@@ -47,13 +58,53 @@ namespace NetUtils
 
         private TcpClient clientTCP;
 
+        public delegate void ReceivedMessageDelegate(TcpClient tcpClient, BackgroundWorker bwListener);
+        private Dictionary<Commands, ReceivedMessageDelegate> behaviourByCommand;
+
         private Connections()
         {
             serverListeners = new Dictionary<int, TcpListener>();
             serverSocks = new Dictionary<int, TcpClient>();
+
+            initBehaviours();
         }
 
-        
+        private void initBehaviours()
+        {
+            behaviourByCommand = new Dictionary<Commands, ReceivedMessageDelegate>();
+
+            var behaviours = this.GetType()
+                        .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+                        .Where(m => m.GetCustomAttributes(typeof(CommandBehaviour)).Count() == 1).ToArray();
+
+            for (int i = 0; i < behaviours.Length; i++)
+            {
+                var b = behaviours[i];
+                var cmd = ((CommandBehaviour)b.GetCustomAttribute(typeof(CommandBehaviour))).Command;
+                var del = Delegate.CreateDelegate(typeof(ReceivedMessageDelegate), this, b);
+                behaviourByCommand[cmd] = (ReceivedMessageDelegate)del;
+            }
+        }
+
+        #region BEHAVIOURS
+
+        [CommandBehaviour(Commands.Ping)]
+        public void PingBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            MessageBox.Show("I was pinged");
+            tcpClient.Client.Send(Commands.Pong.ToByteArray());
+            bwListener.RunWorkerAsync();
+        }
+
+        [CommandBehaviour(Commands.Pong)]
+        public void PongBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            MessageBox.Show("I was ponged back");
+            bwListener.RunWorkerAsync();
+        }
+
+        #endregion
+
         public string InvitePlayer(out Int32 sockID, out BackgroundWorker waitingPlayerBw)
         {
             var port = GeneratePort();
@@ -117,57 +168,6 @@ namespace NetUtils
             return bwWaitForConnection;
         }
 
-        private void StartListeningThread(TcpClient tcpClient)
-        {
-            var bwListening = new BackgroundWorker();
-
-            bwListening.DoWork += (s, e) =>
-            {
-                var bufferCommand = new byte[1];
-                tcpClient.Client.Receive(bufferCommand);
-
-                e.Result = new object[]
-                {
-                    (Commands)bufferCommand[0],
-                };
-            };
-
-            bwListening.RunWorkerCompleted += (s, e) =>
-            {
-                if(e.Error != null)
-                {
-                    MessageBox.Show(e.Error.Message);
-                }
-                else
-                {
-                    var results = (object[])e.Result;
-
-                    var command = (Commands)results[0];
-
-                    switch(command)
-                    {
-                        case Commands.Ping:
-                            MessageBox.Show("I was pinged");
-                            tcpClient.Client.Send(Commands.Pong.ToByteArray());
-                            bwListening.RunWorkerAsync();
-                            break;
-                        case Commands.Pong:
-                            MessageBox.Show("I was ponged back");
-                            bwListening.RunWorkerAsync();
-                            break;
-                        case Commands.SendInitialData:
-                            break;
-                        case Commands.CloseChannel:
-                            break;
-                        default:
-                            throw new Exception("Unknown command");
-                    }
-                }
-            };
-
-            bwListening.RunWorkerAsync();
-        }
-
         public void AcceptInvite(IPAddress serverAddress, int serverPort)
         {
             clientTCP = new TcpClient();
@@ -200,6 +200,65 @@ namespace NetUtils
         {
             serverListeners[sockID].Stop();
             serverListeners.Remove(sockID);
+        }
+
+        private void StartListeningThread(TcpClient tcpClient)
+        {
+            var bwListening = new BackgroundWorker();
+
+            bwListening.DoWork += (s, e) =>
+            {
+                var bufferCommand = new byte[1];
+                tcpClient.Client.Receive(bufferCommand);
+
+                e.Result = new object[]
+                {
+                    (Commands)bufferCommand[0],
+                };
+            };
+
+            bwListening.RunWorkerCompleted += (s, e) =>
+            {
+                if (e.Error != null)
+                {
+                    MessageBox.Show(e.Error.Message);
+                }
+                else
+                {
+                    var results = (object[])e.Result;
+
+                    var command = (Commands)results[0];
+
+                    //switch (command)
+                    //{
+                    //    case Commands.Ping:
+                    //        MessageBox.Show("I was pinged");
+                    //        tcpClient.Client.Send(Commands.Pong.ToByteArray());
+                    //        bwListening.RunWorkerAsync();
+                    //        break;
+                    //    case Commands.Pong:
+                    //        MessageBox.Show("I was ponged back");
+                    //        bwListening.RunWorkerAsync();
+                    //        break;
+                    //    case Commands.SendInitialData:
+                    //        break;
+                    //    case Commands.CloseChannel:
+                    //        break;
+                    //    default:
+                    //        throw new Exception("Unknown command");
+                    //}
+                    if(behaviourByCommand.ContainsKey(command))
+                    {
+                        behaviourByCommand[command](tcpClient, bwListening);
+                    }
+                    else
+                    {
+                        throw new Exception("Unknown command");
+                    }
+                }
+            };
+
+            bwListening.RunWorkerAsync();
         }
 
         public bool PingServer()
