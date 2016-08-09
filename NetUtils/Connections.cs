@@ -57,20 +57,21 @@ namespace NetUtils
         public string InvitePlayer(out Int32 sockID, out BackgroundWorker waitingPlayerBw)
         {
             var port = GeneratePort();
-#if DEBUG
+#if LOCAL_HOST_DEBUG
             var localAddr = IPAddress.Parse("127.0.0.1");
-            var s = new TcpListener(localAddr, port);
+#else
+            IPAddress localAddr = null;
             var host = Dns.GetHostEntry(Dns.GetHostName());
             foreach (var ip in host.AddressList)
             {
                 if(ip.AddressFamily == AddressFamily.InterNetwork)
                 {
-                    ip.ToString();
+                    localAddr = ip;
                 }
             }
-#else
-            var s = new TcpListener(port);
 #endif
+            var s = new TcpListener(localAddr, port);
+
             s.Start();
             var task = s.AcceptTcpClientAsync();
             
