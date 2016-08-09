@@ -1,31 +1,26 @@
 ﻿using MailSenderLib;
 using NetUtils;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace RpgGrid
 {
-    public partial class Form1 : Form
+    public partial class FrmMain : Form
     {
-        public Form1()
+        RpgGrid grid;
+
+        public FrmMain()
         {
             InitializeComponent();
+            grid = new RpgGrid();
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
             // Pawn ----------------------------------------
-            characterPawn1.CurrentPf = 59;
-            characterPawn1.MaxPf = 60;
-            characterPawn1.Image = Image.FromFile(@"character1.png");
-            //characterPawn1.ModSize = RpgGridUserControls.GridPawn.RpgSize.Large_Long;
+            pawnManager1.LoadPawns(grid.RetrievePawns());
+            pawnContainer1.LoadPawns(grid.RetrievePawns());
 
             // Grid ----------------------------------------
             grid1.ImagePath = @"dnd_map_1.jpg";
@@ -35,11 +30,7 @@ namespace RpgGrid
             ShowMasterControls();
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            SendMail(txtMyMail.Text, txtPlayer.Text);
-        }
-
+        
         private void SendMail(  string from, 
                                 string to, 
                                 string content = "", 
@@ -119,6 +110,33 @@ namespace RpgGrid
             bw.RunWorkerAsync();
         }
 
+        private void HideMasterControls()
+        {
+            grpMaster.Enabled = false;
+            pawnManager1.Visible = false;
+        }
+
+        private void ShowMasterControls()
+        {
+            grpMaster.Enabled = true;
+            pawnManager1.Visible = true;
+        }
+
+        private void HidePlayerControls()
+        {
+            grpPlayer.Enabled = false;
+        }
+
+        private void ShowPlayerControls()
+        {
+            grpPlayer.Enabled = true;
+        }
+
+        private void btnSendMail_Click(object sender, EventArgs e)
+        {
+            SendMail(txtMyMail.Text, txtPlayer.Text);
+        }
+
         private void btnInvite_Click(object sender, EventArgs e)
         {
             btnSendInvite.Enabled = false;
@@ -137,26 +155,6 @@ namespace RpgGrid
         private void txtPwd_TextChanged(object sender, EventArgs e)
         {
             MailSender.Current.Pwd = txtPwd.Text;
-        }
-
-        private void HideMasterControls()
-        {
-            grpMaster.Enabled = false;
-        }
-
-        private void ShowMasterControls()
-        {
-            grpMaster.Enabled = true;
-        }
-
-        private void HidePlayerControls()
-        {
-            grpPlayer.Enabled = false;
-        }
-
-        private void ShowPlayerControls()
-        {
-            grpPlayer.Enabled = true;
         }
 
         private void chkMaster_CheckedChanged(object sender, EventArgs e)

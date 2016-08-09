@@ -12,6 +12,8 @@ namespace RpgGridUserControls
     [Serializable]
     public abstract class GridPawn : UserControl, ISerializable
     {
+        private const string NameSerializationKey = "name";
+
         private const string ImageSerializationName = "img";
         private const string SizeAtNoZoomSerializationName = "ctrlSize";
         private const string PositionAtNoZoomSerializationName = "pos";
@@ -35,16 +37,19 @@ namespace RpgGridUserControls
 
         public GridPawn(SerializationInfo info, StreamingContext context)
         {
+            Name = info.GetString(NameSerializationKey);
+
             Image = (Image)info.GetValue(ImageSerializationName, typeof(Image));
             SizeAtNoZoom = (SizeF)info.GetValue(SizeAtNoZoomSerializationName, typeof(SizeF));
             PositionAtNoZoom = (Point)info.GetValue(PositionAtNoZoomSerializationName, typeof(Point));
 
             ModSize = (RpgSize)info.GetValue(ModSizeSerializationName, typeof(RpgSize));
-            IsSquared = (bool)info.GetValue(IsSquaredSerializationName, typeof(bool));
+            IsSquared = info.GetBoolean(IsSquaredSerializationName);
         }
 
         public event EventHandler Rotate90Degrees;
 
+        public new string Name { get; set; }
         public abstract Image Image { get; set; }
         public SizeF SizeAtNoZoom { get; private set; }
         public Point PositionAtNoZoom { get; private set; }
@@ -128,6 +133,7 @@ namespace RpgGridUserControls
 
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
+            info.AddValue(NameSerializationKey, Name, typeof(string));
             info.AddValue(ImageSerializationName,Image,typeof(Image));
             info.AddValue(SizeAtNoZoomSerializationName,SizeAtNoZoom,typeof(SizeF));
             info.AddValue(PositionAtNoZoomSerializationName,PositionAtNoZoom,typeof(Point));

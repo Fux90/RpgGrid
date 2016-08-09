@@ -143,6 +143,16 @@ namespace RpgGridUserControls
             base.PerformRotate90Degrees();
         }
 
+        private void CharacterPawn_Load(object sender, EventArgs e)
+        {
+            ComputeRectImage();
+        }
+
+        private void CharacterPawn_Resize(object sender, EventArgs e)
+        {
+            ComputeRectImage();
+        }
+
         protected override void OnPaint(PaintEventArgs e)
         {
             var g = e.Graphics;
@@ -160,16 +170,6 @@ namespace RpgGridUserControls
 
             g.DrawEllipse(circlePen, rectPie);
             g.FillEllipse(Brushes.Blue, pointFace[Facing]);
-        }
-
-        private void CharacterPawn_Load(object sender, EventArgs e)
-        {
-            ComputeRectImage();
-        }
-
-        private void CharacterPawn_Resize(object sender, EventArgs e)
-        {
-            ComputeRectImage();
         }
 
         private void ComputeRectImage()

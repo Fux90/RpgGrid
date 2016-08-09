@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utils", "Utils\Utils.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetUtils", "NetUtils\NetUtils.csproj", "{C1DA06CB-2DD8-451E-AFD7-E205B208F01A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResourceManagement", "ResourceManagement\ResourceManagement.csproj", "{A2FD5325-CC2E-4A6E-B4FC-6A8D1A43DDA7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{C1DA06CB-2DD8-451E-AFD7-E205B208F01A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C1DA06CB-2DD8-451E-AFD7-E205B208F01A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C1DA06CB-2DD8-451E-AFD7-E205B208F01A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2FD5325-CC2E-4A6E-B4FC-6A8D1A43DDA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2FD5325-CC2E-4A6E-B4FC-6A8D1A43DDA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2FD5325-CC2E-4A6E-B4FC-6A8D1A43DDA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2FD5325-CC2E-4A6E-B4FC-6A8D1A43DDA7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
