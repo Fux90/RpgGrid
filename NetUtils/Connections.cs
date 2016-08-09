@@ -147,6 +147,11 @@ namespace NetUtils
                     {
                         case Commands.Ping:
                             MessageBox.Show("I was pinged");
+                            tcpClient.Client.Send(Commands.Pong.ToByteArray());
+                            bwListening.RunWorkerAsync();
+                            break;
+                        case Commands.Pong:
+                            MessageBox.Show("I was ponged back");
                             bwListening.RunWorkerAsync();
                             break;
                         case Commands.SendInitialData:
@@ -169,6 +174,7 @@ namespace NetUtils
 
             if(clientTCP.Connected)
             {
+                StartListeningThread(clientTCP);
 #if DEBUG
                 clientTCP.Client.Send(Commands.Ping.ToByteArray());
 #endif
@@ -206,24 +212,9 @@ namespace NetUtils
             return false;
         }
 
-        public bool PongServer()
-        {
-            throw new NotImplementedException();
-        }
-
         public bool PingClient(int clientID)
         {
             throw new NotImplementedException();
-        }
-
-        public bool PongClient(int clientID)
-        {
-            if (serverSocks.ContainsKey(clientID) && serverSocks[clientID].Connected)
-            {
-                serverSocks[clientID].Client.Send(Commands.Pong.ToByteArray());
-                return true;
-            }
-            return false;
         }
     }
 }
