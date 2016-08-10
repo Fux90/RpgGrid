@@ -41,6 +41,7 @@ namespace RpgGridUserControls
         public PawnManager()
         {
             InitializeComponent();
+            this.SetStyle(ControlStyles.UserPaint, true);
         }
 
         public void LoadPawns(GridPawn[] gridPawns)

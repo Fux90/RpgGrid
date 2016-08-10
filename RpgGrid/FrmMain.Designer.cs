@@ -33,7 +33,7 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.pagMap = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.tblLayoutControls = new System.Windows.Forms.TableLayoutPanel();
             this.chkMaster = new System.Windows.Forms.CheckBox();
             this.pagInvitation = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
@@ -59,10 +59,11 @@
             this.grid1 = new RpgGridUserControls.Grid();
             this.pawnManager1 = new RpgGridUserControls.PawnManager();
             this.pawnContainer1 = new RpgGridUserControls.PawnContainer();
+            this.scrollableContainer1 = new RpgGridUserControls.ScrollableContainer();
             this.tabControl1.SuspendLayout();
             this.pagMap.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
-            this.tableLayoutPanel2.SuspendLayout();
+            this.tblLayoutControls.SuspendLayout();
             this.pagInvitation.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             this.grpMaster.SuspendLayout();
@@ -87,7 +88,7 @@
             this.chkToggleGrid.AutoSize = true;
             this.chkToggleGrid.Checked = true;
             this.chkToggleGrid.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkToggleGrid.Location = new System.Drawing.Point(3, 115);
+            this.chkToggleGrid.Location = new System.Drawing.Point(3, 75);
             this.chkToggleGrid.Name = "chkToggleGrid";
             this.chkToggleGrid.Size = new System.Drawing.Size(45, 17);
             this.chkToggleGrid.TabIndex = 3;
@@ -123,7 +124,7 @@
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 77.22008F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 22.77992F));
             this.tableLayoutPanel1.Controls.Add(this.grid1, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 1, 0);
+            this.tableLayoutPanel1.Controls.Add(this.tblLayoutControls, 1, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -132,32 +133,35 @@
             this.tableLayoutPanel1.Size = new System.Drawing.Size(777, 463);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
-            // tableLayoutPanel2
+            // tblLayoutControls
             // 
-            this.tableLayoutPanel2.ColumnCount = 1;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Controls.Add(this.chkMaster, 0, 2);
-            this.tableLayoutPanel2.Controls.Add(this.chkToggleGrid, 0, 1);
-            this.tableLayoutPanel2.Controls.Add(this.pawnManager1, 1, 0);
-            this.tableLayoutPanel2.Controls.Add(this.pawnContainer1, 0, 3);
-            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(603, 3);
-            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 4;
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 29F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 291F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(171, 457);
-            this.tableLayoutPanel2.TabIndex = 2;
+            this.tblLayoutControls.ColumnCount = 1;
+            this.tblLayoutControls.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tblLayoutControls.Controls.Add(this.chkMaster, 0, 2);
+            this.tblLayoutControls.Controls.Add(this.chkToggleGrid, 0, 1);
+            this.tblLayoutControls.Controls.Add(this.pawnManager1, 1, 0);
+            this.tblLayoutControls.Controls.Add(this.pawnContainer1, 0, 3);
+            this.tblLayoutControls.Controls.Add(this.scrollableContainer1, 0, 5);
+            this.tblLayoutControls.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tblLayoutControls.Location = new System.Drawing.Point(603, 3);
+            this.tblLayoutControls.Name = "tblLayoutControls";
+            this.tblLayoutControls.RowCount = 6;
+            this.tblLayoutControls.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tblLayoutControls.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 29F));
+            this.tblLayoutControls.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+            this.tblLayoutControls.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 73F));
+            this.tblLayoutControls.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 49F));
+            this.tblLayoutControls.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 209F));
+            this.tblLayoutControls.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tblLayoutControls.Size = new System.Drawing.Size(171, 457);
+            this.tblLayoutControls.TabIndex = 2;
             // 
             // chkMaster
             // 
             this.chkMaster.AutoSize = true;
             this.chkMaster.Checked = true;
             this.chkMaster.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkMaster.Location = new System.Drawing.Point(3, 144);
+            this.chkMaster.Location = new System.Drawing.Point(3, 104);
             this.chkMaster.Name = "chkMaster";
             this.chkMaster.Size = new System.Drawing.Size(73, 17);
             this.chkMaster.TabIndex = 4;
@@ -396,7 +400,7 @@
             this.pawnManager1.Name = "pawnManager1";
             this.pawnManager1.PawnsCellHeight = 30F;
             this.pawnManager1.PawnsCellWidth = 30F;
-            this.pawnManager1.Size = new System.Drawing.Size(165, 106);
+            this.pawnManager1.Size = new System.Drawing.Size(165, 66);
             this.pawnManager1.TabIndex = 5;
             // 
             // pawnContainer1
@@ -404,10 +408,20 @@
             this.pawnContainer1.CellHeight = 30F;
             this.pawnContainer1.CellWidth = 30F;
             this.pawnContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pawnContainer1.Location = new System.Drawing.Point(3, 169);
+            this.pawnContainer1.Location = new System.Drawing.Point(3, 129);
             this.pawnContainer1.Name = "pawnContainer1";
-            this.pawnContainer1.Size = new System.Drawing.Size(165, 285);
+            this.pawnContainer1.Size = new System.Drawing.Size(165, 67);
             this.pawnContainer1.TabIndex = 6;
+            // 
+            // scrollableContainer1
+            // 
+            this.scrollableContainer1.CellHeight = 30F;
+            this.scrollableContainer1.CellWidth = 30F;
+            this.scrollableContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.scrollableContainer1.Location = new System.Drawing.Point(3, 251);
+            this.scrollableContainer1.Name = "scrollableContainer1";
+            this.scrollableContainer1.Size = new System.Drawing.Size(165, 203);
+            this.scrollableContainer1.TabIndex = 7;
             // 
             // FrmMain
             // 
@@ -421,8 +435,8 @@
             this.tabControl1.ResumeLayout(false);
             this.pagMap.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
-            this.tableLayoutPanel2.ResumeLayout(false);
-            this.tableLayoutPanel2.PerformLayout();
+            this.tblLayoutControls.ResumeLayout(false);
+            this.tblLayoutControls.PerformLayout();
             this.pagInvitation.ResumeLayout(false);
             this.tableLayoutPanel3.ResumeLayout(false);
             this.grpMaster.ResumeLayout(false);
@@ -444,7 +458,7 @@
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage pagMap;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
+        private System.Windows.Forms.TableLayoutPanel tblLayoutControls;
         private System.Windows.Forms.TabPage pagInvitation;
         private System.Windows.Forms.Button btnSendInvite;
         private System.Windows.Forms.GroupBox groupBox1;
@@ -469,6 +483,7 @@
         private System.Windows.Forms.Button btnPing;
         private RpgGridUserControls.PawnManager pawnManager1;
         private RpgGridUserControls.PawnContainer pawnContainer1;
+        private RpgGridUserControls.ScrollableContainer scrollableContainer1;
     }
 }
 

@@ -1,8 +1,14 @@
-﻿using System;
+﻿#define TEST_NO_TEMPLATE
+
+using System.Windows.Forms;
 
 namespace RpgGridUserControls
 {
-    partial class PawnContainer
+#if TEST_NO_TEMPLATE
+    public partial class PawnContainer : ScrollableContainer
+#else
+    public partial class PawnContainer : ScrollableContainer<GridPawn>
+#endif
     {
         /// <summary> 
         /// Variabile di progettazione necessaria.
@@ -28,7 +34,7 @@ namespace RpgGridUserControls
         /// Metodo necessario per il supporto della finestra di progettazione. Non modificare 
         /// il contenuto del metodo con l'editor di codice.
         /// </summary>
-        protected override void InitializeComponent()
+        public override void InitializeComponent()
         {
             base.InitializeComponent();
 
@@ -37,14 +43,13 @@ namespace RpgGridUserControls
             //
             // pnlMain
             //
-            this.pnlMain.DragDrop += pnlMain_DragDrop;
-            this.pnlMain.DragEnter += pnlMain_DragEnter;
+            //this.pnlMain.DragDrop += new DragEventHandler(pnlMain_DragDrop);
+            //this.pnlMain.DragEnter += new DragEventHandler(pnlMain_DragEnter);
             // 
             // PawnContainer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "PawnContainer";
             this.Size = new System.Drawing.Size(149, 221);
 

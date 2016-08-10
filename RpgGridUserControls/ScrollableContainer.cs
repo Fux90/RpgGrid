@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define TEST_NO_TEMPLATE
+
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -9,8 +11,12 @@ using System.Windows.Forms;
 
 namespace RpgGridUserControls
 {
+#if TEST_NO_TEMPLATE
+    public partial class ScrollableContainer : UserControl
+#else
     public abstract partial class ScrollableContainer<T> : UserControl
         where T : Control
+#endif
     {
         public const float baseDim = 30.0f;
 
@@ -54,6 +60,7 @@ namespace RpgGridUserControls
             InitializeComponent();
             InitializeScrollbar();
             InitCellDimensions();
+            this.SetStyle(ControlStyles.UserPaint, true);
         }
 
         private void InitCellDimensions()
@@ -72,7 +79,11 @@ namespace RpgGridUserControls
             pnlMain.VerticalScroll.Maximum = 150;
         }
 
+#if TEST_NO_TEMPLATE
+        public void Add(GridPawn ctrl)
+#else
         public void Add(T ctrl)
+#endif
         {
             if (!pnlMain.Controls.Contains(ctrl))
             {
@@ -86,7 +97,7 @@ namespace RpgGridUserControls
         {
             foreach (Control ctrl in parent.Controls)
             {
-                ctrl.Invalidate();
+                ctrl.Invalidate(true);
                 if (ctrl.HasChildren)
                 {
                     UpdateChildrens(ctrl);
@@ -96,7 +107,11 @@ namespace RpgGridUserControls
 
         protected bool IsOfType(DragEventArgs e, out Type type)
         {
+#if TEST_NO_TEMPLATE
+            Type parent = typeof(GridPawn);
+#else
             Type parent = typeof(T);
+#endif
             Type[] types = Assembly.GetExecutingAssembly().GetTypes(); // Maybe select some other assembly here, depending on what you need
             var inheritingTypes = types.Where(t => parent.IsAssignableFrom(t));
 
@@ -182,8 +197,8 @@ namespace RpgGridUserControls
 
         private void setScrollColumnSize(int size)
         {
-            tableLayoutPanel1.ColumnStyles[1].Width = size;
-            tableLayoutPanel1.Invalidate();
+            tableLayoutPanel2.ColumnStyles[1].Width = size;
+            tableLayoutPanel2.Invalidate();
         }
 
         private void pnlMain_ControlAdded(object sender, ControlEventArgs e)
@@ -246,29 +261,6 @@ namespace RpgGridUserControls
             if (r < vR)
             {
                 HideScrollbar();
-            }
-        }
-
-        protected override void OnInvalidated(InvalidateEventArgs e)
-        {
-            base.OnInvalidated(e);
-            InvalidateChildrens();
-        }
-
-        private void InvalidateChildrens()
-        {
-            for (int i = 0; i < Controls.Count; i++)
-            {
-                InvalidateChildrens(Controls[i]);
-            }
-        }
-
-        private void InvalidateChildrens(Control ctrl)
-        {
-            ctrl.Invalidate();
-            for (int i = 0; i < ctrl.Controls.Count; i++)
-            {
-                InvalidateChildrens(ctrl.Controls[i]);
             }
         }
     }

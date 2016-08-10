@@ -21,6 +21,11 @@ namespace RpgGrid
             // Pawn ----------------------------------------
             pawnManager1.LoadPawns(grid.RetrievePawns());
             pawnContainer1.LoadPawns(grid.RetrievePawns());
+            var a = grid.RetrievePawns()[0];
+            var b = grid.RetrievePawns()[0];
+
+            scrollableContainer1.Add(a);
+            tblLayoutControls.Controls.Add(b, 0, 4);
 
             // Grid ----------------------------------------
             grid1.ImagePath = @"dnd_map_1.jpg";

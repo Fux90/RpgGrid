@@ -99,6 +99,9 @@
     <EmbeddedResource Include="PawnManager.resx">
       <DependentUpon>PawnManager.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ScrollableContainer.resx">
+      <DependentUpon>ScrollableContainer.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Utils\Utils.csproj">

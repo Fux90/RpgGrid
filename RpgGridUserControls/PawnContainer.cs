@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define TEST_NO_TEMPLATE
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -11,7 +13,11 @@ using System.Reflection;
 
 namespace RpgGridUserControls
 {
+#if TEST_NO_TEMPLATE
+    public partial class PawnContainer : ScrollableContainer
+#else
     public partial class PawnContainer : ScrollableContainer<GridPawn>
+#endif
     {
         public List<GridPawn> Pawns { get; private set; }
 
@@ -49,6 +55,11 @@ namespace RpgGridUserControls
             {
                 e.Effect = DragDropEffects.None;
             }
+        }
+
+        public override void Refresh()
+        {
+            base.Refresh();
         }
     }
 }

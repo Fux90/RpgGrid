@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define TEST_NO_TEMPLATE
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,57 +9,68 @@ using System.Windows.Forms;
 
 namespace RpgGridUserControls
 {
+#if TEST_NO_TEMPLATE
+    public partial class ScrollableContainer
+#else
     public partial class ScrollableContainer<T>
+        where T : Control
+#endif
     {
-        protected System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        protected System.Windows.Forms.VScrollBar vScrollBar1;
-        protected System.Windows.Forms.Panel pnlMain;
-
-        protected virtual void InitializeComponent()
+        public virtual void InitializeComponent()
         {
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.vScrollBar1 = new System.Windows.Forms.VScrollBar();
+            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.pnlMain = new System.Windows.Forms.Panel();
-            this.Load += ScrollableContainer_Load;
-            this.tableLayoutPanel1.SuspendLayout();
+            this.vScrollBar1 = new System.Windows.Forms.VScrollBar();
+            this.tableLayoutPanel2.SuspendLayout();
             this.SuspendLayout();
             // 
-            // tableLayoutPanel1
+            // tableLayoutPanel2
             // 
-            this.tableLayoutPanel1.ColumnCount = 2;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel1.Controls.Add(this.vScrollBar1, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.pnlMain, 0, 0);
-            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 1;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(149, 221);
-            this.tableLayoutPanel1.TabIndex = 0;
-            // 
-            // vScrollBar1
-            // 
-            this.vScrollBar1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.vScrollBar1.Location = new System.Drawing.Point(129, 0);
-            this.vScrollBar1.Name = "vScrollBar1";
-            this.vScrollBar1.Size = new System.Drawing.Size(20, 221);
-            this.vScrollBar1.TabIndex = 0;
-            this.vScrollBar1.ValueChanged += vScrollBar1_ValueChanged;
+            this.tableLayoutPanel2.ColumnCount = 2;
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.Controls.Add(this.pnlMain, 0, 0);
+            this.tableLayoutPanel2.Controls.Add(this.vScrollBar1, 1, 0);
+            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+            this.tableLayoutPanel2.RowCount = 1;
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(222, 318);
+            this.tableLayoutPanel2.TabIndex = 0;
             // 
             // pnlMain
             // 
             this.pnlMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlMain.Location = new System.Drawing.Point(3, 3);
             this.pnlMain.Name = "pnlMain";
-            this.pnlMain.Size = new System.Drawing.Size(123, 215);
-            this.pnlMain.TabIndex = 1;
-            this.pnlMain.ControlAdded += pnlMain_ControlAdded;
-            this.pnlMain.ControlRemoved += pnlMain_ControlRemoved;
-            this.pnlMain.Paint += pnlMain_Paint;
-            this.tableLayoutPanel1.ResumeLayout(false);
+            this.pnlMain.Size = new System.Drawing.Size(196, 312);
+            this.pnlMain.TabIndex = 0;
+            this.pnlMain.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.pnlMain_ControlAdded);
+            this.pnlMain.ControlRemoved += new System.Windows.Forms.ControlEventHandler(this.pnlMain_ControlRemoved);
+            this.pnlMain.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlMain_Paint);
+            // 
+            // vScrollBar1
+            // 
+            this.vScrollBar1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.vScrollBar1.Location = new System.Drawing.Point(202, 0);
+            this.vScrollBar1.Name = "vScrollBar1";
+            this.vScrollBar1.Size = new System.Drawing.Size(20, 318);
+            this.vScrollBar1.TabIndex = 1;
+            // 
+            // ScrollableContainer
+            // 
+            this.Controls.Add(this.tableLayoutPanel2);
+            this.Name = "ScrollableContainer";
+            this.Size = new System.Drawing.Size(222, 318);
+            this.Load += new System.EventHandler(this.ScrollableContainer_Load);
+            this.tableLayoutPanel2.ResumeLayout(false);
             this.ResumeLayout(false);
+
         }
+
+        private TableLayoutPanel tableLayoutPanel2;
+        private Panel pnlMain;
+        private VScrollBar vScrollBar1;
     }
 }

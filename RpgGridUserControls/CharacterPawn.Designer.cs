@@ -1,4 +1,6 @@
-﻿namespace RpgGridUserControls
+﻿using System.Windows.Forms;
+
+namespace RpgGridUserControls
 {
     partial class CharacterPawn
     {
@@ -28,6 +30,8 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.SetStyle(ControlStyles.UserPaint, true);
+
             this.SuspendLayout();
             // 
             // CharacterPawn

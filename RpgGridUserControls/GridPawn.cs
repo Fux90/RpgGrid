@@ -98,7 +98,7 @@ namespace RpgGridUserControls
             else if (e.Button == MouseButtons.Right)
             {
                 this.PerformRotate90Degrees();
-                this.Parent.Invalidate();
+                this.Parent.Invalidate();                
             }
         }
 
