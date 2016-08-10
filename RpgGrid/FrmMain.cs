@@ -19,12 +19,11 @@ namespace RpgGrid
         private void Form1_Load(object sender, EventArgs e)
         {
             // Pawn ----------------------------------------
-            //pawnManager1.LoadPawns(grid.RetrievePawns());
-            //pawnContainer1.LoadPawns(grid.RetrievePawns());
             grid.ResourceManager.AsyncRetrievePawns(
                 (pawns) => 
                 {
-                    pawnContainer1.LoadPawns(pawns);
+                    //pawnContainer1.LoadPawns(pawns);
+                    pawnManager1.LoadPawns(pawns);
                 },
                 (ex) =>
                 {

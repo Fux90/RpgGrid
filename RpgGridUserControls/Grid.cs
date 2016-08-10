@@ -97,6 +97,8 @@ namespace RpgGridUserControls
             }
         }
 
+        private const float gridLinesWidth = 1.0f;
+
         private Rectangle _vieportAtComplete;
         private float _xControlToPixel
         {
@@ -150,7 +152,7 @@ namespace RpgGridUserControls
                     {
                         gridImage = (Image)Image.Clone();
                         var g = Graphics.FromImage(gridImage);
-                        var p = new Pen(Brushes.YellowGreen, 1.0f);
+                        var p = new Pen(Brushes.YellowGreen, gridLinesWidth);
                         var numHorizontalLines = GridRegion.Height / PixelsInFiveFeet;
                         var numVerticalLines = GridRegion.Width / PixelsInFiveFeet;
 
@@ -396,10 +398,12 @@ namespace RpgGridUserControls
             {
                 var selX = (float)Math.Floor(actualX / PixelsInFiveFeet) * PixelsInFiveFeet;
                 selX -= Viewport.X;
+                selX += gridLinesWidth;
                 selX /= _xControlToPixel;
 
                 var selY = (float)Math.Floor(actualY / PixelsInFiveFeet) * PixelsInFiveFeet;
                 selY -= Viewport.Y;
+                selY += gridLinesWidth;
                 selY /= _yControlToPixel;
 
                 selX = ZeroIfIssues(selX);
