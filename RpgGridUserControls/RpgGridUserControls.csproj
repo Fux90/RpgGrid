@@ -48,6 +48,8 @@
     <Compile Include="CharacterPawn.Designer.cs">
       <DependentUpon>CharacterPawn.cs</DependentUpon>
     </Compile>
+    <Compile Include="CharacterPawnController.cs" />
+    <Compile Include="CharacterPawnListener.cs" />
     <Compile Include="Grid.cs">
       <SubType>UserControl</SubType>
     </Compile>
