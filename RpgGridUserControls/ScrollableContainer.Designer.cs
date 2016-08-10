@@ -1,6 +1,4 @@
-﻿#define TEST_NO_TEMPLATE
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,7 +14,7 @@ namespace RpgGridUserControls
         where T : Control
 #endif
     {
-        public virtual void InitializeComponent()
+        public void InitializeComponent()
         {
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.pnlMain = new System.Windows.Forms.Panel();
@@ -48,6 +46,8 @@ namespace RpgGridUserControls
             this.pnlMain.TabIndex = 0;
             this.pnlMain.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.pnlMain_ControlAdded);
             this.pnlMain.ControlRemoved += new System.Windows.Forms.ControlEventHandler(this.pnlMain_ControlRemoved);
+            this.pnlMain.DragDrop += new System.Windows.Forms.DragEventHandler(this.pnlMain_DragDrop);
+            this.pnlMain.DragEnter += new System.Windows.Forms.DragEventHandler(this.pnlMain_DragEnter);
             this.pnlMain.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlMain_Paint);
             // 
             // vScrollBar1
@@ -57,6 +57,7 @@ namespace RpgGridUserControls
             this.vScrollBar1.Name = "vScrollBar1";
             this.vScrollBar1.Size = new System.Drawing.Size(20, 318);
             this.vScrollBar1.TabIndex = 1;
+            this.vScrollBar1.Scroll += new System.Windows.Forms.ScrollEventHandler(this.vScrollBar1_ValueChanged);
             // 
             // ScrollableContainer
             // 
@@ -69,8 +70,8 @@ namespace RpgGridUserControls
 
         }
 
-        private TableLayoutPanel tableLayoutPanel2;
-        private Panel pnlMain;
-        private VScrollBar vScrollBar1;
+        protected TableLayoutPanel tableLayoutPanel2;
+        protected Panel pnlMain;
+        protected VScrollBar vScrollBar1;
     }
 }

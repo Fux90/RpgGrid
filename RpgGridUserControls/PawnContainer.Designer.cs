@@ -1,13 +1,12 @@
-﻿#define TEST_NO_TEMPLATE
-
+﻿using System.ComponentModel;
 using System.Windows.Forms;
 
 namespace RpgGridUserControls
 {
 #if TEST_NO_TEMPLATE
-    public partial class PawnContainer : ScrollableContainer
+    public partial class PawnContainer
 #else
-    public partial class PawnContainer : ScrollableContainer<GridPawn>
+    public partial class PawnContainer : UserControl
 #endif
     {
         /// <summary> 
@@ -34,18 +33,9 @@ namespace RpgGridUserControls
         /// Metodo necessario per il supporto della finestra di progettazione. Non modificare 
         /// il contenuto del metodo con l'editor di codice.
         /// </summary>
-        public override void InitializeComponent()
+        public void InitializeComponent()
         {
-            base.InitializeComponent();
 
-            this.SuspendLayout();
-
-            //
-            // pnlMain
-            //
-            //this.pnlMain.DragDrop += new DragEventHandler(pnlMain_DragDrop);
-            //this.pnlMain.DragEnter += new DragEventHandler(pnlMain_DragEnter);
-            // 
             // PawnContainer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -53,7 +43,46 @@ namespace RpgGridUserControls
             this.Name = "PawnContainer";
             this.Size = new System.Drawing.Size(149, 221);
 
+#if TEST_NO_TEMPLATE
+            this.scrollableContainer = new ScrollableContainer();
+#else
+            this.scrollableContainerGridPawns = new ScrollableContainer<GridPawn>();
+#endif
+
+            this.Controls.Add(scrollableContainerGridPawns);
+            this.Padding = new Padding(0);
+            scrollableContainerGridPawns.Dock = DockStyle.Fill;
+
             this.ResumeLayout(false);
+        }
+
+        #endregion
+
+        #region DELEGATION
+
+        public float CellHeight
+        {
+            get { return scrollableContainerGridPawns.CellHeight; }
+            set { scrollableContainerGridPawns.CellHeight = value; }
+        }
+
+        public float CellWidth
+        {
+            get { return scrollableContainerGridPawns.CellWidth; }
+            set { scrollableContainerGridPawns.CellWidth = value; }
+        }
+
+        public void LoadPawns(GridPawn[] gridPawns)
+        {
+            var bw = new BackgroundWorker();
+            bw.DoWork += (s, e) =>
+            {
+                for (int i = 0; i < gridPawns.Length; i++)
+                {
+                    scrollableContainerGridPawns.ThreadSafeAdd(gridPawns[i]);
+                }
+            };
+            bw.RunWorkerAsync();
         }
 
         #endregion

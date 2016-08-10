@@ -1,6 +1,4 @@
-﻿#define TEST_NO_TEMPLATE
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -14,10 +12,36 @@ namespace RpgGridUserControls
 #if TEST_NO_TEMPLATE
     public partial class ScrollableContainer : UserControl
 #else
-    public abstract partial class ScrollableContainer<T> : UserControl
+    public sealed partial class ScrollableContainer<T> : UserControl
         where T : Control
 #endif
     {
+        public new event DragEventHandler DragDrop
+        {
+            add
+            {
+                this.pnlMain.DragDrop += value;
+            }
+
+            remove
+            {
+                this.pnlMain.DragDrop -= value;
+            }
+        }
+
+        public new event DragEventHandler DragEnter
+        {
+            add
+            {
+                this.pnlMain.DragEnter += value;
+            }
+
+            remove
+            {
+                this.pnlMain.DragEnter -= value;
+            }
+        }
+
         public const float baseDim = 30.0f;
 
         public int Columns
@@ -60,7 +84,8 @@ namespace RpgGridUserControls
             InitializeComponent();
             InitializeScrollbar();
             InitCellDimensions();
-            this.SetStyle(ControlStyles.UserPaint, true);
+
+            this.DoubleBuffered = true;
         }
 
         private void InitCellDimensions()
@@ -93,6 +118,28 @@ namespace RpgGridUserControls
             }
         }
 
+#if TEST_NO_TEMPLATE
+        public delegate void ThreadSafeOperation(GridPawn ctrl);
+#else
+        public delegate void ThreadSafeOperation(T ctrl);
+#endif
+
+#if TEST_NO_TEMPLATE
+        public void ThreadSafeAdd(GridPawn ctrl)
+#else
+        public void ThreadSafeAdd(T ctrl)
+#endif
+        {
+            if(this.InvokeRequired)
+            {
+                var add = new ThreadSafeOperation(Add);
+                this.Invoke(add, new object[] { ctrl });
+            }
+            else
+            {
+                Add(ctrl);
+            }
+        }
         private static void UpdateChildrens(Control parent)
         {
             foreach (Control ctrl in parent.Controls)
@@ -211,6 +258,32 @@ namespace RpgGridUserControls
             SetScrollOptions();
         }
 
+        private void pnlMain_DragDrop(object sender, DragEventArgs e)
+        {
+            Type t;
+            if (IsOfType(e, out t))
+            {
+#if TEST_NO_TEMPLATE
+                var ctrl = (GridPawn)e.Data.GetData(t);
+#else
+                var ctrl = (T)e.Data.GetData(t);
+#endif
+                Add(ctrl);
+            }
+        }
+
+        private void pnlMain_DragEnter(object sender, DragEventArgs e)
+        {
+            if (IsOfType(e))
+            {
+                e.Effect = DragDropEffects.Copy;
+            }
+            else
+            {
+                e.Effect = DragDropEffects.None;
+            }
+        }
+
         private void pnlMain_Paint(object sender, PaintEventArgs e)
         {
             var g = e.Graphics;
@@ -249,11 +322,6 @@ namespace RpgGridUserControls
             }
         }
 
-        private void vScrollBar1_ValueChanged(object sender, EventArgs e)
-        {
-            pnlMain.Invalidate();
-        }
-
         private void ScrollableContainer_Load(object sender, EventArgs e)
         {
             var r = this.Rows;
@@ -262,6 +330,11 @@ namespace RpgGridUserControls
             {
                 HideScrollbar();
             }
+        }
+
+        private void vScrollBar1_ValueChanged(object sender, ScrollEventArgs e)
+        {
+            pnlMain.Invalidate();
         }
     }
 }

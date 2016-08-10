@@ -1,6 +1,4 @@
-﻿#define TEST_NO_TEMPLATE
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -14,52 +12,21 @@ using System.Reflection;
 namespace RpgGridUserControls
 {
 #if TEST_NO_TEMPLATE
-    public partial class PawnContainer : ScrollableContainer
+    public partial class PawnContainer : UserControl
 #else
-    public partial class PawnContainer : ScrollableContainer<GridPawn>
+    public partial class PawnContainer : UserControl
 #endif
     {
-        public List<GridPawn> Pawns { get; private set; }
+#if TEST_NO_TEMPLATE
+        private ScrollableContainer scrollableContainerGridPawns;
+#else
+        private ScrollableContainer<GridPawn> scrollableContainerGridPawns;
+#endif
+
 
         public PawnContainer()
         {
             InitializeComponent();
-            Pawns = new List<GridPawn>();
-        }
-
-        public void LoadPawns(GridPawn[] gridPawns)
-        {
-            for (int i = 0; i < gridPawns.Length; i++)
-            {
-                this.Add(gridPawns[i]);
-            }
-        }
-
-        private void pnlMain_DragDrop(object sender, DragEventArgs e)
-        {
-            Type t;
-            if (IsOfType(e, out t))
-            {
-                var ctrl = (GridPawn)e.Data.GetData(t);
-                Add(ctrl);
-            }
-        }
-
-        private void pnlMain_DragEnter(object sender, DragEventArgs e)
-        {
-            if (IsOfType(e))
-            {
-                e.Effect = DragDropEffects.Copy;
-            }
-            else
-            {
-                e.Effect = DragDropEffects.None;
-            }
-        }
-
-        public override void Refresh()
-        {
-            base.Refresh();
         }
     }
 }

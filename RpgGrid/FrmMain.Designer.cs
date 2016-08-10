@@ -1,4 +1,6 @@
-﻿namespace RpgGrid
+﻿using RpgGridUserControls;
+
+namespace RpgGrid
 {
     partial class FrmMain
     {
@@ -59,7 +61,11 @@
             this.grid1 = new RpgGridUserControls.Grid();
             this.pawnManager1 = new RpgGridUserControls.PawnManager();
             this.pawnContainer1 = new RpgGridUserControls.PawnContainer();
+#if TEST_NO_TEMPLATE
             this.scrollableContainer1 = new RpgGridUserControls.ScrollableContainer();
+#else
+            this.scrollableContainer1 = new RpgGridUserControls.ScrollableContainer<GridPawn>();
+#endif
             this.tabControl1.SuspendLayout();
             this.pagMap.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -451,7 +457,7 @@
 
         }
 
-        #endregion
+#endregion
         private RpgGridUserControls.Grid grid1;
         private System.Windows.Forms.Button btnAddTcpListener;
         private System.Windows.Forms.CheckBox chkToggleGrid;
@@ -483,7 +489,11 @@
         private System.Windows.Forms.Button btnPing;
         private RpgGridUserControls.PawnManager pawnManager1;
         private RpgGridUserControls.PawnContainer pawnContainer1;
+#if TEST_NO_TEMPLATE
         private RpgGridUserControls.ScrollableContainer scrollableContainer1;
+#else
+        private RpgGridUserControls.ScrollableContainer<GridPawn> scrollableContainer1;
+#endif
     }
 }
 

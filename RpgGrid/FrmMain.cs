@@ -21,10 +21,33 @@ namespace RpgGrid
             // Pawn ----------------------------------------
             pawnManager1.LoadPawns(grid.RetrievePawns());
             pawnContainer1.LoadPawns(grid.RetrievePawns());
-            var a = grid.RetrievePawns()[0];
+            
             var b = grid.RetrievePawns()[0];
 
-            scrollableContainer1.Add(a);
+            var bw = new BackgroundWorker();
+            bw.WorkerReportsProgress = true;
+            bw.DoWork += (s, eA) =>
+            {
+                var perc = 100 / 50;
+                var quot = 0;
+                for (int i = 0; i < 50; i++)
+                {
+                    var a = grid.RetrievePawns()[0];
+                    scrollableContainer1.ThreadSafeAdd(a);
+                    if(i % 5 == 0)
+                    {
+                        bw.ReportProgress(quot);
+                        quot += perc;
+                    }
+                }
+            };
+            bw.ProgressChanged += (s, eA) =>
+            {
+                //scrollableContainer1.Invalidate();
+            };
+
+            bw.RunWorkerAsync();
+
             tblLayoutControls.Controls.Add(b, 0, 4);
 
             // Grid ----------------------------------------
@@ -35,7 +58,6 @@ namespace RpgGrid
             ShowMasterControls();
         }
 
-        
         private void SendMail(  string from, 
                                 string to, 
                                 string content = "", 
