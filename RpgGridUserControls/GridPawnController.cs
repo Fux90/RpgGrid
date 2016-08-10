@@ -17,11 +17,23 @@ namespace RpgGridUserControls
         public GridPawnController()
         {
             InitializeComponent();
+            InitComboSize();
+        }
+
+        private void InitComboSize()
+        {
+            var rpgSizes = (GridPawn.RpgSize[])Enum.GetValues(typeof(GridPawn.RpgSize));
+            for (int i = 0; i < rpgSizes.Length; i++)
+            {
+                cmbSizes.Items.Add(rpgSizes[i]);
+            }
+            cmbSizes.SelectedIndex = 0;
         }
 
         public void RegisterCharacterPawn(CharacterPawn pawn)
         {
             currentPawn = pawn;
+            ShowAll();
         }
 
         #region CONTROLLER
@@ -62,32 +74,37 @@ namespace RpgGridUserControls
 
         public void ShowAll()
         {
-            throw new NotImplementedException();
+            ShowImage();
+            ShowName();
+            ShowPf();
+            ShowSize();
+            ShowNotes();
         }
 
         public void ShowImage()
         {
-            throw new NotImplementedException();
+            picPawn.Image = currentPawn.Image;
         }
 
         public void ShowName()
         {
-            throw new NotImplementedException();
+            txtName.Text = currentPawn.Name;
         }
 
         public void ShowNotes()
         {
-            throw new NotImplementedException();
+            txtName.Text = currentPawn.Notes == null ? "" : currentPawn.Notes;
         }
 
         public void ShowPf()
         {
-            throw new NotImplementedException();
+            txtCurrPf.Text = currentPawn.CurrentPf.ToString();
+            txtMaxPf.Text = currentPawn.MaxPf.ToString();
         }
 
         public void ShowSize()
         {
-            throw new NotImplementedException();
+            cmbSizes.SelectedIndex = (int)currentPawn.ModSize;
         }
 
         #endregion

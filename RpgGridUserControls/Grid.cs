@@ -97,6 +97,9 @@ namespace RpgGridUserControls
             }
         }
 
+        public CharacterPawnListener PawnListener { get; set; }
+        public CharacterPawnController PawnController { get; set; }
+
         private const float gridLinesWidth = 1.0f;
 
         private Rectangle _vieportAtComplete;
@@ -189,7 +192,6 @@ namespace RpgGridUserControls
         public bool DrawGrid { get; set; }
         private Rectangle GridRegion { get; set; }
         
-        
         // 1.5 m
         public float PixelsInFiveFeet
         {
@@ -275,13 +277,15 @@ namespace RpgGridUserControls
                 ctrl.SetSizeAtNoZoom(PixelsInFiveFeet);
                 SetSize(ctrl);
                 ctrl.Rotate90Degrees += Ctrl_Rotate90Degrees;
+                ctrl.MouseUp += Pawn_MouseUp;
                 this.Invalidate();
             }
         }
 
         public void Remove(GridPawn ctrl)
         {
-            ctrl.Rotate90Degrees -= Ctrl_Rotate90Degrees;     
+            ctrl.Rotate90Degrees -= Ctrl_Rotate90Degrees;
+            ctrl.MouseUp -= Pawn_MouseUp;
             Controls.Remove(ctrl);
         }
 
@@ -721,6 +725,21 @@ namespace RpgGridUserControls
             }
 
             return null;
+        }
+
+        private void Pawn_MouseUp(object sender, MouseEventArgs mE)
+        {
+            if (mE.Button == MouseButtons.Middle)
+            {
+                if(PawnListener != null)
+                {
+                    PawnListener.RegisterCharacterPawn((CharacterPawn)sender);
+                }
+                if (PawnController != null)
+                {
+                    PawnController.RegisterCharacterPawn((CharacterPawn)sender);
+                }
+            }
         }
     }
 }

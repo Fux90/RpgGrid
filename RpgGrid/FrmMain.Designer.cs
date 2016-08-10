@@ -35,10 +35,8 @@ namespace RpgGrid
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.pagMap = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.grid1 = new RpgGridUserControls.Grid();
             this.tblLayoutControls = new System.Windows.Forms.TableLayoutPanel();
             this.chkMaster = new System.Windows.Forms.CheckBox();
-            this.pawnManager1 = new RpgGridUserControls.PawnManager();
             this.pagInvitation = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.grpMaster = new System.Windows.Forms.GroupBox();
@@ -61,6 +59,8 @@ namespace RpgGrid
             this.label3 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.pawnManager1 = new RpgGridUserControls.PawnManager();
+            this.grid1 = new RpgGridUserControls.Grid();
             this.gridPawnController1 = new RpgGridUserControls.GridPawnController();
             this.tabControl1.SuspendLayout();
             this.pagMap.SuspendLayout();
@@ -136,17 +136,6 @@ namespace RpgGrid
             this.tableLayoutPanel1.Size = new System.Drawing.Size(913, 629);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
-            // grid1
-            // 
-            this.grid1.AllowDrop = true;
-            this.grid1.DrawGrid = true;
-            this.grid1.ImagePath = null;
-            this.grid1.Location = new System.Drawing.Point(3, 3);
-            this.grid1.Name = "grid1";
-            this.grid1.PanningSensibilityFactor = 50F;
-            this.grid1.Size = new System.Drawing.Size(638, 368);
-            this.grid1.TabIndex = 1;
-            // 
             // tblLayoutControls
             // 
             this.tblLayoutControls.ColumnCount = 1;
@@ -179,23 +168,13 @@ namespace RpgGrid
             this.chkMaster.UseVisualStyleBackColor = true;
             this.chkMaster.CheckedChanged += new System.EventHandler(this.chkMaster_CheckedChanged);
             // 
-            // pawnManager1
-            // 
-            this.pawnManager1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pawnManager1.Location = new System.Drawing.Point(3, 3);
-            this.pawnManager1.Name = "pawnManager1";
-            this.pawnManager1.PawnsCellHeight = 30F;
-            this.pawnManager1.PawnsCellWidth = 30F;
-            this.pawnManager1.Size = new System.Drawing.Size(196, 435);
-            this.pawnManager1.TabIndex = 5;
-            // 
             // pagInvitation
             // 
             this.pagInvitation.Controls.Add(this.tableLayoutPanel3);
             this.pagInvitation.Location = new System.Drawing.Point(4, 22);
             this.pagInvitation.Name = "pagInvitation";
             this.pagInvitation.Padding = new System.Windows.Forms.Padding(3);
-            this.pagInvitation.Size = new System.Drawing.Size(783, 469);
+            this.pagInvitation.Size = new System.Drawing.Size(919, 635);
             this.pagInvitation.TabIndex = 1;
             this.pagInvitation.Text = "Invite";
             this.pagInvitation.UseVisualStyleBackColor = true;
@@ -212,7 +191,7 @@ namespace RpgGrid
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 1;
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(777, 463);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(913, 629);
             this.tableLayoutPanel3.TabIndex = 6;
             // 
             // grpMaster
@@ -225,7 +204,7 @@ namespace RpgGrid
             this.grpMaster.Dock = System.Windows.Forms.DockStyle.Fill;
             this.grpMaster.Location = new System.Drawing.Point(3, 3);
             this.grpMaster.Name = "grpMaster";
-            this.grpMaster.Size = new System.Drawing.Size(382, 457);
+            this.grpMaster.Size = new System.Drawing.Size(450, 623);
             this.grpMaster.TabIndex = 0;
             this.grpMaster.TabStop = false;
             this.grpMaster.Text = "Master";
@@ -330,9 +309,9 @@ namespace RpgGrid
             this.grpPlayer.Controls.Add(this.btnAcceptInvite);
             this.grpPlayer.Controls.Add(this.groupBox5);
             this.grpPlayer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.grpPlayer.Location = new System.Drawing.Point(391, 3);
+            this.grpPlayer.Location = new System.Drawing.Point(459, 3);
             this.grpPlayer.Name = "grpPlayer";
-            this.grpPlayer.Size = new System.Drawing.Size(383, 457);
+            this.grpPlayer.Size = new System.Drawing.Size(451, 623);
             this.grpPlayer.TabIndex = 1;
             this.grpPlayer.TabStop = false;
             this.grpPlayer.Text = "Player";
@@ -417,11 +396,32 @@ namespace RpgGrid
             this.tableLayoutPanel2.Size = new System.Drawing.Size(699, 623);
             this.tableLayoutPanel2.TabIndex = 3;
             // 
+            // pawnManager1
+            // 
+            this.pawnManager1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pawnManager1.Location = new System.Drawing.Point(3, 3);
+            this.pawnManager1.Name = "pawnManager1";
+            this.pawnManager1.PawnsCellHeight = 30F;
+            this.pawnManager1.PawnsCellWidth = 30F;
+            this.pawnManager1.Size = new System.Drawing.Size(196, 435);
+            this.pawnManager1.TabIndex = 5;
+            // 
+            // grid1
+            // 
+            this.grid1.AllowDrop = true;
+            this.grid1.DrawGrid = true;
+            this.grid1.ImagePath = null;
+            this.grid1.Location = new System.Drawing.Point(3, 3);
+            this.grid1.Name = "grid1";
+            this.grid1.PanningSensibilityFactor = 50F;
+            this.grid1.Size = new System.Drawing.Size(638, 368);
+            this.grid1.TabIndex = 1;
+            // 
             // gridPawnController1
             // 
             this.gridPawnController1.Location = new System.Drawing.Point(3, 377);
             this.gridPawnController1.Name = "gridPawnController1";
-            this.gridPawnController1.Size = new System.Drawing.Size(377, 199);
+            this.gridPawnController1.Size = new System.Drawing.Size(392, 243);
             this.gridPawnController1.TabIndex = 2;
             // 
             // FrmMain

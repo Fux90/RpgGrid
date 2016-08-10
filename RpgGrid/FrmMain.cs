@@ -34,6 +34,8 @@ namespace RpgGrid
             // Grid ----------------------------------------
             grid1.ImagePath = @"dnd_map_1.jpg";
             //grid1.ImagePath = @"placeholder.png";
+            grid1.PawnListener = this.gridPawnController1;
+            grid1.PawnController = this.gridPawnController1;
 
             HidePlayerControls();
             ShowMasterControls();
