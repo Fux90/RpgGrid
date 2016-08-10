@@ -16,10 +16,5 @@ namespace RpgGrid
         {
             ResourceManager = ResourceManager.Current;
         }
-
-        public GridPawn[] RetrievePawns()
-        {
-            return ResourceManager.RetrievePawns();
-        }
     }
 }

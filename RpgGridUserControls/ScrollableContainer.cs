@@ -258,6 +258,11 @@ namespace RpgGridUserControls
             SetScrollOptions();
         }
 
+        private void Control_DragDrop(object sender, DragEventArgs e)
+        {
+            pnlMain_DragDrop(sender, e);
+        }
+
         private void pnlMain_DragDrop(object sender, DragEventArgs e)
         {
             Type t;
@@ -335,6 +340,11 @@ namespace RpgGridUserControls
         private void vScrollBar1_ValueChanged(object sender, ScrollEventArgs e)
         {
             pnlMain.Invalidate();
+        }
+
+        private void pnlMain_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("click");
         }
     }
 }

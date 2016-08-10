@@ -35,54 +35,17 @@ namespace RpgGridUserControls
         /// </summary>
         public void InitializeComponent()
         {
-
+            this.SuspendLayout();
+            // 
             // PawnContainer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Name = "PawnContainer";
             this.Size = new System.Drawing.Size(149, 221);
-
-#if TEST_NO_TEMPLATE
-            this.scrollableContainer = new ScrollableContainer();
-#else
-            this.scrollableContainerGridPawns = new ScrollableContainer<GridPawn>();
-#endif
-
-            this.Controls.Add(scrollableContainerGridPawns);
-            this.Padding = new Padding(0);
-            scrollableContainerGridPawns.Dock = DockStyle.Fill;
-
+            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.PawnContainer_DragEnter);
             this.ResumeLayout(false);
-        }
 
-        #endregion
-
-        #region DELEGATION
-
-        public float CellHeight
-        {
-            get { return scrollableContainerGridPawns.CellHeight; }
-            set { scrollableContainerGridPawns.CellHeight = value; }
-        }
-
-        public float CellWidth
-        {
-            get { return scrollableContainerGridPawns.CellWidth; }
-            set { scrollableContainerGridPawns.CellWidth = value; }
-        }
-
-        public void LoadPawns(GridPawn[] gridPawns)
-        {
-            var bw = new BackgroundWorker();
-            bw.DoWork += (s, e) =>
-            {
-                for (int i = 0; i < gridPawns.Length; i++)
-                {
-                    scrollableContainerGridPawns.ThreadSafeAdd(gridPawns[i]);
-                }
-            };
-            bw.RunWorkerAsync();
         }
 
         #endregion

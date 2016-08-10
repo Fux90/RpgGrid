@@ -35,8 +35,11 @@ namespace RpgGrid
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.pagMap = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.grid1 = new RpgGridUserControls.Grid();
             this.tblLayoutControls = new System.Windows.Forms.TableLayoutPanel();
             this.chkMaster = new System.Windows.Forms.CheckBox();
+            this.pawnManager1 = new RpgGridUserControls.PawnManager();
+            this.pawnContainer1 = new RpgGridUserControls.PawnContainer();
             this.pagInvitation = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.grpMaster = new System.Windows.Forms.GroupBox();
@@ -58,14 +61,6 @@ namespace RpgGrid
             this.txtIpServer = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
-            this.grid1 = new RpgGridUserControls.Grid();
-            this.pawnManager1 = new RpgGridUserControls.PawnManager();
-            this.pawnContainer1 = new RpgGridUserControls.PawnContainer();
-#if TEST_NO_TEMPLATE
-            this.scrollableContainer1 = new RpgGridUserControls.ScrollableContainer();
-#else
-            this.scrollableContainer1 = new RpgGridUserControls.ScrollableContainer<GridPawn>();
-#endif
             this.tabControl1.SuspendLayout();
             this.pagMap.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -94,7 +89,7 @@ namespace RpgGrid
             this.chkToggleGrid.AutoSize = true;
             this.chkToggleGrid.Checked = true;
             this.chkToggleGrid.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkToggleGrid.Location = new System.Drawing.Point(3, 75);
+            this.chkToggleGrid.Location = new System.Drawing.Point(3, 278);
             this.chkToggleGrid.Name = "chkToggleGrid";
             this.chkToggleGrid.Size = new System.Drawing.Size(45, 17);
             this.chkToggleGrid.TabIndex = 3;
@@ -139,6 +134,17 @@ namespace RpgGrid
             this.tableLayoutPanel1.Size = new System.Drawing.Size(777, 463);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
+            // grid1
+            // 
+            this.grid1.AllowDrop = true;
+            this.grid1.DrawGrid = true;
+            this.grid1.ImagePath = null;
+            this.grid1.Location = new System.Drawing.Point(3, 3);
+            this.grid1.Name = "grid1";
+            this.grid1.PanningSensibilityFactor = 50F;
+            this.grid1.Size = new System.Drawing.Size(594, 380);
+            this.grid1.TabIndex = 1;
+            // 
             // tblLayoutControls
             // 
             this.tblLayoutControls.ColumnCount = 1;
@@ -147,17 +153,14 @@ namespace RpgGrid
             this.tblLayoutControls.Controls.Add(this.chkToggleGrid, 0, 1);
             this.tblLayoutControls.Controls.Add(this.pawnManager1, 1, 0);
             this.tblLayoutControls.Controls.Add(this.pawnContainer1, 0, 3);
-            this.tblLayoutControls.Controls.Add(this.scrollableContainer1, 0, 5);
             this.tblLayoutControls.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tblLayoutControls.Location = new System.Drawing.Point(603, 3);
             this.tblLayoutControls.Name = "tblLayoutControls";
-            this.tblLayoutControls.RowCount = 6;
+            this.tblLayoutControls.RowCount = 4;
             this.tblLayoutControls.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tblLayoutControls.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 29F));
             this.tblLayoutControls.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            this.tblLayoutControls.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 73F));
-            this.tblLayoutControls.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 49F));
-            this.tblLayoutControls.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 209F));
+            this.tblLayoutControls.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 24F));
+            this.tblLayoutControls.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 133F));
             this.tblLayoutControls.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tblLayoutControls.Size = new System.Drawing.Size(171, 457);
             this.tblLayoutControls.TabIndex = 2;
@@ -167,13 +170,33 @@ namespace RpgGrid
             this.chkMaster.AutoSize = true;
             this.chkMaster.Checked = true;
             this.chkMaster.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkMaster.Location = new System.Drawing.Point(3, 104);
+            this.chkMaster.Location = new System.Drawing.Point(3, 303);
             this.chkMaster.Name = "chkMaster";
             this.chkMaster.Size = new System.Drawing.Size(73, 17);
             this.chkMaster.TabIndex = 4;
             this.chkMaster.Text = "I\'m master";
             this.chkMaster.UseVisualStyleBackColor = true;
             this.chkMaster.CheckedChanged += new System.EventHandler(this.chkMaster_CheckedChanged);
+            // 
+            // pawnManager1
+            // 
+            this.pawnManager1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pawnManager1.Location = new System.Drawing.Point(3, 3);
+            this.pawnManager1.Name = "pawnManager1";
+            this.pawnManager1.PawnsCellHeight = 30F;
+            this.pawnManager1.PawnsCellWidth = 30F;
+            this.pawnManager1.Size = new System.Drawing.Size(165, 269);
+            this.pawnManager1.TabIndex = 5;
+            // 
+            // pawnContainer1
+            // 
+            this.pawnContainer1.CellHeight = 30F;
+            this.pawnContainer1.CellWidth = 30F;
+            this.pawnContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pawnContainer1.Location = new System.Drawing.Point(3, 327);
+            this.pawnContainer1.Name = "pawnContainer1";
+            this.pawnContainer1.Size = new System.Drawing.Size(165, 127);
+            this.pawnContainer1.TabIndex = 6;
             // 
             // pagInvitation
             // 
@@ -388,47 +411,6 @@ namespace RpgGrid
             this.label5.TabIndex = 0;
             this.label5.Text = "IP";
             // 
-            // grid1
-            // 
-            this.grid1.AllowDrop = true;
-            this.grid1.DrawGrid = true;
-            this.grid1.ImagePath = null;
-            this.grid1.Location = new System.Drawing.Point(3, 3);
-            this.grid1.Name = "grid1";
-            this.grid1.PanningSensibilityFactor = 50F;
-            this.grid1.Size = new System.Drawing.Size(594, 380);
-            this.grid1.TabIndex = 1;
-            // 
-            // pawnManager1
-            // 
-            this.pawnManager1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pawnManager1.Location = new System.Drawing.Point(3, 3);
-            this.pawnManager1.Name = "pawnManager1";
-            this.pawnManager1.PawnsCellHeight = 30F;
-            this.pawnManager1.PawnsCellWidth = 30F;
-            this.pawnManager1.Size = new System.Drawing.Size(165, 66);
-            this.pawnManager1.TabIndex = 5;
-            // 
-            // pawnContainer1
-            // 
-            this.pawnContainer1.CellHeight = 30F;
-            this.pawnContainer1.CellWidth = 30F;
-            this.pawnContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pawnContainer1.Location = new System.Drawing.Point(3, 129);
-            this.pawnContainer1.Name = "pawnContainer1";
-            this.pawnContainer1.Size = new System.Drawing.Size(165, 67);
-            this.pawnContainer1.TabIndex = 6;
-            // 
-            // scrollableContainer1
-            // 
-            this.scrollableContainer1.CellHeight = 30F;
-            this.scrollableContainer1.CellWidth = 30F;
-            this.scrollableContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.scrollableContainer1.Location = new System.Drawing.Point(3, 251);
-            this.scrollableContainer1.Name = "scrollableContainer1";
-            this.scrollableContainer1.Size = new System.Drawing.Size(165, 203);
-            this.scrollableContainer1.TabIndex = 7;
-            // 
             // FrmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -436,7 +418,7 @@ namespace RpgGrid
             this.ClientSize = new System.Drawing.Size(791, 495);
             this.Controls.Add(this.tabControl1);
             this.Name = "FrmMain";
-            this.Text = "Form1";
+            this.Text = "Rpg Grid";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.tabControl1.ResumeLayout(false);
             this.pagMap.ResumeLayout(false);
@@ -489,11 +471,6 @@ namespace RpgGrid
         private System.Windows.Forms.Button btnPing;
         private RpgGridUserControls.PawnManager pawnManager1;
         private RpgGridUserControls.PawnContainer pawnContainer1;
-#if TEST_NO_TEMPLATE
-        private RpgGridUserControls.ScrollableContainer scrollableContainer1;
-#else
-        private RpgGridUserControls.ScrollableContainer<GridPawn> scrollableContainer1;
-#endif
     }
 }
 

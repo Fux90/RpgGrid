@@ -19,36 +19,18 @@ namespace RpgGrid
         private void Form1_Load(object sender, EventArgs e)
         {
             // Pawn ----------------------------------------
-            pawnManager1.LoadPawns(grid.RetrievePawns());
-            pawnContainer1.LoadPawns(grid.RetrievePawns());
-            
-            var b = grid.RetrievePawns()[0];
-
-            var bw = new BackgroundWorker();
-            bw.WorkerReportsProgress = true;
-            bw.DoWork += (s, eA) =>
-            {
-                var perc = 100 / 50;
-                var quot = 0;
-                for (int i = 0; i < 50; i++)
+            //pawnManager1.LoadPawns(grid.RetrievePawns());
+            //pawnContainer1.LoadPawns(grid.RetrievePawns());
+            grid.ResourceManager.AsyncRetrievePawns(
+                (pawns) => 
                 {
-                    var a = grid.RetrievePawns()[0];
-                    scrollableContainer1.ThreadSafeAdd(a);
-                    if(i % 5 == 0)
-                    {
-                        bw.ReportProgress(quot);
-                        quot += perc;
-                    }
+                    pawnContainer1.LoadPawns(pawns);
+                },
+                (ex) =>
+                {
+                    MessageBox.Show(ex.Message);
                 }
-            };
-            bw.ProgressChanged += (s, eA) =>
-            {
-                //scrollableContainer1.Invalidate();
-            };
-
-            bw.RunWorkerAsync();
-
-            tblLayoutControls.Controls.Add(b, 0, 4);
+            );
 
             // Grid ----------------------------------------
             grid1.ImagePath = @"dnd_map_1.jpg";

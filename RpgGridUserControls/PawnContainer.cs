@@ -23,10 +23,81 @@ namespace RpgGridUserControls
         private ScrollableContainer<GridPawn> scrollableContainerGridPawns;
 #endif
 
-
         public PawnContainer()
         {
+#if TEST_NO_TEMPLATE
+        scrollableContainerGridPawns = new ScrollableContainer();
+#else
+        scrollableContainerGridPawns = new ScrollableContainer<GridPawn>();
+#endif
+
             InitializeComponent();
+
+            this.Controls.Add(scrollableContainerGridPawns);
+            scrollableContainerGridPawns.Dock = DockStyle.Fill;
+        }
+
+
+
+        #region DELEGATION
+
+        //public new event DragEventHandler DragDrop
+        //{
+        //    add
+        //    {
+        //        scrollableContainerGridPawns.DragDrop += value;
+        //    }
+
+        //    remove
+        //    {
+        //        scrollableContainerGridPawns.DragDrop -= value;
+        //    }
+        //}
+
+        //public new event DragEventHandler DragEnter
+        //{
+        //    add
+        //    {
+        //        scrollableContainerGridPawns.DragEnter += value;
+        //    }
+
+        //    remove
+        //    {
+        //        scrollableContainerGridPawns.DragEnter -= value;
+        //    }
+        //}
+
+        public float CellHeight
+        {
+            get { return scrollableContainerGridPawns.CellHeight; }
+            set { scrollableContainerGridPawns.CellHeight = value; }
+        }
+
+        public float CellWidth
+        {
+            get { return scrollableContainerGridPawns.CellWidth; }
+            set { scrollableContainerGridPawns.CellWidth = value; }
+        }
+
+        public void LoadPawns(GridPawn[] gridPawns)
+        {
+            var bw = new BackgroundWorker();
+            bw.DoWork += (s, e) =>
+            {
+                for (int i = 0; i < gridPawns.Length; i++)
+                {
+                    scrollableContainerGridPawns.ThreadSafeAdd(gridPawns[i]);
+                }
+            };
+            bw.RunWorkerAsync();
+        }
+
+        #endregion
+
+        private void PawnContainer_DragEnter(object sender, DragEventArgs e)
+        {
+            var c = 0;
+            c++;
         }
     }
 }

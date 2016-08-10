@@ -39,11 +39,13 @@ namespace RpgGridUserControls
             // 
             // pnlMain
             // 
+            this.pnlMain.AllowDrop = true;
             this.pnlMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pnlMain.Location = new System.Drawing.Point(3, 3);
             this.pnlMain.Name = "pnlMain";
             this.pnlMain.Size = new System.Drawing.Size(196, 312);
             this.pnlMain.TabIndex = 0;
+            this.pnlMain.Click += new System.EventHandler(this.pnlMain_Click);
             this.pnlMain.ControlAdded += new System.Windows.Forms.ControlEventHandler(this.pnlMain_ControlAdded);
             this.pnlMain.ControlRemoved += new System.Windows.Forms.ControlEventHandler(this.pnlMain_ControlRemoved);
             this.pnlMain.DragDrop += new System.Windows.Forms.DragEventHandler(this.pnlMain_DragDrop);
