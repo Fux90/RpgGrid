@@ -126,6 +126,7 @@
             this.cmbSizes.Name = "cmbSizes";
             this.cmbSizes.Size = new System.Drawing.Size(181, 21);
             this.cmbSizes.TabIndex = 7;
+            this.cmbSizes.SelectedIndexChanged += new System.EventHandler(this.cmbSizes_SelectedIndexChanged);
             // 
             // label4
             // 
@@ -142,6 +143,8 @@
             this.txtMaxPf.Name = "txtMaxPf";
             this.txtMaxPf.Size = new System.Drawing.Size(84, 20);
             this.txtMaxPf.TabIndex = 5;
+            this.txtMaxPf.MouseClick += new System.Windows.Forms.MouseEventHandler(this.txt_MouseClick);
+            this.txtMaxPf.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txt_KeyDown);
             // 
             // txtCurrPf
             // 
@@ -149,6 +152,8 @@
             this.txtCurrPf.Name = "txtCurrPf";
             this.txtCurrPf.Size = new System.Drawing.Size(78, 20);
             this.txtCurrPf.TabIndex = 4;
+            this.txtCurrPf.MouseClick += new System.Windows.Forms.MouseEventHandler(this.txt_MouseClick);
+            this.txtCurrPf.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txt_KeyDown);
             // 
             // txtName
             // 
@@ -156,6 +161,8 @@
             this.txtName.Name = "txtName";
             this.txtName.Size = new System.Drawing.Size(181, 20);
             this.txtName.TabIndex = 3;
+            this.txtName.MouseClick += new System.Windows.Forms.MouseEventHandler(this.txt_MouseClick);
+            this.txtName.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txt_KeyDown);
             // 
             // label3
             // 
@@ -204,6 +211,8 @@
             this.txtNotes.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txtNotes.Size = new System.Drawing.Size(227, 52);
             this.txtNotes.TabIndex = 0;
+            this.txtNotes.MouseClick += new System.Windows.Forms.MouseEventHandler(this.txt_MouseClick);
+            this.txtNotes.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txt_KeyDown);
             // 
             // GridPawnController
             // 

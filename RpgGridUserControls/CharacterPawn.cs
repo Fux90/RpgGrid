@@ -24,7 +24,20 @@ namespace RpgGridUserControls
         private readonly Brush damageBrush = Brushes.Red;
         private readonly Pen circlePen = new Pen(Brushes.Black, 2.0f);
 
-        public int CurrentPf { get; set; }
+        private int currentPf;
+        public int CurrentPf
+        {
+            get
+            {
+                return currentPf;
+            }
+
+            set
+            {
+                currentPf = Math.Max(-10, value);
+                this.Invalidate();
+            }
+        }
 
         private int maxPf;
         public int MaxPf
@@ -37,6 +50,7 @@ namespace RpgGridUserControls
             set
             {
                 maxPf = value;
+                this.Invalidate();
             }
         }
 
@@ -68,6 +82,7 @@ namespace RpgGridUserControls
             set
             {
                 image = ApplyCircleMask((Bitmap)value);
+                this.Invalidate();
             }
         }
 
@@ -80,7 +95,7 @@ namespace RpgGridUserControls
         {
             get
             {
-                return (float)CurrentPf * 360.0f / (float)MaxPf;
+                return (float)Math.Max(0, Math.Min(CurrentPf, MaxPf)) * 360.0f / (float)MaxPf;
             }
         }
 

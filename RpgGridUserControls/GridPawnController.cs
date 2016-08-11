@@ -18,6 +18,7 @@ namespace RpgGridUserControls
         {
             InitializeComponent();
             InitComboSize();
+            InitTextBoxBehaviours();
         }
 
         private void InitComboSize()
@@ -40,32 +41,32 @@ namespace RpgGridUserControls
 
         public void SetImage(Image image)
         {
-            throw new NotImplementedException();
-        }
-
-        public void SetMaxPf(int maxPf)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetName(string name)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetNotes(string notes)
-        {
-            throw new NotImplementedException();
+            currentPawn.Image = image;
         }
 
         public void SetPf(int pf)
         {
-            throw new NotImplementedException();
+            currentPawn.CurrentPf = pf;
+        }
+
+        public void SetMaxPf(int maxPf)
+        {
+            currentPawn.MaxPf = maxPf; 
+        }
+
+        public void SetName(string name)
+        {
+            currentPawn.Name = name;
+        }
+
+        public void SetNotes(string notes)
+        {
+            currentPawn.Notes = notes;
         }
 
         public void SetSize(GridPawn.RpgSize size)
         {
-            throw new NotImplementedException();
+            currentPawn.ModSize = size;
         }
 
         #endregion
@@ -93,7 +94,7 @@ namespace RpgGridUserControls
 
         public void ShowNotes()
         {
-            txtName.Text = currentPawn.Notes == null ? "" : currentPawn.Notes;
+            txtNotes.Text = currentPawn.Notes == null ? "" : currentPawn.Notes;
         }
 
         public void ShowPf()
@@ -105,6 +106,78 @@ namespace RpgGridUserControls
         public void ShowSize()
         {
             cmbSizes.SelectedIndex = (int)currentPawn.ModSize;
+        }
+
+        #endregion
+
+        #region EVENTS
+
+        private delegate void setIntMethod(int newValue);
+        private delegate void textBoxBehaviour(TextBox txt);
+        Dictionary<TextBox, textBoxBehaviour> behavioursByTextBox;
+
+        private void InitTextBoxBehaviours()
+        {
+            behavioursByTextBox = new Dictionary<TextBox, textBoxBehaviour>();
+            var readonlyTextboxes = new TextBox[]
+            {
+                txtName,
+                txtCurrPf,
+                txtMaxPf,
+                txtNotes,
+            };
+
+            for (int i = 0; i < readonlyTextboxes.Length; i++)
+            {
+                readonlyTextboxes[i].ReadOnly = true;
+            }
+
+            behavioursByTextBox[txtCurrPf] = (txt) =>
+            {
+                setIntValue(txt, SetPf);
+            };
+
+            behavioursByTextBox[txtMaxPf] = (txt) =>
+            {
+                setIntValue(txt, SetMaxPf);
+            };
+        }
+
+        private void cmbSizes_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            MessageBox.Show("Not yet...");
+        }
+
+        private void txt_KeyDown(object sender, KeyEventArgs e)
+        {
+            var txt = (TextBox)sender;
+
+            if(e.KeyCode == Keys.Enter)
+            {
+                behavioursByTextBox[txt](txt);
+                txt.ReadOnly = true;
+            }
+        }
+
+        private void txt_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (currentPawn != null)
+            {
+                var txt = (TextBox)sender;
+                if (txt.ReadOnly)
+                {
+                    txt.ReadOnly = false;
+                }
+            }
+        }
+
+        private void setIntValue(TextBox inputTxt, setIntMethod setter)
+        {
+            int newValue;
+            if(int.TryParse(inputTxt.Text, out newValue))
+            {
+                setter(newValue);
+            }
         }
 
         #endregion
