@@ -186,6 +186,28 @@ namespace RpgGridUserControls
             }
         }
 
+        private void picPawn_Click(object sender, EventArgs e)
+        {
+            if (currentPawn != null)
+            {
+                var mE = (MouseEventArgs)e;
+                if (mE.Button == MouseButtons.Right)
+                {
+                    using (var oDlg = new OpenFileDialog())
+                    {
+                        oDlg.Multiselect = false;
+                        oDlg.Filter = "Jpg Files|*.jpg|Png Files|*.png|Bmp Files|*.bmp|All Files|*.*";
+
+                        if(oDlg.ShowDialog() == DialogResult.OK)
+                        {
+                            currentPawn.Image = Image.FromFile(oDlg.FileName);
+                            ShowImage();
+                        }
+                    }
+                }
+            }
+        }
+
         private void setIntValue(TextBox inputTxt, setIntMethod setter)
         {
             int newValue;

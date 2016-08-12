@@ -85,7 +85,7 @@ namespace RpgGridUserControls
         private void ResetSizeAtNoZoom()
         {
             SetSizeAtNoZoom(-1.0f);
-            if(Parent != null && typeof(ResizeablePawnContainer).IsAssignableFrom(Parent.GetType()))
+            if (ParentIsGrid())
             {
                 ((ResizeablePawnContainer)Parent).SetPawnSize(this);
             }
@@ -184,6 +184,11 @@ namespace RpgGridUserControls
             {
                 tmp(this, e);
             }
+        }
+
+        private bool ParentIsGrid()
+        {
+            return Parent != null && typeof(ResizeablePawnContainer).IsAssignableFrom(Parent.GetType());
         }
 
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
