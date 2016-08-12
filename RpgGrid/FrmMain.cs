@@ -1,5 +1,6 @@
 ﻿using MailSenderLib;
 using NetUtils;
+using RpgGridUserControls.Utilities;
 using System;
 using System.ComponentModel;
 using System.Windows.Forms;
@@ -14,6 +15,14 @@ namespace RpgGrid
         {
             InitializeComponent();
             grid = new RpgGrid();
+
+#if DEBUG
+            this.MouseClick += (s, e) =>
+            {
+                var colorPicker = new ColorPicker();
+                colorPicker.ShowDialog();
+            };
+#endif
         }
 
         private void Form1_Load(object sender, EventArgs e)

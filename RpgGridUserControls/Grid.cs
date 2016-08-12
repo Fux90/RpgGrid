@@ -16,7 +16,7 @@ using System.Reflection;
 
 namespace RpgGridUserControls
 {
-    public partial class Grid : UserControl
+    public partial class Grid : UserControl, ResizeablePawnContainer
     {
         private sealed class ExtraInfoFileCodes
         {
@@ -275,7 +275,7 @@ namespace RpgGridUserControls
             {
                 Controls.Add(ctrl);
                 ctrl.SetSizeAtNoZoom(PixelsInFiveFeet);
-                SetSize(ctrl);
+                SetPawnSize(ctrl);
                 ctrl.Rotate90Degrees += Ctrl_Rotate90Degrees;
                 ctrl.MouseUp += Pawn_MouseUp;
                 this.Invalidate();
@@ -296,7 +296,7 @@ namespace RpgGridUserControls
             pawn.Width = (int)Math.Round(pawn.Width * _yControlToPixel);
             pawn.Height = (int)Math.Round(pawn.Height * _xControlToPixel);
             
-            SetSize(pawn);
+            SetPawnSize(pawn);
 
             this.Invalidate();
         }
@@ -555,13 +555,13 @@ namespace RpgGridUserControls
                 var ctrl = Controls[i];
                 if (typeof(GridPawn).IsAssignableFrom(ctrl.GetType()))
                 {
-                    SetSize((GridPawn)ctrl);
+                    SetPawnSize((GridPawn)ctrl);
                 }
             }
             this.Invalidate();
         }
 
-        private void SetSize(GridPawn pawn)
+        public void SetPawnSize(GridPawn pawn)
         {
             var w = (int)Math.Floor(pawn.SizeAtNoZoom.Width / _xControlToPixel);
             var h = (int)Math.Floor(pawn.SizeAtNoZoom.Height / _yControlToPixel);

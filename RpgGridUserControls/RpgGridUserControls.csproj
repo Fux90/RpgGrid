@@ -78,11 +78,18 @@
       <DependentUpon>PawnManager.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResizeablePawnContainer.cs" />
     <Compile Include="ScrollableContainer.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="ScrollableContainer.Designer.cs">
       <DependentUpon>ScrollableContainer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Utilities\ColorPicker.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Utilities\ColorPicker.Designer.cs">
+      <DependentUpon>ColorPicker.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -103,6 +110,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ScrollableContainer.resx">
       <DependentUpon>ScrollableContainer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Utilities\ColorPicker.resx">
+      <DependentUpon>ColorPicker.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

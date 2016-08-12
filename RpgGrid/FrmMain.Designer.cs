@@ -37,6 +37,7 @@ namespace RpgGrid
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.tblLayoutControls = new System.Windows.Forms.TableLayoutPanel();
             this.chkMaster = new System.Windows.Forms.CheckBox();
+            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.pagInvitation = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.grpMaster = new System.Windows.Forms.GroupBox();
@@ -58,14 +59,14 @@ namespace RpgGrid
             this.txtIpServer = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
-            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.pawnManager1 = new RpgGridUserControls.PawnManager();
-            this.grid1 = new RpgGridUserControls.Grid();
             this.gridPawnController1 = new RpgGridUserControls.GridPawnController();
+            this.grid1 = new RpgGridUserControls.Grid();
             this.tabControl1.SuspendLayout();
             this.pagMap.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.tblLayoutControls.SuspendLayout();
+            this.tableLayoutPanel2.SuspendLayout();
             this.pagInvitation.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             this.grpMaster.SuspendLayout();
@@ -73,7 +74,6 @@ namespace RpgGrid
             this.groupBox1.SuspendLayout();
             this.grpPlayer.SuspendLayout();
             this.groupBox5.SuspendLayout();
-            this.tableLayoutPanel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnAddTcpListener
@@ -123,16 +123,18 @@ namespace RpgGrid
             // 
             // tableLayoutPanel1
             // 
-            this.tableLayoutPanel1.ColumnCount = 2;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 77.22008F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 22.77992F));
-            this.tableLayoutPanel1.Controls.Add(this.tblLayoutControls, 1, 0);
-            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 0, 0);
+            this.tableLayoutPanel1.ColumnCount = 3;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 388F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 71.12135F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 28.87865F));
+            this.tableLayoutPanel1.Controls.Add(this.tblLayoutControls, 2, 0);
+            this.tableLayoutPanel1.Controls.Add(this.gridPawnController1, 0, 0);
+            this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 1, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(913, 629);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
@@ -144,7 +146,7 @@ namespace RpgGrid
             this.tblLayoutControls.Controls.Add(this.chkToggleGrid, 0, 1);
             this.tblLayoutControls.Controls.Add(this.pawnManager1, 1, 0);
             this.tblLayoutControls.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tblLayoutControls.Location = new System.Drawing.Point(708, 3);
+            this.tblLayoutControls.Location = new System.Drawing.Point(764, 3);
             this.tblLayoutControls.Name = "tblLayoutControls";
             this.tblLayoutControls.RowCount = 4;
             this.tblLayoutControls.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
@@ -152,7 +154,7 @@ namespace RpgGrid
             this.tblLayoutControls.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 24F));
             this.tblLayoutControls.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 133F));
             this.tblLayoutControls.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tblLayoutControls.Size = new System.Drawing.Size(202, 623);
+            this.tblLayoutControls.Size = new System.Drawing.Size(146, 623);
             this.tblLayoutControls.TabIndex = 2;
             // 
             // chkMaster
@@ -167,6 +169,20 @@ namespace RpgGrid
             this.chkMaster.Text = "I\'m master";
             this.chkMaster.UseVisualStyleBackColor = true;
             this.chkMaster.CheckedChanged += new System.EventHandler(this.chkMaster_CheckedChanged);
+            // 
+            // tableLayoutPanel2
+            // 
+            this.tableLayoutPanel2.ColumnCount = 1;
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel2.Controls.Add(this.grid1, 0, 0);
+            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(391, 3);
+            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+            this.tableLayoutPanel2.RowCount = 2;
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 249F));
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(367, 623);
+            this.tableLayoutPanel2.TabIndex = 3;
             // 
             // pagInvitation
             // 
@@ -381,21 +397,6 @@ namespace RpgGrid
             this.label5.TabIndex = 0;
             this.label5.Text = "IP";
             // 
-            // tableLayoutPanel2
-            // 
-            this.tableLayoutPanel2.ColumnCount = 1;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Controls.Add(this.grid1, 0, 0);
-            this.tableLayoutPanel2.Controls.Add(this.gridPawnController1, 0, 1);
-            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 3);
-            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 2;
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 249F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(699, 623);
-            this.tableLayoutPanel2.TabIndex = 3;
-            // 
             // pawnManager1
             // 
             this.pawnManager1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -403,8 +404,16 @@ namespace RpgGrid
             this.pawnManager1.Name = "pawnManager1";
             this.pawnManager1.PawnsCellHeight = 30F;
             this.pawnManager1.PawnsCellWidth = 30F;
-            this.pawnManager1.Size = new System.Drawing.Size(196, 435);
+            this.pawnManager1.Size = new System.Drawing.Size(140, 435);
             this.pawnManager1.TabIndex = 5;
+            // 
+            // gridPawnController1
+            // 
+            this.gridPawnController1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.gridPawnController1.Location = new System.Drawing.Point(3, 3);
+            this.gridPawnController1.Name = "gridPawnController1";
+            this.gridPawnController1.Size = new System.Drawing.Size(382, 623);
+            this.gridPawnController1.TabIndex = 2;
             // 
             // grid1
             // 
@@ -414,15 +423,10 @@ namespace RpgGrid
             this.grid1.Location = new System.Drawing.Point(3, 3);
             this.grid1.Name = "grid1";
             this.grid1.PanningSensibilityFactor = 50F;
-            this.grid1.Size = new System.Drawing.Size(638, 368);
+            this.grid1.PawnController = null;
+            this.grid1.PawnListener = null;
+            this.grid1.Size = new System.Drawing.Size(361, 368);
             this.grid1.TabIndex = 1;
-            // 
-            // gridPawnController1
-            // 
-            this.gridPawnController1.Location = new System.Drawing.Point(3, 377);
-            this.gridPawnController1.Name = "gridPawnController1";
-            this.gridPawnController1.Size = new System.Drawing.Size(392, 243);
-            this.gridPawnController1.TabIndex = 2;
             // 
             // FrmMain
             // 
@@ -438,6 +442,7 @@ namespace RpgGrid
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tblLayoutControls.ResumeLayout(false);
             this.tblLayoutControls.PerformLayout();
+            this.tableLayoutPanel2.ResumeLayout(false);
             this.pagInvitation.ResumeLayout(false);
             this.tableLayoutPanel3.ResumeLayout(false);
             this.grpMaster.ResumeLayout(false);
@@ -448,7 +453,6 @@ namespace RpgGrid
             this.grpPlayer.ResumeLayout(false);
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
-            this.tableLayoutPanel2.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }

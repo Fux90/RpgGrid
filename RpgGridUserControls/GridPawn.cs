@@ -21,6 +21,8 @@ namespace RpgGridUserControls
         private const string ModSizeSerializationName = "rpgSize";
         private const string IsSquaredSerializationName = "sqr";
 
+        private float SquarePixelSize { get; set; }
+
         public enum RpgSize
         {
             //...
@@ -53,20 +55,57 @@ namespace RpgGridUserControls
         public abstract Image Image { get; set; }
         public SizeF SizeAtNoZoom { get; private set; }
         public Point PositionAtNoZoom { get; private set; }
-        public abstract Point PositionAtNoZoomNoMargin { get; }
+        //public abstract Point PositionAtNoZoomNoMargin { get; }
 
-        public RpgSize ModSize { get; set; }
+        private RpgSize modSize;
+        public RpgSize ModSize
+        {
+            get
+            {
+                return modSize;
+            }
+
+            set
+            {
+                modSize = value;
+                ResetSizeAtNoZoom();
+                this.Invalidate();
+            }
+        }
+
         protected bool IsSquared { get; private set; }
+
+        public bool MouseIsOver { get; private set; }
 
         public void SetPositionAtNoZoom(Point positionInPixels)
         {
             PositionAtNoZoom = positionInPixels;
         }
 
+        private void ResetSizeAtNoZoom()
+        {
+            SetSizeAtNoZoom(-1.0f);
+            if(Parent != null && typeof(ResizeablePawnContainer).IsAssignableFrom(Parent.GetType()))
+            {
+                ((ResizeablePawnContainer)Parent).SetPawnSize(this);
+            }
+        }
+
         public void SetSizeAtNoZoom(float squareSizeInPixels)
         {
             var dim1 = squareSizeInPixels;
             var dim2 = squareSizeInPixels;
+            
+            if(squareSizeInPixels == -1.0f)
+            {
+                dim1 = SquarePixelSize;
+                dim2 = SquarePixelSize;
+            }
+            else
+            {
+                SquarePixelSize = squareSizeInPixels;
+            }
+
             IsSquared = true;
 
             switch (ModSize)
@@ -100,6 +139,22 @@ namespace RpgGridUserControls
                 this.PerformRotate90Degrees();
                 this.Parent.Invalidate();                
             }
+        }
+
+        protected override void OnMouseEnter(EventArgs e)
+        {
+            setMouseOver(true);
+        }
+
+        protected override void OnMouseLeave(EventArgs e)
+        {
+            setMouseOver(false);
+        }
+
+        private void setMouseOver(bool value)
+        {
+            MouseIsOver = value;
+            this.Invalidate();
         }
 
         public virtual void PerformRotate90Degrees()

@@ -132,6 +132,11 @@ namespace RpgGridUserControls
                 readonlyTextboxes[i].ReadOnly = true;
             }
 
+            behavioursByTextBox[txtName] = (txt) =>
+            {
+                SetName(txt.Text);
+            };
+
             behavioursByTextBox[txtCurrPf] = (txt) =>
             {
                 setIntValue(txt, SetPf);
@@ -141,11 +146,21 @@ namespace RpgGridUserControls
             {
                 setIntValue(txt, SetMaxPf);
             };
+
+            behavioursByTextBox[txtNotes] = (txt) =>
+            {
+                SetNotes(txt.Text);
+            };
         }
 
         private void cmbSizes_SelectedIndexChanged(object sender, EventArgs e)
         {
-            MessageBox.Show("Not yet...");
+            if (currentPawn != null)
+            {
+                var newSize = (GridPawn.RpgSize)cmbSizes.SelectedIndex;
+                //MessageBox.Show(String.Format("->{0}", newSize));
+                currentPawn.ModSize = newSize;
+            }
         }
 
         private void txt_KeyDown(object sender, KeyEventArgs e)

@@ -43,21 +43,23 @@
             this.label1 = new System.Windows.Forms.Label();
             this.grpNotes = new System.Windows.Forms.GroupBox();
             this.txtNotes = new System.Windows.Forms.TextBox();
+            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.grpMain.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picPawn)).BeginInit();
             this.tableLayoutPanel2.SuspendLayout();
             this.panel1.SuspendLayout();
             this.grpNotes.SuspendLayout();
+            this.tableLayoutPanel3.SuspendLayout();
             this.SuspendLayout();
             // 
             // grpMain
             // 
-            this.grpMain.Controls.Add(this.tableLayoutPanel1);
+            this.grpMain.Controls.Add(this.tableLayoutPanel3);
             this.grpMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.grpMain.Location = new System.Drawing.Point(0, 0);
             this.grpMain.Name = "grpMain";
-            this.grpMain.Size = new System.Drawing.Size(377, 199);
+            this.grpMain.Size = new System.Drawing.Size(377, 292);
             this.grpMain.TabIndex = 0;
             this.grpMain.TabStop = false;
             this.grpMain.Text = "Pawn";
@@ -70,11 +72,11 @@
             this.tableLayoutPanel1.Controls.Add(this.picPawn, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 1, 0);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 16);
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 1;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(371, 180);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(365, 140);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // picPawn
@@ -82,7 +84,7 @@
             this.picPawn.Dock = System.Windows.Forms.DockStyle.Fill;
             this.picPawn.Location = new System.Drawing.Point(3, 3);
             this.picPawn.Name = "picPawn";
-            this.picPawn.Size = new System.Drawing.Size(120, 174);
+            this.picPawn.Size = new System.Drawing.Size(120, 134);
             this.picPawn.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.picPawn.TabIndex = 0;
             this.picPawn.TabStop = false;
@@ -92,14 +94,12 @@
             this.tableLayoutPanel2.ColumnCount = 1;
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel2.Controls.Add(this.panel1, 0, 0);
-            this.tableLayoutPanel2.Controls.Add(this.grpNotes, 0, 1);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(129, 3);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 2;
+            this.tableLayoutPanel2.RowCount = 1;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 97F));
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(239, 174);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(233, 134);
             this.tableLayoutPanel2.TabIndex = 1;
             // 
             // panel1
@@ -115,7 +115,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(3, 3);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(233, 91);
+            this.panel1.Size = new System.Drawing.Size(227, 128);
             this.panel1.TabIndex = 0;
             // 
             // cmbSizes
@@ -195,9 +195,9 @@
             // 
             this.grpNotes.Controls.Add(this.txtNotes);
             this.grpNotes.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.grpNotes.Location = new System.Drawing.Point(3, 100);
+            this.grpNotes.Location = new System.Drawing.Point(3, 149);
             this.grpNotes.Name = "grpNotes";
-            this.grpNotes.Size = new System.Drawing.Size(233, 71);
+            this.grpNotes.Size = new System.Drawing.Size(365, 121);
             this.grpNotes.TabIndex = 1;
             this.grpNotes.TabStop = false;
             this.grpNotes.Text = "Notes";
@@ -209,10 +209,25 @@
             this.txtNotes.Multiline = true;
             this.txtNotes.Name = "txtNotes";
             this.txtNotes.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtNotes.Size = new System.Drawing.Size(227, 52);
+            this.txtNotes.Size = new System.Drawing.Size(359, 102);
             this.txtNotes.TabIndex = 0;
             this.txtNotes.MouseClick += new System.Windows.Forms.MouseEventHandler(this.txt_MouseClick);
             this.txtNotes.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txt_KeyDown);
+            // 
+            // tableLayoutPanel3
+            // 
+            this.tableLayoutPanel3.ColumnCount = 1;
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel3.Controls.Add(this.grpNotes, 0, 1);
+            this.tableLayoutPanel3.Controls.Add(this.tableLayoutPanel1, 0, 0);
+            this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 16);
+            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
+            this.tableLayoutPanel3.RowCount = 2;
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 146F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(371, 273);
+            this.tableLayoutPanel3.TabIndex = 1;
             // 
             // GridPawnController
             // 
@@ -220,7 +235,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.grpMain);
             this.Name = "GridPawnController";
-            this.Size = new System.Drawing.Size(377, 199);
+            this.Size = new System.Drawing.Size(377, 292);
             this.grpMain.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.picPawn)).EndInit();
@@ -229,6 +244,7 @@
             this.panel1.PerformLayout();
             this.grpNotes.ResumeLayout(false);
             this.grpNotes.PerformLayout();
+            this.tableLayoutPanel3.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -250,5 +266,6 @@
         private System.Windows.Forms.TextBox txtName;
         private System.Windows.Forms.GroupBox grpNotes;
         private System.Windows.Forms.TextBox txtNotes;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
     }
 }

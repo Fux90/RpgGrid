@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing.Imaging;
 using Utils;
@@ -23,6 +18,7 @@ namespace RpgGridUserControls
         private readonly Brush pfBrush = Brushes.Green;
         private readonly Brush damageBrush = Brushes.Red;
         private readonly Pen circlePen = new Pen(Brushes.Black, 2.0f);
+        private readonly Pen highlightPen = new Pen(Brushes.YellowGreen, 3.0f);
 
         private int currentPf;
         public int CurrentPf
@@ -183,7 +179,15 @@ namespace RpgGridUserControls
                 g.DrawImage(Image, rectImage);
             }
 
-            g.DrawEllipse(circlePen, rectPie);
+            if (MouseIsOver)
+            {
+                g.DrawEllipse(highlightPen, rectPie);
+            }
+            else
+            {
+                g.DrawEllipse(circlePen, rectPie);
+            }
+
             g.FillEllipse(Brushes.Blue, pointFace[Facing]);
         }
 
@@ -231,18 +235,6 @@ namespace RpgGridUserControls
             var border = (int)Math.Round(0.30 * baseDim);
             border_2 = border / 2;
             dim = baseDim - 2 * border_2;
-        }
-
-        public override Point PositionAtNoZoomNoMargin
-        {
-            get
-            {
-                return new Point()
-                {
-                    X = PositionAtNoZoom.X + rectImage.X,
-                    Y = PositionAtNoZoom.Y + rectImage.Y,
-                };
-            }
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
