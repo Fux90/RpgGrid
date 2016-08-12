@@ -327,6 +327,11 @@ namespace RpgGridUserControls
             }
         }
 
+        private void pnlMain_Resize(object sender, EventArgs e)
+        {
+            SetScrollOptions();
+        }
+
         private void ScrollableContainer_Load(object sender, EventArgs e)
         {
             var r = this.Rows;

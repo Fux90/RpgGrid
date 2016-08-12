@@ -51,6 +51,7 @@ namespace RpgGridUserControls
             this.pnlMain.DragDrop += new System.Windows.Forms.DragEventHandler(this.pnlMain_DragDrop);
             this.pnlMain.DragEnter += new System.Windows.Forms.DragEventHandler(this.pnlMain_DragEnter);
             this.pnlMain.Paint += new System.Windows.Forms.PaintEventHandler(this.pnlMain_Paint);
+            this.pnlMain.Resize += new System.EventHandler(this.pnlMain_Resize);
             // 
             // vScrollBar1
             // 

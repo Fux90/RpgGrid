@@ -1,13 +1,6 @@
-﻿using System.ComponentModel;
-using System.Windows.Forms;
-
-namespace RpgGridUserControls
+﻿namespace RpgGridUserControls
 {
-#if TEST_NO_TEMPLATE
-    public partial class PawnContainer
-#else
-    public partial class PawnContainer : UserControl
-#endif
+    partial class CharacterPawnTemplate
     {
         /// <summary> 
         /// Variabile di progettazione necessaria.
@@ -33,16 +26,17 @@ namespace RpgGridUserControls
         /// Metodo necessario per il supporto della finestra di progettazione. Non modificare 
         /// il contenuto del metodo con l'editor di codice.
         /// </summary>
-        public void InitializeComponent()
+        private void InitializeComponent()
         {
             this.SuspendLayout();
             // 
-            // PawnContainer
+            // CharacterPawnTemplate
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Name = "PawnContainer";
-            this.Size = new System.Drawing.Size(149, 221);
+            this.Name = "CharacterPawnTemplate";
+            this.Load += new System.EventHandler(this.CharacterPawnTemplate_Load);
+            this.Resize += new System.EventHandler(this.CharacterPawnTemplate_Resize);
             this.ResumeLayout(false);
 
         }

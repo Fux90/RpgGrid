@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ResourceManagement
 {
-    public sealed class ResourceManager
+    public sealed partial class ResourceManager
     {
         private static ResourceManager current;
         public static ResourceManager Current

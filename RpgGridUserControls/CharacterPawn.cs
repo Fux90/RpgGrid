@@ -18,7 +18,7 @@ namespace RpgGridUserControls
         private readonly Brush pfBrush = Brushes.Green;
         private readonly Brush damageBrush = Brushes.Red;
         private readonly Pen circlePen = new Pen(Brushes.Black, 2.0f);
-        private readonly Pen highlightPen = new Pen(Brushes.YellowGreen, 3.0f);
+        private readonly Pen highlightPen = new Pen(Brushes.YellowGreen, 2.0f);
 
         private int currentPf;
         public int CurrentPf

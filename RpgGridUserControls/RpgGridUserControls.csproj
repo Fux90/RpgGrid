@@ -50,6 +50,12 @@
     </Compile>
     <Compile Include="CharacterPawnController.cs" />
     <Compile Include="CharacterPawnListener.cs" />
+    <Compile Include="CharacterPawnTemplate.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CharacterPawnTemplate.Designer.cs">
+      <DependentUpon>CharacterPawnTemplate.cs</DependentUpon>
+    </Compile>
     <Compile Include="Grid.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -59,11 +65,18 @@
     <Compile Include="GridPawn.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="GridPawnBuilder.cs" />
     <Compile Include="GridPawnController.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="GridPawnController.Designer.cs">
       <DependentUpon>GridPawnController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TemplateContainer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TemplateContainer.Designer.cs">
+      <DependentUpon>TemplateContainer.cs</DependentUpon>
     </Compile>
     <Compile Include="PawnContainer.cs">
       <SubType>UserControl</SubType>
@@ -96,11 +109,17 @@
     <EmbeddedResource Include="CharacterPawn.resx">
       <DependentUpon>CharacterPawn.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="CharacterPawnTemplate.resx">
+      <DependentUpon>CharacterPawnTemplate.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Grid.resx">
       <DependentUpon>Grid.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GridPawnController.resx">
       <DependentUpon>GridPawnController.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TemplateContainer.resx">
+      <DependentUpon>TemplateContainer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="PawnContainer.resx">
       <DependentUpon>PawnContainer.cs</DependentUpon>

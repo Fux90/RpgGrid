@@ -93,11 +93,5 @@ namespace RpgGridUserControls
         }
 
         #endregion
-
-        private void PawnContainer_DragEnter(object sender, DragEventArgs e)
-        {
-            var c = 0;
-            c++;
-        }
     }
 }

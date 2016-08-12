@@ -33,9 +33,11 @@
             this.pagInstancePawns = new System.Windows.Forms.TabPage();
             this.pagTemplatePawns = new System.Windows.Forms.TabPage();
             this.pawnContainer1 = new RpgGridUserControls.PawnContainer();
+            this.templateContainer1 = new RpgGridUserControls.TemplateContainer();
             this.grpMain.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.pagInstancePawns.SuspendLayout();
+            this.pagTemplatePawns.SuspendLayout();
             this.SuspendLayout();
             // 
             // grpMain
@@ -73,6 +75,7 @@
             // 
             // pagTemplatePawns
             // 
+            this.pagTemplatePawns.Controls.Add(this.templateContainer1);
             this.pagTemplatePawns.Location = new System.Drawing.Point(4, 22);
             this.pagTemplatePawns.Name = "pagTemplatePawns";
             this.pagTemplatePawns.Padding = new System.Windows.Forms.Padding(3);
@@ -83,11 +86,23 @@
             // 
             // pawnContainer1
             // 
+            this.pawnContainer1.CellHeight = 30F;
+            this.pawnContainer1.CellWidth = 30F;
             this.pawnContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pawnContainer1.Location = new System.Drawing.Point(3, 3);
             this.pawnContainer1.Name = "pawnContainer1";
             this.pawnContainer1.Size = new System.Drawing.Size(189, 218);
             this.pawnContainer1.TabIndex = 0;
+            // 
+            // templateContainer1
+            // 
+            this.templateContainer1.CellHeight = 30F;
+            this.templateContainer1.CellWidth = 30F;
+            this.templateContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.templateContainer1.Location = new System.Drawing.Point(3, 3);
+            this.templateContainer1.Name = "templateContainer1";
+            this.templateContainer1.Size = new System.Drawing.Size(189, 218);
+            this.templateContainer1.TabIndex = 0;
             // 
             // PawnManager
             // 
@@ -99,6 +114,7 @@
             this.grpMain.ResumeLayout(false);
             this.tabControl1.ResumeLayout(false);
             this.pagInstancePawns.ResumeLayout(false);
+            this.pagTemplatePawns.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -110,5 +126,6 @@
         private System.Windows.Forms.TabPage pagInstancePawns;
         private System.Windows.Forms.TabPage pagTemplatePawns;
         private PawnContainer pawnContainer1;
+        private TemplateContainer templateContainer1;
     }
 }

@@ -4,9 +4,9 @@ using System.Windows.Forms;
 namespace RpgGridUserControls
 {
 #if TEST_NO_TEMPLATE
-    public partial class PawnContainer
+    public partial class TemplateContainer
 #else
-    public partial class PawnContainer : UserControl
+    public partial class TemplateContainer : UserControl
 #endif
     {
         /// <summary> 

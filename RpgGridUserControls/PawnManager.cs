@@ -38,6 +38,32 @@ namespace RpgGridUserControls
             }
         }
 
+        public float TemplatesCellWidth
+        {
+            get
+            {
+                return templateContainer1.CellWidth;
+            }
+
+            set
+            {
+                templateContainer1.CellWidth = value;
+            }
+        }
+
+        public float TemplatesCellHeight
+        {
+            get
+            {
+                return templateContainer1.CellHeight;
+            }
+
+            set
+            {
+                templateContainer1.CellHeight = value;
+            }
+        }
+
         public PawnManager()
         {
             InitializeComponent();
@@ -47,6 +73,11 @@ namespace RpgGridUserControls
         public void LoadPawns(GridPawn[] gridPawns)
         {
             pawnContainer1.LoadPawns(gridPawns);
+        }
+
+        public void LoadPawnTemplates(CharacterPawnTemplate[] gridPawnTemplates)
+        {
+            templateContainer1.LoadPawns(gridPawnTemplates);
         }
     }
 }
