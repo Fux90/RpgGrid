@@ -8,6 +8,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.Serialization;
+using System.Drawing.Imaging;
+using System.Threading;
 
 namespace RpgGridUserControls
 {
@@ -16,13 +18,13 @@ namespace RpgGridUserControls
     {
         public class Builder : CharacterPawnTemplate
         {
-            public CharacterPawnTemplate Create()
+            public static CharacterPawnTemplate Create()
             {
                 return new CharacterPawnTemplate()
                 {
-                    defaultName = "Npg",
-                    defaultImage = Image.FromFile(@"character2.jpg"),
-                    defaultSize = GridPawn.RpgSize.Medium,
+                    DefaultName = "Npg",
+                    DefaultImage = Image.FromFile(@"character2.jpg"),
+                    DefaultSize = GridPawn.RpgSize.Medium,
                 };
             }
         }
@@ -31,13 +33,13 @@ namespace RpgGridUserControls
         private const string ImageSerializationName = "image";
         private const string ModSizeSerializationName = "size";
 
-        private readonly Dictionary<GridPawn.RpgSize, Brush> brushBySize;
+        private readonly static Dictionary<GridPawn.RpgSize, Brush> brushBySize;
         private readonly Pen circlePen = new Pen(Brushes.Black, 2.0f);
         private readonly Pen highlightPen = new Pen(Brushes.YellowGreen, 2.0f);
 
-        protected string defaultName;
-        protected Image defaultImage;
-        protected GridPawn.RpgSize defaultSize;
+        private string defaultName;
+        private Image defaultImage;
+        private GridPawn.RpgSize defaultSize;
 
         public string DefaultName
         {
@@ -61,7 +63,19 @@ namespace RpgGridUserControls
 
             protected set
             {
-                defaultImage = value;
+                //defaultImage = Utils.ApplyCircleMask((Bitmap)value);
+                var sem = new Semaphore(0,1);
+                Utils.ApplyCircleMask((Bitmap)value, (res) =>
+                {
+                    if(res == null)
+                    {
+                        MessageBox.Show("No");
+                    }
+                    defaultImage = res;
+                    sem.Release();
+                    this.Invalidate();
+                });
+                sem.WaitOne();
             }
         }
 
@@ -82,6 +96,15 @@ namespace RpgGridUserControls
 
         private Rectangle rectImage;
         private Rectangle rectPie;
+
+        static CharacterPawnTemplate()
+        {
+            brushBySize = new Dictionary<GridPawn.RpgSize, Brush>();
+
+            brushBySize[GridPawn.RpgSize.Medium] = Brushes.Green;
+            brushBySize[GridPawn.RpgSize.Large] = Brushes.Orange;
+            brushBySize[GridPawn.RpgSize.Large_Long] = Brushes.Red;
+        }
 
         protected CharacterPawnTemplate()
         {

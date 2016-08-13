@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using System.Drawing.Imaging;
 using Utils;
 using System.Runtime.Serialization;
+using System.Threading;
 
 namespace RpgGridUserControls
 {
@@ -77,8 +78,20 @@ namespace RpgGridUserControls
 
             set
             {
-                image = ApplyCircleMask((Bitmap)value);
-                this.Invalidate();
+                //image = Utils.ApplyCircleMask((Bitmap)value);
+                //Utils.ApplyCircleMask((Bitmap)value, (res) => image = res);
+                var sem = new Semaphore(0, 1);
+                Utils.ApplyCircleMask((Bitmap)value, (res) =>
+                {
+                    if (res == null)
+                    {
+                        MessageBox.Show("No");
+                    }
+                    image = res;
+                    sem.Release();
+                    this.Invalidate();
+                });
+                sem.WaitOne();
             }
         }
 
@@ -95,41 +108,41 @@ namespace RpgGridUserControls
             }
         }
 
-        private Image ApplyCircleMask(Bitmap inputImage)
-        {
-            if (inputImage != null)
-            {
-                var img = new Bitmap(inputImage.Width, inputImage.Height, PixelFormat.Format32bppArgb);
-                var alphaChannel = new Bitmap(inputImage.Width, inputImage.Height);
-                var g = Graphics.FromImage(alphaChannel);
-                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+        //private Image ApplyCircleMask(Bitmap inputImage)
+        //{
+        //    if (inputImage != null)
+        //    {
+        //        var img = new Bitmap(inputImage.Width, inputImage.Height, PixelFormat.Format32bppArgb);
+        //        var alphaChannel = new Bitmap(inputImage.Width, inputImage.Height);
+        //        var g = Graphics.FromImage(alphaChannel);
+        //        g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
-                var rect = new Rectangle(new Point(), new Size(alphaChannel.Width, alphaChannel.Height));
+        //        var rect = new Rectangle(new Point(), new Size(alphaChannel.Width, alphaChannel.Height));
 
-                g.FillRectangle(Brushes.White, rect);
-                g.FillEllipse(Brushes.Black, rect);
+        //        g.FillRectangle(Brushes.White, rect);
+        //        g.FillEllipse(Brushes.Black, rect);
 
-                for (int r = 0; r < img.Height; r++)
-                {
-                    for (int c = 0; c < img.Width; c++)
-                    {
-                        if (alphaChannel.GetPixel(c, r).R == (byte)0)
-                        {
-                            img.SetPixel(c, r, Color.FromArgb(255, inputImage.GetPixel(c, r)));
-                        }
-                    }
-                }
+        //        for (int r = 0; r < img.Height; r++)
+        //        {
+        //            for (int c = 0; c < img.Width; c++)
+        //            {
+        //                if (alphaChannel.GetPixel(c, r).R == (byte)0)
+        //                {
+        //                    img.SetPixel(c, r, Color.FromArgb(255, inputImage.GetPixel(c, r)));
+        //                }
+        //            }
+        //        }
 
-                var gOut = Graphics.FromImage(img);
-                gOut.DrawEllipse(circlePen, rect);
+        //        var gOut = Graphics.FromImage(img);
+        //        gOut.DrawEllipse(circlePen, rect);
 
-                return img;
-            }
-            else
-            {
-                return null;
-            }
-        }
+        //        return img;
+        //    }
+        //    else
+        //    {
+        //        return null;
+        //    }
+        //}
 
         public CharacterPawn()
         {

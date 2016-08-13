@@ -40,6 +40,18 @@ namespace RpgGrid
                 }
             );
 
+            // Templates -----------------------------------
+            grid.ResourceManager.AsyncRetrievePawnTemplates(
+                (templates) =>
+                {
+                    pawnManager1.LoadPawnTemplates(templates);
+                },
+                (ex) =>
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            );
+
             // Grid ----------------------------------------
             grid1.ImagePath = @"dnd_map_1.jpg";
             //grid1.ImagePath = @"placeholder.png";

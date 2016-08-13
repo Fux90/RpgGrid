@@ -34,6 +34,7 @@ namespace ResourceManagement
         }
 
         public delegate void GridPawnResultCallback(GridPawn[] pawns);
+        public delegate void GridPawnTemplateResultCallback(CharacterPawnTemplate[] pawns);
         public delegate void ErrorCallback(Exception ex);
 
         public GridPawn[] RetrievePawns()
@@ -74,6 +75,26 @@ namespace ResourceManagement
             return pawns;
         }
 
+        public CharacterPawnTemplate[] RetrievePawnTemplates()
+        {
+            var pawns = new CharacterPawnTemplate[20];
+
+            var partition = Partitioner.Create(0, pawns.Length);
+            var parOption = new ParallelOptions()
+            {
+                MaxDegreeOfParallelism = ParallelExecution ? -1 : 1
+            };
+
+            Parallel.ForEach(partition, parOption, p => {
+                for (int i = p.Item1; i < p.Item2; i++)
+                {
+                    pawns[i] = CharacterPawnTemplate.Builder.Create();
+                };
+            });
+
+            return pawns;
+        }
+
         public void AsyncRetrievePawns(GridPawnResultCallback callback, ErrorCallback onError = null)
         {
             var bw = new BackgroundWorker();
@@ -83,9 +104,34 @@ namespace ResourceManagement
             };
             bw.RunWorkerCompleted += (s, e) =>
             {
-                if(e.Error == null)
+                if (e.Error == null)
                 {
                     callback((GridPawn[])e.Result);
+                }
+                else
+                {
+                    if (onError != null)
+                    {
+                        onError(e.Error);
+                    }
+                }
+            };
+
+            bw.RunWorkerAsync();
+        }
+
+        public void AsyncRetrievePawnTemplates(GridPawnTemplateResultCallback callback, ErrorCallback onError = null)
+        {
+            var bw = new BackgroundWorker();
+            bw.DoWork += (s, e) =>
+            {
+                e.Result = RetrievePawnTemplates();
+            };
+            bw.RunWorkerCompleted += (s, e) =>
+            {
+                if (e.Error == null)
+                {
+                    callback((CharacterPawnTemplate[])e.Result);
                 }
                 else
                 {
