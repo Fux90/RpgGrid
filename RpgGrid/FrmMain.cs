@@ -214,6 +214,7 @@ namespace RpgGrid
             var inviteInfo = Connections.Current.InvitePlayer(out sockID, out waitPlayerBw);
             waitPlayerBw.RunWorkerAsync();
             MessageBox.Show("Opened socket");
+            lblConnectionAddress.Text = String.Format("Address {0}", inviteInfo);
         }
 
         private void btnPing_Click(object sender, EventArgs e)
@@ -222,6 +223,11 @@ namespace RpgGrid
             {
                 MessageBox.Show("I cannot ping");
             }
+        }
+
+        private void chkPawnController_CheckedChanged(object sender, EventArgs e)
+        {
+            tableLayoutPanel1.ColumnStyles[0].Width = chkPawnController.Checked ? 388 : 0;
         }
     }
 }
