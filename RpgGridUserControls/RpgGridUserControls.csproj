@@ -104,6 +104,8 @@
     <Compile Include="Utilities\ColorPicker.Designer.cs">
       <DependentUpon>ColorPicker.cs</DependentUpon>
     </Compile>
+    <Compile Include="Utilities\DiceTypes.cs" />
+    <Compile Include="Utilities\Statistics.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>

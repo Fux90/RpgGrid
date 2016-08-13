@@ -15,6 +15,6 @@ namespace RpgGridUserControls
 
         string generateUniqueName();
 
-        GridPawn Build();
+        GridPawn Build(bool randomness = false);
     }
 }

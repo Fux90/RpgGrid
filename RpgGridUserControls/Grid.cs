@@ -303,7 +303,8 @@ namespace RpgGridUserControls
 
         protected override void OnDragEnter(DragEventArgs e)
         {
-            if (IsGridPawn(e) && e.AllowedEffect == (DragDropEffects.Move | DragDropEffects.Copy))
+            if ((IsOfType<GridPawn>(e) || IsOfType<CharacterPawnTemplate>(e))
+                && e.AllowedEffect == (DragDropEffects.Move | DragDropEffects.Copy))
             {
                 e.Effect = DragDropEffects.Copy;
             }
@@ -316,7 +317,7 @@ namespace RpgGridUserControls
         protected override void OnDragDrop(DragEventArgs drgevent)
         {
             Type t;
-            if (IsGridPawn(drgevent, out t))
+            if (IsOfType<GridPawn>(drgevent, out t))
             {
                 var ctrl = (GridPawn)drgevent.Data.GetData(t);
                 var ptClient = this.PointToClient(new Point(drgevent.X, drgevent.Y));
@@ -324,11 +325,44 @@ namespace RpgGridUserControls
                 SetLocation(ctrl, ptClient.X, ptClient.Y);
                 InvalidatePawnsImage();
             }
+            else if(IsOfType<CharacterPawnTemplate>(drgevent, out t))
+            {
+                var ctrl = ((CharacterPawnTemplate)drgevent.Data.GetData(t)).Build();
+                var ptClient = this.PointToClient(new Point(drgevent.X, drgevent.Y));
+                AddIfNotPresent(ctrl);
+                SetLocation(ctrl, ptClient.X, ptClient.Y);
+                InvalidatePawnsImage();
+            }
         }
 
-        private bool IsGridPawn(DragEventArgs e, out Type type)
+        //private bool IsGridPawn(DragEventArgs e, out Type type)
+        //{
+        //    Type parent = typeof(GridPawn);
+        //    var types = Assembly.GetExecutingAssembly().GetTypes(); // Maybe select some other assembly here, depending on what you need
+        //    var inheritingTypes = types.Where(t => parent.IsAssignableFrom(t));
+
+        //    foreach (var item in inheritingTypes)
+        //    {
+        //        if (e.Data.GetDataPresent(item))
+        //        {
+        //            type = item;
+        //            return true;
+        //        }
+        //    }
+
+        //    type = null;
+        //    return false;
+        //}
+
+        //private bool IsGridPawn(DragEventArgs e)
+        //{
+        //    Type dummy;
+        //    return IsGridPawn(e, out dummy);
+        //}
+
+        private bool IsOfType<T>(DragEventArgs e, out Type type)
         {
-            Type parent = typeof(GridPawn);
+            Type parent = typeof(T);
             var types = Assembly.GetExecutingAssembly().GetTypes(); // Maybe select some other assembly here, depending on what you need
             var inheritingTypes = types.Where(t => parent.IsAssignableFrom(t));
 
@@ -345,12 +379,11 @@ namespace RpgGridUserControls
             return false;
         }
 
-        private bool IsGridPawn(DragEventArgs e)
+        private bool IsOfType<T>(DragEventArgs e)
         {
             Type dummy;
-            return IsGridPawn(e, out dummy);
+            return IsOfType<T>(e, out dummy);
         }
-
         protected override void OnMouseEnter(EventArgs e)
         {
             this.Focus();

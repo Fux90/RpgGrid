@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Runtime.Serialization;
 using System.Drawing.Imaging;
 using System.Threading;
+using RpgGridUserControls.Utilities;
 
 namespace RpgGridUserControls
 {
@@ -25,6 +26,13 @@ namespace RpgGridUserControls
                     DefaultName = "Npg",
                     DefaultImage = Image.FromFile(@"character2.jpg"),
                     DefaultSize = GridPawn.RpgSize.Medium,
+                    NumHitDice = 1,
+                    HealthDie = DiceTypes.d8,
+                    DefaultStatistics = new Statistics(new Dictionary<StatsType, int>()
+                    {
+                        {StatsType.Strength, 14},
+                        {StatsType.Constitution, 12},
+                    }),
                 };
             }
         }
@@ -32,6 +40,7 @@ namespace RpgGridUserControls
         private const string NameSerializationKey = "name";
         private const string ImageSerializationName = "image";
         private const string ModSizeSerializationName = "size";
+        private const string MaxPfSerializationName = "maxPf";
 
         private readonly static Dictionary<GridPawn.RpgSize, Brush> brushBySize;
         private readonly Pen circlePen = new Pen(Brushes.Black, 2.0f);
@@ -40,6 +49,9 @@ namespace RpgGridUserControls
         private string defaultName;
         private Image defaultImage;
         private GridPawn.RpgSize defaultSize;
+        private int numHitDice;
+        private DiceTypes healthDie;
+        private Statistics defaultStats;
 
         public string DefaultName
         {
@@ -89,6 +101,50 @@ namespace RpgGridUserControls
             protected set
             {
                 defaultSize = value;
+            }
+        }
+
+        public Statistics DefaultStatistics
+        {
+            get
+            {
+                //if(defaultStats == null)
+                //{
+                //    defaultStats = new Statistics();
+                //}
+
+                return defaultStats;
+            }
+
+            protected set
+            {
+                defaultStats = value;
+            }
+        }
+
+        public int NumHitDice
+        {
+            get
+            {
+                return numHitDice;
+            }
+
+            protected set
+            {
+                numHitDice = Math.Max(1, value);
+            }
+        }
+
+        public DiceTypes HealthDie
+        {
+            get
+            {
+                return healthDie;
+            }
+
+            protected set
+            {
+                healthDie = value;
             }
         }
 
@@ -161,6 +217,15 @@ namespace RpgGridUserControls
             dim = baseDim - 2 * border_2;
         }
 
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            base.OnMouseDown(e);
+            if (e.Button == MouseButtons.Left)
+            {
+                this.DoDragDrop(this, DragDropEffects.Copy | DragDropEffects.Move);
+            }
+        }
+
         protected override void OnMouseEnter(EventArgs e)
         {
             setMouseOver(true);
@@ -198,15 +263,31 @@ namespace RpgGridUserControls
             }
         }
 
-        public GridPawn Build()
+        public GridPawn Build(bool randomBuild = false)
         {
             var newPawn = new CharacterPawn();
 
             newPawn.Name = String.Format("{0}_{1}", DefaultName, generateUniqueName());
             newPawn.Image = DefaultImage;
             newPawn.ModSize = DefaultSize;
+            newPawn.MaxPf = randomBuild ? randomPf(NumHitDice, HealthDie) : NumHitDice * (int)HealthDie;
+            newPawn.MaxPf += NumHitDice * DefaultStatistics[StatsType.Constitution].Modifier();
+            newPawn.CurrentPf = newPawn.MaxPf;
 
             return newPawn;
+        }
+
+        private int randomPf(int numHitDice, DiceTypes healthDie)
+        {
+            var rnd = new Random();
+            var pf = (int)healthDie;
+
+            for (int i = 1; i < numHitDice; i++)
+            {
+                pf += (rnd.Next((int)healthDie) + 1);
+            }
+
+            return pf;
         }
 
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
