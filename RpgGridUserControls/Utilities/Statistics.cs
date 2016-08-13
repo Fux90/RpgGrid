@@ -18,19 +18,36 @@ namespace RpgGridUserControls.Utilities
 
     public class Statistics
     {
-        private const int defaultValueIfMissingStat = 0;
+        private const int defaultValueIfMissingStat = 10;
+        private static StatsType[] allTypes;
 
+        private CharacterPawn currentPawn;
         private Dictionary<StatsType, int> stats;
 
-        public Statistics()
-            : this(new Dictionary<StatsType, int>())
+        static Statistics()
+        {
+            allTypes = (StatsType[])Enum.GetValues(typeof(StatsType));
+        }
+
+        public Statistics(CharacterPawn pawn)
+            : this(pawn, new Dictionary<StatsType, int>())
         {
             
         }
 
-        public Statistics(Dictionary<StatsType, int> baseStats)
+        public Statistics(CharacterPawn pawn, Dictionary<StatsType, int> baseStats)
         {
             stats = baseStats;
+            currentPawn = pawn;
+        }
+
+        public Statistics(CharacterPawn pawn, Statistics model)
+            : this(pawn)
+        {
+            foreach (var key in allTypes)
+            {
+                this[key] = model[key];
+            }
         }
 
         public int this[StatsType type]
@@ -50,7 +67,29 @@ namespace RpgGridUserControls.Utilities
             set
             {
                 stats[type] = value;
+                currentPawn.InvalidateTooltipDescription();
             }
+        }
+
+        public override string ToString()
+        {
+            return ToString(false);
+        }
+
+        public string ToString(bool minimal)
+        {
+            var strB = new StringBuilder();
+
+            var keys = minimal ? stats.Keys.ToArray() : allTypes;
+
+            foreach (var key in keys)
+            {
+                var value = this[key];
+                var mod = value.Modifier();
+                strB.AppendLine();
+                strB.AppendFormat("{0}: {1} ({2:+0;-0;0})", key, value, mod);
+            }
+            return strB.ToString();
         }
     }
 

@@ -28,7 +28,7 @@ namespace RpgGridUserControls
                     DefaultSize = GridPawn.RpgSize.Medium,
                     NumHitDice = 1,
                     HealthDie = DiceTypes.d8,
-                    DefaultStatistics = new Statistics(new Dictionary<StatsType, int>()
+                    DefaultStatistics = new Statistics(null, new Dictionary<StatsType, int>()
                     {
                         {StatsType.Strength, 14},
                         {StatsType.Constitution, 12},
@@ -108,11 +108,6 @@ namespace RpgGridUserControls
         {
             get
             {
-                //if(defaultStats == null)
-                //{
-                //    defaultStats = new Statistics();
-                //}
-
                 return defaultStats;
             }
 
@@ -168,9 +163,26 @@ namespace RpgGridUserControls
             this.DoubleBuffered = true;
         }
 
+        private void CreateToolTip()
+        {
+            // Create the ToolTip and associate with the Form container.
+            var toolTip1 = new ToolTip();
+
+            // Set up the delays for the ToolTip.
+            toolTip1.AutoPopDelay = 5000;
+            toolTip1.InitialDelay = 1000;
+            toolTip1.ReshowDelay = 500;
+            // Force the ToolTip text to be displayed whether or not the form is active.
+            toolTip1.ShowAlways = true;
+
+            // Set up the ToolTip text for the Button and Checkbox.
+            toolTip1.SetToolTip(this, this.ToString());
+        }
+
         private void CharacterPawnTemplate_Load(object sender, EventArgs e)
         {
             ComputeRectImage();
+            CreateToolTip();
         }
 
         private void CharacterPawnTemplate_Resize(object sender, EventArgs e)
@@ -273,6 +285,7 @@ namespace RpgGridUserControls
             newPawn.MaxPf = randomBuild ? randomPf(NumHitDice, HealthDie) : NumHitDice * (int)HealthDie;
             newPawn.MaxPf += NumHitDice * DefaultStatistics[StatsType.Constitution].Modifier();
             newPawn.CurrentPf = newPawn.MaxPf;
+            newPawn.Stats = new Statistics(newPawn, DefaultStatistics);
 
             return newPawn;
         }
@@ -295,6 +308,18 @@ namespace RpgGridUserControls
             info.AddValue(NameSerializationKey, DefaultName, typeof(string));
             info.AddValue(ImageSerializationName, DefaultImage, typeof(Image));
             info.AddValue(ModSizeSerializationName, DefaultSize, typeof(GridPawn.RpgSize));
+        }
+
+        public override string ToString()
+        {
+            var strB = new StringBuilder();
+
+            strB.AppendLine(DefaultName);
+            strB.AppendLine(DefaultSize.ToString());
+            strB.AppendFormat("{0}{1}", NumHitDice, HealthDie.ToString());
+            strB.AppendLine(DefaultStatistics.ToString());
+
+            return strB.ToString();
         }
     }
 }

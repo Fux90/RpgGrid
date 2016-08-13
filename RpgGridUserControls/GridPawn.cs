@@ -12,12 +12,12 @@ namespace RpgGridUserControls
     [Serializable]
     public abstract class GridPawn : UserControl, ISerializable
     {
-        private const string NameSerializationKey = "name";
+        private const string defaultName = "NPC";
 
+        private const string NameSerializationKey = "name";
         private const string ImageSerializationName = "img";
         private const string SizeAtNoZoomSerializationName = "ctrlSize";
         private const string PositionAtNoZoomSerializationName = "pos";
-
         private const string ModSizeSerializationName = "rpgSize";
         private const string IsSquaredSerializationName = "sqr";
 
@@ -32,12 +32,15 @@ namespace RpgGridUserControls
             //...
         }
 
+        public event EventHandler DescriptionInvalidate;
+
         public GridPawn()
         {
-
+           
         }
 
         public GridPawn(SerializationInfo info, StreamingContext context)
+            : this()
         {
             Name = info.GetString(NameSerializationKey);
 
@@ -49,9 +52,53 @@ namespace RpgGridUserControls
             IsSquared = info.GetBoolean(IsSquaredSerializationName);
         }
 
+        protected void OnDescriptionInvalidate(EventArgs e)
+        {
+            CreateToolTip();
+            var tmp = DescriptionInvalidate;
+            if(tmp != null)
+            {
+                tmp(this, EventArgs.Empty);
+            }
+        }
+
+        private void CreateToolTip()
+        {
+            // Create the ToolTip and associate with the Form container.
+            var toolTip1 = new ToolTip();
+
+            // Set up the delays for the ToolTip.
+            toolTip1.AutoPopDelay = 5000;
+            toolTip1.InitialDelay = 1000;
+            toolTip1.ReshowDelay = 500;
+            // Force the ToolTip text to be displayed whether or not the form is active.
+            toolTip1.ShowAlways = true;
+
+            // Set up the ToolTip text for the Button and Checkbox.
+            toolTip1.SetToolTip(this, this.ToString());
+        }
+        
+        public void InvalidateTooltipDescription()
+        {
+            OnDescriptionInvalidate(EventArgs.Empty);
+        }
+
         public event EventHandler Rotate90Degrees;
 
-        public new string Name { get; set; }
+        private string name;
+        public new string Name
+        {
+            get
+            {
+                return name == null ? defaultName : name;
+            }
+            set
+            {
+                name = value;
+                InvalidateTooltipDescription();
+            }
+        }
+
         public abstract Image Image { get; set; }
         public SizeF SizeAtNoZoom { get; private set; }
         public Point PositionAtNoZoom { get; private set; }
@@ -70,6 +117,7 @@ namespace RpgGridUserControls
                 modSize = value;
                 ResetSizeAtNoZoom();
                 this.Invalidate();
+                InvalidateTooltipDescription();
             }
         }
 
@@ -189,6 +237,16 @@ namespace RpgGridUserControls
         private bool ParentIsGrid()
         {
             return Parent != null && typeof(ResizeablePawnContainer).IsAssignableFrom(Parent.GetType());
+        }
+
+        public override string ToString()
+        {
+            var strB = new StringBuilder();
+
+            strB.AppendLine(this.Name);
+            strB.AppendLine(this.ModSize.ToString());
+
+            return strB.ToString();
         }
 
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)

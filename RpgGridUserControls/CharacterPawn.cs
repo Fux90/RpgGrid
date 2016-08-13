@@ -7,6 +7,7 @@ using Utils;
 using System.Runtime.Serialization;
 using System.Threading;
 using RpgGridUserControls.Utilities;
+using System.Text;
 
 namespace RpgGridUserControls
 {
@@ -18,9 +19,12 @@ namespace RpgGridUserControls
         private const string NotesSerializationKey = "notes";
 
         private readonly Brush pfBrush = Brushes.Green;
+        private readonly Brush underZeroBrush = Brushes.Yellow;
         private readonly Brush damageBrush = Brushes.Red;
         private readonly Pen circlePen = new Pen(Brushes.Black, 2.0f);
         private readonly Pen highlightPen = new Pen(Brushes.YellowGreen, 2.0f);
+
+        private bool dying;
 
         private int currentPf;
         public int CurrentPf
@@ -33,7 +37,16 @@ namespace RpgGridUserControls
             set
             {
                 currentPf = Math.Max(-10, value);
+                if(currentPf >= 0)
+                {
+                    dying = false;
+                }
+                else
+                {
+                    dying = true;
+                }
                 this.Invalidate();
+                InvalidateTooltipDescription();
             }
         }
 
@@ -49,6 +62,7 @@ namespace RpgGridUserControls
             {
                 maxPf = value;
                 this.Invalidate();
+                InvalidateTooltipDescription();
             }
         }
 
@@ -59,7 +73,7 @@ namespace RpgGridUserControls
             {
                 if (stats == null)
                 {
-                    stats = new Statistics();
+                    stats = new Statistics(this);
                 }
 
                 return stats;
@@ -68,6 +82,7 @@ namespace RpgGridUserControls
             set
             {
                 stats = value;
+                InvalidateTooltipDescription();
             }
         }
 
@@ -122,7 +137,14 @@ namespace RpgGridUserControls
         {
             get
             {
-                return (float)Math.Max(0, Math.Min(CurrentPf, MaxPf)) * 360.0f / (float)MaxPf;
+                if (CurrentPf >= 0)
+                {
+                    return (float)Math.Max(0, Math.Min(CurrentPf, MaxPf)) * 360.0f / (float)MaxPf;
+                }
+                else
+                {
+                    return (float)Math.Max(0, Math.Min(-CurrentPf, 10.0f)) * 360.0f / 10.0f;
+                }
             }
         }
 
@@ -166,8 +188,16 @@ namespace RpgGridUserControls
             var anglePf = AnglePf;
             var damagePf = 360.0f - anglePf;
 
-            g.FillPie(pfBrush, rectPie, 0.0f, anglePf);
-            g.FillPie(damageBrush, rectPie, anglePf, damagePf);
+            if (dying)
+            {
+                g.FillPie(underZeroBrush, rectPie, 0.0f, anglePf);
+                g.FillPie(damageBrush, rectPie, anglePf, damagePf);
+            }
+            else
+            {
+                g.FillPie(pfBrush, rectPie, 0.0f, anglePf);
+                g.FillPie(damageBrush, rectPie, anglePf, damagePf);
+            }
 
             if (Image != null)
             {
@@ -230,6 +260,16 @@ namespace RpgGridUserControls
             var border = (int)Math.Round(0.30 * baseDim);
             border_2 = border / 2;
             dim = baseDim - 2 * border_2;
+        }
+
+        public override string ToString()
+        {
+            var strB = new StringBuilder(base.ToString());
+
+            strB.AppendFormat("{0}/{1}", CurrentPf, MaxPf);
+            strB.AppendLine(Stats.ToString());
+
+            return strB.ToString();
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
