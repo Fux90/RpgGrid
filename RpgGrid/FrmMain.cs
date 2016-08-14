@@ -62,6 +62,7 @@ namespace RpgGrid
             ShowMasterControls();
         }
 
+        // TODO: Move to RpgGrid class?
         private void SendMail(  string from, 
                                 string to, 
                                 string content = "", 
@@ -144,7 +145,9 @@ namespace RpgGrid
         private void HideMasterControls()
         {
             grpMaster.Enabled = false;
+#if !DEBUG
             pawnManager1.Visible = false;
+#endif
         }
 
         private void ShowMasterControls()
@@ -174,7 +177,9 @@ namespace RpgGrid
 
             Int32 sockID;
             BackgroundWorker waitPlayerBw;
-            var inviteInfo = Connections.Current.InvitePlayer(out sockID, out waitPlayerBw);
+            Button closeConnectionBtn;
+            var inviteInfo = Connections.Current.InvitePlayer(out sockID, out waitPlayerBw, out closeConnectionBtn);
+            ManageCloseConnectionButton(closeConnectionBtn, inviteInfo);
             SendMail(txtMyMail.Text, txtPlayer.Text, inviteInfo, sockID, waitPlayerBw);
         }
 
@@ -211,10 +216,24 @@ namespace RpgGrid
         {
             int sockID;
             BackgroundWorker waitPlayerBw;
-            var inviteInfo = Connections.Current.InvitePlayer(out sockID, out waitPlayerBw);
+            Button closeConnectionBtn;
+            var inviteInfo = Connections.Current.InvitePlayer(out sockID, out waitPlayerBw, out closeConnectionBtn);
             waitPlayerBw.RunWorkerAsync();
             MessageBox.Show("Opened socket");
             lblConnectionAddress.Text = String.Format("Address {0}", inviteInfo);
+
+            ManageCloseConnectionButton(closeConnectionBtn, inviteInfo);
+        }
+
+        private void ManageCloseConnectionButton(Button closeConnectionBtn, string inviteInfo)
+        {
+            grpConnections.Controls.Add(closeConnectionBtn);
+            closeConnectionBtn.Dock = DockStyle.Top;
+            closeConnectionBtn.Text = String.Format("Awaiting on {0}...", inviteInfo);
+            closeConnectionBtn.EnabledChanged += (s, eEnabled) =>
+            {
+                closeConnectionBtn.Text = String.Format("Closing on {0}...", inviteInfo);
+            };
         }
 
         private void btnPing_Click(object sender, EventArgs e)

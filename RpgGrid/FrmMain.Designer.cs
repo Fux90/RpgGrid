@@ -45,6 +45,7 @@ namespace RpgGrid
             this.pagInvitation = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.grpMaster = new System.Windows.Forms.GroupBox();
+            this.lblConnectionAddress = new System.Windows.Forms.Label();
             this.btnStartTcpListener = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.txtPlayer = new System.Windows.Forms.TextBox();
@@ -63,7 +64,7 @@ namespace RpgGrid
             this.txtIpServer = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
-            this.lblConnectionAddress = new System.Windows.Forms.Label();
+            this.grpConnections = new System.Windows.Forms.GroupBox();
             this.tabControl1.SuspendLayout();
             this.pagMap.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
@@ -262,6 +263,7 @@ namespace RpgGrid
             // 
             // grpMaster
             // 
+            this.grpMaster.Controls.Add(this.grpConnections);
             this.grpMaster.Controls.Add(this.lblConnectionAddress);
             this.grpMaster.Controls.Add(this.btnStartTcpListener);
             this.grpMaster.Controls.Add(this.groupBox2);
@@ -275,6 +277,15 @@ namespace RpgGrid
             this.grpMaster.TabIndex = 0;
             this.grpMaster.TabStop = false;
             this.grpMaster.Text = "Master";
+            // 
+            // lblConnectionAddress
+            // 
+            this.lblConnectionAddress.AutoSize = true;
+            this.lblConnectionAddress.Location = new System.Drawing.Point(117, 170);
+            this.lblConnectionAddress.Name = "lblConnectionAddress";
+            this.lblConnectionAddress.Size = new System.Drawing.Size(45, 13);
+            this.lblConnectionAddress.TabIndex = 7;
+            this.lblConnectionAddress.Text = "Address";
             // 
             // btnStartTcpListener
             // 
@@ -448,14 +459,14 @@ namespace RpgGrid
             this.label5.TabIndex = 0;
             this.label5.Text = "IP";
             // 
-            // lblConnectionAddress
+            // grpConnections
             // 
-            this.lblConnectionAddress.AutoSize = true;
-            this.lblConnectionAddress.Location = new System.Drawing.Point(117, 170);
-            this.lblConnectionAddress.Name = "lblConnectionAddress";
-            this.lblConnectionAddress.Size = new System.Drawing.Size(45, 13);
-            this.lblConnectionAddress.TabIndex = 7;
-            this.lblConnectionAddress.Text = "Address";
+            this.grpConnections.Location = new System.Drawing.Point(6, 194);
+            this.grpConnections.Name = "grpConnections";
+            this.grpConnections.Size = new System.Drawing.Size(257, 301);
+            this.grpConnections.TabIndex = 8;
+            this.grpConnections.TabStop = false;
+            this.grpConnections.Text = "Players";
             // 
             // FrmMain
             // 
@@ -522,6 +533,7 @@ namespace RpgGrid
         private GridPawnController gridPawnController1;
         private System.Windows.Forms.CheckBox chkPawnController;
         private System.Windows.Forms.Label lblConnectionAddress;
+        private System.Windows.Forms.GroupBox grpConnections;
     }
 }
 

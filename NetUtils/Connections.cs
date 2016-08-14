@@ -35,6 +35,7 @@ namespace NetUtils
         {
             Ping,
             Pong,
+            RequestInitialData,
             SendInitialData,
             CloseChannel,
         };
@@ -103,9 +104,24 @@ namespace NetUtils
             bwListener.RunWorkerAsync();
         }
 
+        [CommandBehaviour(Commands.RequestInitialData)]
+        public void RequestInitialDataBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            MessageBox.Show("I was asked for initial data");
+            tcpClient.Client.Send(Commands.SendInitialData.ToByteArray());
+            bwListener.RunWorkerAsync();
+        }
+
+        [CommandBehaviour(Commands.SendInitialData)]
+        public void SendInitialDataBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            MessageBox.Show("I received initial data");
+            bwListener.RunWorkerAsync();
+        }
+
         #endregion
 
-        public string InvitePlayer(out Int32 sockID, out BackgroundWorker waitingPlayerBw)
+        public string InvitePlayer(out Int32 sockID, out BackgroundWorker waitingPlayerBw, out Button closeConnectionButton)
         {
             var port = GeneratePort();
 #if LOCAL_HOST_DEBUG
@@ -128,13 +144,29 @@ namespace NetUtils
             
             sockID = port;
             serverListeners.Add(port, s);
-            waitingPlayerBw = AwaitPlayer(sockID, task);
+
+            closeConnectionButton = new Button();
+            var btn = closeConnectionButton;
+            closeConnectionButton.Click += (sBtn, eBtn) =>
+            {
+                CloseByID(port);
+                btn.Parent.Controls.Remove(btn);
+            };
+            closeConnectionButton.Enabled = false;
+
+            waitingPlayerBw = AwaitPlayer(sockID, task, closeConnectionButton);
             var strB = new StringBuilder();
             strB.AppendFormat("{0}:{1}", localAddr.ToString(), port);
             return strB.ToString();
         }
 
-        private BackgroundWorker AwaitPlayer(int sockID, Task<TcpClient> task)
+        private int GeneratePort()
+        {
+            // TODO: Generate random port (one for each player)
+            return 8888;
+        }
+
+        private BackgroundWorker AwaitPlayer(int sockID, Task<TcpClient> task, Button closeConnectionBtn)
         {
             var bwWaitForConnection = new BackgroundWorker();
             
@@ -162,6 +194,8 @@ namespace NetUtils
                     serverListeners.Remove(id);
 
                     StartListeningThread(tcpClient);
+
+                    closeConnectionBtn.Enabled = true;
                 }
             };
 
@@ -177,7 +211,8 @@ namespace NetUtils
             {
                 StartListeningThread(clientTCP);
 #if DEBUG
-                clientTCP.Client.Send(Commands.Ping.ToByteArray());
+                //clientTCP.Client.Send(Commands.Ping.ToByteArray());
+                clientTCP.Client.Send(Commands.RequestInitialData.ToByteArray());
 #endif
             }
             else
@@ -191,15 +226,22 @@ namespace NetUtils
             AcceptInvite(IPAddress.Parse(serverAddress), int.Parse(serverPort));
         }
 
-        private int GeneratePort()
-        {
-            return 8888;
-        }
-
+        
         public void CloseByID(int sockID)
         {
-            serverListeners[sockID].Stop();
-            serverListeners.Remove(sockID);
+            if (serverListeners.ContainsKey(sockID))
+            {
+                serverListeners[sockID].Stop();
+                serverListeners.Remove(sockID);
+            }
+            else if(serverSocks.ContainsKey(sockID))
+            {
+                serverSocks[sockID].Close();
+            }
+            else
+            {
+                throw new Exception(String.Format("No socket with specified ID [{0}]", sockID));
+            }
         }
 
         private void StartListeningThread(TcpClient tcpClient)
@@ -229,24 +271,6 @@ namespace NetUtils
 
                     var command = (Commands)results[0];
 
-                    //switch (command)
-                    //{
-                    //    case Commands.Ping:
-                    //        MessageBox.Show("I was pinged");
-                    //        tcpClient.Client.Send(Commands.Pong.ToByteArray());
-                    //        bwListening.RunWorkerAsync();
-                    //        break;
-                    //    case Commands.Pong:
-                    //        MessageBox.Show("I was ponged back");
-                    //        bwListening.RunWorkerAsync();
-                    //        break;
-                    //    case Commands.SendInitialData:
-                    //        break;
-                    //    case Commands.CloseChannel:
-                    //        break;
-                    //    default:
-                    //        throw new Exception("Unknown command");
-                    //}
                     if(behaviourByCommand.ContainsKey(command))
                     {
                         behaviourByCommand[command](tcpClient, bwListening);
@@ -261,6 +285,8 @@ namespace NetUtils
             bwListening.RunWorkerAsync();
         }
 
+        #region COMMUNICATION_INTERFACE
+
         public bool PingServer()
         {
             if(clientTCP.Connected)
@@ -271,10 +297,7 @@ namespace NetUtils
 
             return false;
         }
-
-        public bool PingClient(int clientID)
-        {
-            throw new NotImplementedException();
-        }
+        
+        #endregion
     }
 }
