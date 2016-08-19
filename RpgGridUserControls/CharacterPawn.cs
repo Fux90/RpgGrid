@@ -21,7 +21,7 @@ namespace RpgGridUserControls
         private readonly Brush pfBrush = Brushes.Green;
         private readonly Brush underZeroBrush = Brushes.Yellow;
         private readonly Brush damageBrush = Brushes.Red;
-        private readonly Pen circlePen = new Pen(Brushes.Black, 2.0f);
+        private Pen circlePen = new Pen(Brushes.Black, 2.0f);
         private readonly Pen highlightPen = new Pen(Brushes.YellowGreen, 2.0f);
 
         private bool dying;
@@ -148,6 +148,19 @@ namespace RpgGridUserControls
             }
         }
 
+        private ContextMenuStrip menuStrip;
+        private ContextMenuStrip MenuStrip {
+            get
+            {
+                if(menuStrip == null)
+                {
+                    menuStrip = CreateContextMenu();
+                }
+
+                return menuStrip;
+            }
+        }
+
         public CharacterPawn()
         {
             InitializeComponent();
@@ -157,6 +170,8 @@ namespace RpgGridUserControls
 
             Facing = GridDirections.North;
             pointFace = new Dictionary<GridDirections, Rectangle>();
+
+            this.DoubleClick += OnDoubleClick;
         }
 
         public CharacterPawn(SerializationInfo info, StreamingContext context)
@@ -179,6 +194,16 @@ namespace RpgGridUserControls
         private void CharacterPawn_Resize(object sender, EventArgs e)
         {
             ComputeRectImage();
+        }
+
+        protected void OnDoubleClick(object sender, EventArgs e)
+        {
+            var mE = (MouseEventArgs)e;
+
+            if(mE.Button == MouseButtons.Left)
+            {
+                ShowContextMenu(mE.Location);
+            }
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -260,6 +285,31 @@ namespace RpgGridUserControls
             var border = (int)Math.Round(0.30 * baseDim);
             border_2 = border / 2;
             dim = baseDim - 2 * border_2;
+        }
+
+        private ContextMenuStrip CreateContextMenu()
+        {
+            var menu = new ContextMenuStrip();
+
+            menu.Items.Add("Assign border color", null, (s,e) =>
+            {
+                var clrPicker = new ColorPicker();
+
+                if(clrPicker.ShowDialog() == DialogResult.OK)
+                {
+                    this.circlePen.Color = clrPicker.ChosenColor;
+                    this.Invalidate();
+                }
+
+            });
+
+            return menu;
+        }
+
+        private void ShowContextMenu(Point location)
+        {
+            ContextMenuStrip = MenuStrip;
+            ContextMenuStrip.Show(this, location);
         }
 
         public override string ToString()

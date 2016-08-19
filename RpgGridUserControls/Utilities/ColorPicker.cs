@@ -13,6 +13,12 @@ namespace RpgGridUserControls.Utilities
 {
     public partial class ColorPicker : Form
     {
+        public enum ColorType
+        {
+            baseColors,
+            knowColors,
+        };
+
         private readonly Size btnSize = new Size(15, 15);
 
         Color[] colors;
@@ -21,12 +27,30 @@ namespace RpgGridUserControls.Utilities
         public Color ChosenColor {get; private set;}
 
         public ColorPicker()
+            : this(ColorType.baseColors)
+        {
+            
+        }
+
+        public ColorPicker(ColorType clrType)
         {
             InitializeComponent();
-            InitColors();
+
+            switch(clrType)
+            {
+                case ColorType.baseColors:
+                    InitColors();
+                    break;
+                case ColorType.knowColors:
+                    break;
+                default:
+                    throw new Exception();
+            }
+            
             CreateChoices();
 
             DialogResult = DialogResult.Cancel;
+            TopMost = true;
         }
 
         private void CreateChoices()
@@ -50,7 +74,12 @@ namespace RpgGridUserControls.Utilities
                 btn.Location = new Point(c, r);
                 btn.KeyDown += (s, e) => { this.Close(); };
                 var localI = i;
-                btn.Click += (s, e) => { MessageBox.Show(colorNames[localI]); };
+                //btn.Click += (s, e) => { MessageBox.Show(colorNames[localI]); };
+                btn.Click += (s, e) => 
+                {
+                    ChosenColor = colors[localI];
+                    this.DialogResult = DialogResult.OK;
+                };
                 this.Controls.Add(btn);
 
                 c += btnSize.Width;
@@ -75,6 +104,11 @@ namespace RpgGridUserControls.Utilities
             }
             colors = lst.ToArray();
             colorNames = names.ToArray();
+        }
+
+        private void InitKnownColors()
+        {
+            throw new NotImplementedException();
         }
 
         protected override void OnKeyDown(KeyEventArgs e)

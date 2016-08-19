@@ -178,14 +178,22 @@ namespace RpgGridUserControls
         protected override void OnMouseDown(MouseEventArgs e)
         {
             base.OnMouseDown(e);
-            if (e.Button == MouseButtons.Left)
+
+            if ((ModifierKeys & Keys.Control) == Keys.Control)
             {
-                this.DoDragDrop(this, DragDropEffects.Copy | DragDropEffects.Move);
+                InvokeOnClick(this, e);
             }
-            else if (e.Button == MouseButtons.Right)
-            {
-                this.PerformRotate90Degrees();
-                this.Parent.Invalidate();                
+            else
+            { 
+                if (e.Button == MouseButtons.Left)
+                {
+                    this.DoDragDrop(this, DragDropEffects.Copy | DragDropEffects.Move);
+                }
+                else if (e.Button == MouseButtons.Right)
+                {
+                    this.PerformRotate90Degrees();
+                    this.Parent.Invalidate();
+                }
             }
         }
 

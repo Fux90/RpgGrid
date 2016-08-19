@@ -24,14 +24,6 @@ namespace RpgGrid
                                 grid1,
                                 pawnManager1);
 
-#if DEBUG
-            this.MouseClick += (s, e) =>
-            {
-                var colorPicker = new ColorPicker();
-                colorPicker.ShowDialog();
-            };
-#endif
-
 #if DEBUG && VERBOSE_DEBUGGING
             ShowVerboseDebuggingForm();
 #endif
