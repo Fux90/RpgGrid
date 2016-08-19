@@ -21,6 +21,13 @@ namespace NetUtils
 
     public sealed class Connections
     {
+        #region COMMUNICATION_SEMANTICS
+
+        public const string INITIAL_DATA_RECEIVING = "initDataRec";
+        public const string INITIAL_DATA_SENDING = "initDataSend";
+
+        #endregion
+
         private class CommandBehaviour : Attribute
         {
             public Commands Command { get; private set; }
@@ -50,6 +57,25 @@ namespace NetUtils
                     current = new Connections();
                 }
                 return current;
+            }
+        }
+
+        private CommunicationModel model;
+        public CommunicationModel Model
+        {
+            get
+            {
+                if(model == null)
+                {
+                    throw new Exception("MISSING MODEL");
+                }
+
+                return model;
+            }
+
+            set
+            {
+                model = value;
             }
         }
 
@@ -105,17 +131,32 @@ namespace NetUtils
         }
 
         [CommandBehaviour(Commands.RequestInitialData)]
-        public void RequestInitialDataBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
+        public void OnRequestInitialDataBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
         {
             MessageBox.Show("I was asked for initial data");
             tcpClient.Client.Send(Commands.SendInitialData.ToByteArray());
+            // Send initial data
+            var data = Model.ProcessData(INITIAL_DATA_SENDING, null);
+            tcpClient.Client.Send(data.Length);
+            tcpClient.Client.Send(data.Buffer);
+
             bwListener.RunWorkerAsync();
         }
 
         [CommandBehaviour(Commands.SendInitialData)]
-        public void SendInitialDataBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
+        public void OnSendInitialDataBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
         {
             MessageBox.Show("I received initial data");
+            
+            // Wait for initial data - Can do synch
+            Model.ShowProcessing();
+            byte[] sizeBuf = new byte[sizeof(int)];
+            tcpClient.Client.Receive(sizeBuf);
+            byte[] buffer = new byte[BitConverter.ToInt32(sizeBuf, 0)];
+            tcpClient.Client.Receive(buffer);
+            Model.ProcessData(INITIAL_DATA_RECEIVING, buffer);
+            Model.EndShowProcessing();
+
             bwListener.RunWorkerAsync();
         }
 

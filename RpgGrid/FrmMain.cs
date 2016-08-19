@@ -1,4 +1,6 @@
-﻿using MailSenderLib;
+﻿#define VERBOSE_DEBUGGING
+
+using MailSenderLib;
 using NetUtils;
 using RpgGridUserControls.Utilities;
 using System;
@@ -10,11 +12,19 @@ namespace RpgGrid
     public partial class FrmMain : Form
     {
         RpgGrid grid;
+#if DEBUG && VERBOSE_DEBUGGING
+        Form frmVerboseDebugging;
+#endif
 
         public FrmMain()
         {
             InitializeComponent();
-            grid = new RpgGrid();
+
+            grid = new RpgGrid(this)
+            {
+#if DEBUG
+#endif
+            };
 
 #if DEBUG
             this.MouseClick += (s, e) =>
@@ -23,7 +33,44 @@ namespace RpgGrid
                 colorPicker.ShowDialog();
             };
 #endif
+
+#if DEBUG && VERBOSE_DEBUGGING
+            ShowVerboseDebuggingForm();
+#endif
         }
+
+#if DEBUG && VERBOSE_DEBUGGING
+        private void ShowVerboseDebuggingForm()
+        {
+            frmVerboseDebugging = new Form()
+            {
+                Text = "Verbose Debugging",
+                TopMost = true,
+            };
+
+            var txt = new TextBox()
+            {
+                Name = "txtDebug",
+                Dock = DockStyle.Fill,
+                ReadOnly = true,
+                Multiline = true,
+            };
+
+            Func<string, string> appendLine = (string str) => str + Environment.NewLine;
+
+            frmVerboseDebugging.Controls.Add(txt);
+
+            frmVerboseDebugging.FormClosing += (s, e) =>
+            {
+                txt.AppendText(appendLine("Can't close Verbose Debugging form."));
+                e.Cancel = true;
+            };
+
+            frmVerboseDebugging.Show();
+
+            this.grid.VerboseDebugging += (s, e) => txt.AppendText(appendLine(e.Message));
+        }
+#endif
 
         private void Form1_Load(object sender, EventArgs e)
         {
