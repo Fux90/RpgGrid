@@ -20,11 +20,9 @@ namespace RpgGrid
         {
             InitializeComponent();
 
-            grid = new RpgGrid(this)
-            {
-#if DEBUG
-#endif
-            };
+            grid = new RpgGrid( this,
+                                grid1,
+                                pawnManager1);
 
 #if DEBUG
             this.MouseClick += (s, e) =>

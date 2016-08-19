@@ -19,13 +19,19 @@ namespace RpgGrid
         public Form ViewContainer { get; private set; }
 
         public ResourceManager ResourceManager{ get; private set; }
+        public Grid MainGrid { get; private set; }
+        public PawnManager MainPawnManager { get; private set; }
 
-        public RpgGrid(Form viewContainer)
+        public RpgGrid( Form viewContainer,
+                        Grid mainGrid,
+                        PawnManager mainPawnManager)
             : base()
         {
             ResourceManager = ResourceManager.Current;
 
             ViewContainer = viewContainer;
+            MainGrid = mainGrid;
+            MainPawnManager = mainPawnManager;
         }
 
         public override void ShowProcessing()
