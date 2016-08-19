@@ -3,8 +3,11 @@ using ResourceManagement;
 using RpgGridUserControls;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -21,6 +24,19 @@ namespace RpgGrid
         public ResourceManager ResourceManager{ get; private set; }
         public Grid MainGrid { get; private set; }
         public PawnManager MainPawnManager { get; private set; }
+
+        private BinaryFormatter binaryFormatter;
+        private BinaryFormatter BinaryFormatter
+        {
+            get
+            {
+                if(binaryFormatter == null)
+                {
+                    binaryFormatter = new BinaryFormatter();
+                }
+                return binaryFormatter;
+            }
+        }
 
         public RpgGrid( Form viewContainer,
                         Grid mainGrid,
@@ -62,25 +78,51 @@ namespace RpgGrid
             }
         }
 
-        [ResponseMethods(Connections.INITIAL_DATA_RECEIVING)]
-        private DataRes ReceiveInitialData(byte[] buffer)
+        [ResponseMethods(Connections.MAP_RECEIVING)]
+        private DataRes ReceiveMap(byte[] buffer)
         {
-            var receivedString = GetString(buffer);
+            using (var ms = new MemoryStream(buffer))
+            {
+                MainGrid.Image = Image.FromStream(ms);
+            }
 #if DEBUG
-            OnVerboseDebugging(new VerboseDebugArgs(receivedString));
+            OnVerboseDebugging(new VerboseDebugArgs("Receive map"));
 #endif
             return DataRes.Empty;
         }
 
-        [ResponseMethods(Connections.INITIAL_DATA_SENDING)]
-        private DataRes SendInitialData(byte[] buffer)
+        [ResponseMethods(Connections.PAWNS_AND_TEMPLATES_RECEIVING)]
+        private DataRes ReceivePawnsAndTemplates(byte[] buffer)
         {
-            var testMsg = "Hola this is a test";
-            var outBuf = GetBytes(testMsg);
+            
 #if DEBUG
-            OnVerboseDebugging(new VerboseDebugArgs(String.Format("Sent initial msg, strLen {0}, bufferLen {1}", testMsg.Length, outBuf.Length)));
+            OnVerboseDebugging(new VerboseDebugArgs("Receive pawn and templates"));
 #endif
-            return new DataRes(outBuf);
+            return DataRes.Empty;
+        }
+
+        [ResponseMethods(Connections.MAP_SENDING)]
+        private DataRes SendMap(byte[] buffer)
+        {
+            using (var ms = new MemoryStream())
+            {
+                MainGrid.Image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                return new DataRes(ms.ToArray());
+            }
+#if DEBUG
+            OnVerboseDebugging(new VerboseDebugArgs("Receive map"));
+#endif
+            return DataRes.Empty;
+        }
+
+        [ResponseMethods(Connections.PAWNS_AND_TEMPLATES_SENDING)]
+        private DataRes SendPawnsAndTemplates(byte[] buffer)
+        {
+
+#if DEBUG
+            OnVerboseDebugging(new VerboseDebugArgs("Receive pawn and templates"));
+#endif
+            return DataRes.Empty;
         }
 
         #endregion

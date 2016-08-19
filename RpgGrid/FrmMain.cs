@@ -64,39 +64,12 @@ namespace RpgGrid
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            // Pawn ----------------------------------------
-            grid.ResourceManager.AsyncRetrievePawns(
-                (pawns) => 
-                {
-                    //pawnContainer1.LoadPawns(pawns);
-                    pawnManager1.LoadPawns(pawns);
-                },
-                (ex) =>
-                {
-                    MessageBox.Show(ex.Message);
-                }
-            );
+            this.chkMaster.Checked = false;
+            this.chkPawnController.Checked = false;
 
-            // Templates -----------------------------------
-            grid.ResourceManager.AsyncRetrievePawnTemplates(
-                (templates) =>
-                {
-                    pawnManager1.LoadPawnTemplates(templates);
-                },
-                (ex) =>
-                {
-                    MessageBox.Show(ex.Message);
-                }
-            );
-
-            // Grid ----------------------------------------
-            grid1.ImagePath = @"dnd_map_1.jpg";
             //grid1.ImagePath = @"placeholder.png";
             grid1.PawnListener = this.gridPawnController1;
             grid1.PawnController = this.gridPawnController1;
-
-            HidePlayerControls();
-            ShowMasterControls();
         }
 
         // TODO: Move to RpgGrid class?
@@ -191,7 +164,44 @@ namespace RpgGrid
         {
             grpMaster.Enabled = true;
             pawnManager1.Visible = true;
+
+#if DEBUG
+            LoadDefaults();
+#endif
         }
+
+#if DEBUG
+        private void LoadDefaults()
+        {
+            // Pawn ----------------------------------------
+            grid.ResourceManager.AsyncRetrievePawns(
+                (pawns) =>
+                {
+                    //pawnContainer1.LoadPawns(pawns);
+                    pawnManager1.LoadPawns(pawns);
+                },
+                (ex) =>
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            );
+
+            // Templates -----------------------------------
+            grid.ResourceManager.AsyncRetrievePawnTemplates(
+                (templates) =>
+                {
+                    pawnManager1.LoadPawnTemplates(templates);
+                },
+                (ex) =>
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            );
+
+            // Grid ----------------------------------------
+            grid1.ImagePath = @"dnd_map_1.jpg";
+        }
+#endif
 
         private void HidePlayerControls()
         {

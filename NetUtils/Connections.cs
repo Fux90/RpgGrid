@@ -23,8 +23,10 @@ namespace NetUtils
     {
         #region COMMUNICATION_SEMANTICS
 
-        public const string INITIAL_DATA_RECEIVING = "initDataRec";
-        public const string INITIAL_DATA_SENDING = "initDataSend";
+        public const string MAP_RECEIVING = "mapRec";
+        public const string MAP_SENDING = "mapSend";
+        public const string PAWNS_AND_TEMPLATES_RECEIVING = "pawnsAndTemplatesRec";
+        public const string PAWNS_AND_TEMPLATES_SENDING = "pawnsAndTemplatesSend";
 
         #endregion
 
@@ -42,8 +44,9 @@ namespace NetUtils
         {
             Ping,
             Pong,
-            RequestInitialData,
-            SendInitialData,
+            InitialDataRequested,
+            InitialDataReceived,
+            Done,
             CloseChannel,
         };
 
@@ -130,34 +133,69 @@ namespace NetUtils
             bwListener.RunWorkerAsync();
         }
 
-        [CommandBehaviour(Commands.RequestInitialData)]
-        public void OnRequestInitialDataBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
+        [CommandBehaviour(Commands.InitialDataRequested)]
+        public void OnInitialDataRequestedBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
         {
             MessageBox.Show("I was asked for initial data");
-            tcpClient.Client.Send(Commands.SendInitialData.ToByteArray());
+            tcpClient.Client.Send(Commands.InitialDataReceived.ToByteArray());
             // Send initial data
-            var data = Model.ProcessData(INITIAL_DATA_SENDING, null);
-            tcpClient.Client.Send(data.Length);
-            tcpClient.Client.Send(data.Buffer);
+            var checkpoint = new byte[1];
+
+            // Map
+            var mapData = Model.ProcessData(MAP_SENDING, null);
+            tcpClient.Client.Send(mapData.Length);
+            tcpClient.Client.Send(mapData.Buffer);
+
+            tcpClient.Client.Receive(checkpoint);
+
+            // Pawns and templates
+            var pawnsTemplatesData = Model.ProcessData(PAWNS_AND_TEMPLATES_SENDING, null);
+            //tcpClient.Client.Send(pawnsTemplatesData.Length);
+            //tcpClient.Client.Send(pawnsTemplatesData.Buffer);
+            //tcpClient.Client.Receive(checkpoint);
+
+            // -----------------
+            bwListener.RunWorkerAsync();
+        }
+
+        [CommandBehaviour(Commands.InitialDataReceived)]
+        public void OnInitialDataReceivedBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            // Wait for initial data - Can do synch
+            Model.ShowProcessing();
+
+            ReceiveMap(tcpClient);
+            tcpClient.Client.Send(Commands.Done.ToByteArray());
+            //ReceivePawnsAndTemplates(tcpClient);
+            //tcpClient.Client.Send(Commands.Done.ToByteArray());
+
+            Model.EndShowProcessing();
 
             bwListener.RunWorkerAsync();
         }
 
-        [CommandBehaviour(Commands.SendInitialData)]
-        public void OnSendInitialDataBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
+        private void ReceiveMap(TcpClient tcpClient)
         {
-            MessageBox.Show("I received initial data");
-            
-            // Wait for initial data - Can do synch
-            Model.ShowProcessing();
             byte[] sizeBuf = new byte[sizeof(int)];
             tcpClient.Client.Receive(sizeBuf);
             byte[] buffer = new byte[BitConverter.ToInt32(sizeBuf, 0)];
-            tcpClient.Client.Receive(buffer);
-            Model.ProcessData(INITIAL_DATA_RECEIVING, buffer);
-            Model.EndShowProcessing();
+            if (buffer.Length > 0)
+            {
+                tcpClient.Client.Receive(buffer);
+                Model.ProcessData(MAP_RECEIVING, buffer);
+            }
+        }
 
-            bwListener.RunWorkerAsync();
+        private void ReceivePawnsAndTemplates(TcpClient tcpClient)
+        {
+            byte[] sizeBuf = new byte[sizeof(int)];
+            tcpClient.Client.Receive(sizeBuf);
+            byte[] buffer = new byte[BitConverter.ToInt32(sizeBuf, 0)];
+            if (buffer.Length > 0)
+            {
+                tcpClient.Client.Receive(buffer);
+                Model.ProcessData(PAWNS_AND_TEMPLATES_RECEIVING, buffer);
+            }
         }
 
         #endregion
@@ -253,7 +291,7 @@ namespace NetUtils
                 StartListeningThread(clientTCP);
 #if DEBUG
                 //clientTCP.Client.Send(Commands.Ping.ToByteArray());
-                clientTCP.Client.Send(Commands.RequestInitialData.ToByteArray());
+                clientTCP.Client.Send(Commands.InitialDataRequested.ToByteArray());
 #endif
             }
             else

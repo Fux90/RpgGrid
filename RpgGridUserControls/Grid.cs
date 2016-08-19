@@ -127,7 +127,7 @@ namespace RpgGridUserControls
                 return image;
             }
 
-            private set
+            set
             {
                 ResizeToFitImage(value);
                 ZoomFactor = 1.0f;
