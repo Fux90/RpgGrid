@@ -81,10 +81,8 @@ namespace RpgGrid
         [ResponseMethods(Connections.MAP_RECEIVING)]
         private DataRes ReceiveMap(byte[] buffer)
         {
-            using (var ms = new MemoryStream(buffer))
-            {
-                MainGrid.Image = Image.FromStream(ms);
-            }
+            var ms = new MemoryStream(buffer);
+            MainGrid.Image = Image.FromStream(ms);
 #if DEBUG
             OnVerboseDebugging(new VerboseDebugArgs("Receive map"));
 #endif
