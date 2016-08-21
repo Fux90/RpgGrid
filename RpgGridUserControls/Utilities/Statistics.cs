@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,8 +17,12 @@ namespace RpgGridUserControls.Utilities
         Charisma
     }
 
-    public class Statistics
+    [Serializable]
+    public class Statistics : ISerializable
     {
+        private const string StatsSerializationName = "stats";
+        private const string CurrentPawnSerializationName = "pawn";
+
         private const int defaultValueIfMissingStat = 10;
         private static StatsType[] allTypes;
 
@@ -50,6 +55,12 @@ namespace RpgGridUserControls.Utilities
             }
         }
 
+        public Statistics(SerializationInfo info, StreamingContext context)
+        {
+            stats = (Dictionary<StatsType, int>)info.GetValue(StatsSerializationName, typeof(Dictionary<StatsType, int>));
+            currentPawn = (CharacterPawn)info.GetValue(CurrentPawnSerializationName, typeof(CharacterPawn));
+        }
+
         public int this[StatsType type]
         {
             get
@@ -69,6 +80,12 @@ namespace RpgGridUserControls.Utilities
                 stats[type] = value;
                 currentPawn.InvalidateTooltipDescription();
             }
+        }
+
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue(StatsSerializationName, stats, typeof(Dictionary<StatsType, int>));
+            info.AddValue(CurrentPawnSerializationName, currentPawn, typeof(CharacterPawn));
         }
 
         public override string ToString()

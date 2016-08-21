@@ -261,13 +261,15 @@ namespace RpgGrid
         [ResponseMethods(Connections.PAWNS_RECEIVING)]
         private DataRes ReceivePawns(byte[] buffer)
         {
-            var ms = new MemoryStream(buffer);
-            var pawns = (GridPawn[])BinaryFormatter.Deserialize(ms);
-            MainPawnManager.LoadPawns(pawns);
+            using (var ms = new MemoryStream(buffer))
+            {
+                var pawns = (GridPawn[])BinaryFormatter.Deserialize(ms);
+                MainPawnManager.LoadPawns(pawns);
 #if DEBUG
-            OnVerboseDebugging(new VerboseDebugArgs(String.Format("Received pawns: {0} bytes, {1} items", buffer.Length, pawns.Length)));
+                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Received pawns: {0} bytes, {1} items", buffer.Length, pawns.Length)));
 #endif
-            return DataRes.Empty;
+                return DataRes.Empty;
+            }
         }
         
         [ResponseMethods(Connections.PAWNS_SENDING)]
@@ -288,11 +290,15 @@ namespace RpgGrid
         [ResponseMethods(Connections.TEMPLATES_RECEIVING)]
         private DataRes ReceiveTemplates(byte[] buffer)
         {
-
+            using (var ms = new MemoryStream(buffer))
+            {
+                var templates = (CharacterPawnTemplate[])BinaryFormatter.Deserialize(ms);
+                MainPawnManager.LoadPawnTemplates(templates);
 #if DEBUG
-            OnVerboseDebugging(new VerboseDebugArgs("Receive templates"));
+                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Received templates: {0} bytes, {1} items", buffer.Length, templates.Length)));
 #endif
-            return DataRes.Empty;
+                return DataRes.Empty;
+            }
         }
 
 
@@ -300,11 +306,16 @@ namespace RpgGrid
         [ResponseMethods(Connections.TEMPLATES_SENDING)]
         private DataRes SendTemplates(byte[] buffer)
         {
+            var templates = this.MainPawnManager.GetPawnTemplates();
 
+            using (var ms = new MemoryStream())
+            {
+                BinaryFormatter.Serialize(ms, templates);
 #if DEBUG
-            OnVerboseDebugging(new VerboseDebugArgs("Sent templates"));
+                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Sent templates: {0} items, {1} bytes", templates.Length, ms.Length)));
 #endif
-            return DataRes.Empty;
+                return new DataRes(ms.ToArray());
+            }
         }
 
         #endregion

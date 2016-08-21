@@ -24,8 +24,12 @@ namespace RpgGrid
                                 grid1,
                                 pawnManager1);
 
-#if DEBUG && VERBOSE_DEBUGGING
+#if DEBUG
+#if  VERBOSE_DEBUGGING
             ShowVerboseDebuggingForm();
+#endif
+            txtIpServer.Text = "192.168.1.106";
+            txtPortServer.Text = "8888";
 #endif
         }
 

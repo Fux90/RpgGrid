@@ -306,7 +306,7 @@ namespace NetUtils
         private void SendPawnAndTemplates(TcpClient tcpClient, byte[] checkpoint)
         {
             SendPawns(tcpClient, checkpoint);
-            //SendTemplates(tcpClient, checkpoint);
+            SendTemplates(tcpClient, checkpoint);
         }
 
         private void SendPawns(TcpClient tcpClient, byte[] checkpoint)
@@ -328,7 +328,7 @@ namespace NetUtils
         private void ReceivePawnsAndTemplates(TcpClient tcpClient)
         {
             ReceivePawns(tcpClient);
-            //ReceiveTemplates(tcpClient);
+            ReceiveTemplates(tcpClient);
         }
 
         private void ReceivePawns(TcpClient tcpClient)

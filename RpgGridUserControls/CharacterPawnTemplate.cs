@@ -38,9 +38,11 @@ namespace RpgGridUserControls
         }
 
         private const string NameSerializationKey = "name";
-        private const string ImageSerializationName = "image";
-        private const string ModSizeSerializationName = "size";
-        private const string MaxPfSerializationName = "maxPf";
+        private const string ImageSerializationKey = "image";
+        private const string ModSizeSerializationKey = "size";
+        private const string NumHitDiceSerializationKey = "numDice";
+        private const string HealthDieSerializationKey = "diceType";
+        private const string StatisticsSerializationKey = "stats";
 
         private readonly static Dictionary<GridPawn.RpgSize, Brush> brushBySize;
         private readonly Pen circlePen = new Pen(Brushes.Black, 2.0f);
@@ -158,6 +160,26 @@ namespace RpgGridUserControls
         }
 
         protected CharacterPawnTemplate()
+        {
+            init();
+        }
+
+        public CharacterPawnTemplate(SerializationInfo info, StreamingContext context)
+        {
+            InitializeComponent();
+            this.DoubleBuffered = true;
+
+            DefaultName = info.GetString(NameSerializationKey);
+            DefaultImage = (Image)info.GetValue(ImageSerializationKey, typeof(Image));
+            DefaultSize = (GridPawn.RpgSize)info.GetValue(ModSizeSerializationKey, typeof(GridPawn.RpgSize));
+            NumHitDice = info.GetInt32(NumHitDiceSerializationKey);
+            HealthDie = (DiceTypes)info.GetValue(HealthDieSerializationKey, typeof(DiceTypes));
+            DefaultStatistics = (Statistics)info.GetValue(StatisticsSerializationKey, typeof(Statistics));
+
+            ComputeRectImage();
+        }
+
+        private void init()
         {
             InitializeComponent();
             this.DoubleBuffered = true;
@@ -306,8 +328,12 @@ namespace RpgGridUserControls
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue(NameSerializationKey, DefaultName, typeof(string));
-            info.AddValue(ImageSerializationName, DefaultImage, typeof(Image));
-            info.AddValue(ModSizeSerializationName, DefaultSize, typeof(GridPawn.RpgSize));
+            info.AddValue(ImageSerializationKey, DefaultImage, typeof(Image));
+            info.AddValue(ModSizeSerializationKey, DefaultSize, typeof(GridPawn.RpgSize));
+            info.AddValue(NumHitDiceSerializationKey, NumHitDice, typeof(int));
+            info.AddValue(HealthDieSerializationKey, HealthDie, typeof(DiceTypes));
+            info.AddValue(StatisticsSerializationKey, DefaultStatistics, typeof(Statistics));
+
         }
 
         public override string ToString()
