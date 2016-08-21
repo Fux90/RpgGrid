@@ -115,5 +115,19 @@ namespace RpgGridUserControls
                 localImage
             });
         }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public static string generateUniqueName()
+        {
+            return compact(DateTime.Now);
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        private static string compact(DateTime now)
+        {
+            return String.Format("{0}{1}{2}{3}{4}{5}",
+                                    now.Year, now.Month, now.Day,
+                                    now.Hour, now.Minute, now.Second);
+        }
     }
 }

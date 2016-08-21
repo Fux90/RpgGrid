@@ -94,5 +94,10 @@ namespace RpgGridUserControls
         {
             return templateContainer1.GetAll();
         }
+
+        public GridPawn RemoveByUniqueID(string ID)
+        {
+            return pawnContainer1.RemoveByUniqueID(ID);
+        }
     }
 }

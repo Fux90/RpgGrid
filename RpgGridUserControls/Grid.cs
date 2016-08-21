@@ -281,6 +281,8 @@ namespace RpgGridUserControls
         private Control PreviousFocused { get; set; }
 
         public event EventHandler<PawnEventArgs> PawnAdded;
+        public event EventHandler<PawnEventArgs> PawnDragDropped;
+        public event EventHandler<PawnEventArgs> TemplateDragDropped;
         public event EventHandler<PawnEventArgs> PawnRemoved;
         public event EventHandler<PawnAndLocationEventArgs> PawnMoved;
 
@@ -366,18 +368,23 @@ namespace RpgGridUserControls
             {
                 var ctrl = (GridPawn)drgevent.Data.GetData(t);
                 var ptClient = this.PointToClient(new Point(drgevent.X, drgevent.Y));
-                AddIfNotPresent(ctrl);
-                SetLocation(ctrl, ptClient.X, ptClient.Y);
-                InvalidatePawnsImage();
+                DragDropAdding(ctrl, ptClient);
+                OnPawnDragDropped(new PawnAndLocationEventArgs(ctrl, ptClient));
             }
             else if(IsOfType<CharacterPawnTemplate>(drgevent, out t))
             {
                 var ctrl = ((CharacterPawnTemplate)drgevent.Data.GetData(t)).Build();
                 var ptClient = this.PointToClient(new Point(drgevent.X, drgevent.Y));
-                AddIfNotPresent(ctrl);
-                SetLocation(ctrl, ptClient.X, ptClient.Y);
-                InvalidatePawnsImage();
+                DragDropAdding(ctrl, ptClient);
+                OnTemplateDragDropped(new PawnAndLocationEventArgs(ctrl, ptClient));
             }
+        }
+
+        public void DragDropAdding(GridPawn ctrl, Point ptClient)
+        {
+            AddIfNotPresent(ctrl);
+            SetLocation(ctrl, ptClient.X, ptClient.Y);
+            InvalidatePawnsImage();
         }
 
         private bool IsOfType<T>(DragEventArgs e, out Type type)
@@ -771,6 +778,24 @@ namespace RpgGridUserControls
         protected void OnPawnAdded(PawnEventArgs e)
         {
             var tmp = PawnAdded;
+            if (tmp != null)
+            {
+                tmp(this, e);
+            }
+        }
+
+        protected void OnPawnDragDropped(PawnEventArgs e)
+        {
+            var tmp = PawnDragDropped;
+            if (tmp != null)
+            {
+                tmp(this, e);
+            }
+        }
+
+        protected void OnTemplateDragDropped(PawnEventArgs e)
+        {
+            var tmp = TemplateDragDropped;
             if (tmp != null)
             {
                 tmp(this, e);

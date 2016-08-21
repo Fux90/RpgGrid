@@ -12,6 +12,9 @@ namespace RpgGridUserControls
     [Serializable]
     public abstract class GridPawn : UserControl, ISerializable
     {
+        public const string TemplateGeneratePrefix = "T_";
+        public const string NonTemplateGeneratePrefix = "";
+
         private const string defaultName = "NPC";
 
         private const string NameSerializationKey = "name";
@@ -20,6 +23,8 @@ namespace RpgGridUserControls
         private const string PositionAtNoZoomSerializationName = "pos";
         private const string ModSizeSerializationName = "rpgSize";
         private const string IsSquaredSerializationName = "sqr";
+
+        private const string UniqueIDSerializationName = "uID";
 
         private float SquarePixelSize { get; set; }
 
@@ -32,16 +37,43 @@ namespace RpgGridUserControls
             //...
         }
 
+        private string uniqueID;
+        public string UniqueID
+        {
+            get
+            {
+                if(uniqueID == null)
+                {
+                    uniqueID = generateUniqueID();
+                }
+
+                return uniqueID;
+            }
+
+            private set
+            {
+                uniqueID = value;
+            }
+        }
+
         public event EventHandler DescriptionInvalidate;
 
         public GridPawn()
+            : this(false)
         {
-           
+            UniqueID = generateUniqueID();
+        }
+
+        public GridPawn(bool generatedFromTemplate)
+        {
+            UniqueID = String.Format(   "{0}_generateUniqueID()", 
+                                        generatedFromTemplate ? TemplateGeneratePrefix : NonTemplateGeneratePrefix);
         }
 
         public GridPawn(SerializationInfo info, StreamingContext context)
             : this()
         {
+            UniqueID = info.GetString(UniqueIDSerializationName);
             Name = info.GetString(NameSerializationKey);
 
             Image = (Image)info.GetValue(ImageSerializationName, typeof(Image));
@@ -50,6 +82,11 @@ namespace RpgGridUserControls
 
             ModSize = (RpgSize)info.GetValue(ModSizeSerializationName, typeof(RpgSize));
             IsSquared = info.GetBoolean(IsSquaredSerializationName);
+        }
+
+        private string generateUniqueID()
+        {
+            return Utils.generateUniqueName();
         }
 
         protected void OnDescriptionInvalidate(EventArgs e)
@@ -259,6 +296,8 @@ namespace RpgGridUserControls
 
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
+            info.AddValue(UniqueIDSerializationName, UniqueID, typeof(string)); 
+
             info.AddValue(NameSerializationKey, Name, typeof(string));
             info.AddValue(ImageSerializationName,Image,typeof(Image));
             info.AddValue(SizeAtNoZoomSerializationName,SizeAtNoZoom,typeof(SizeF));
@@ -266,6 +305,19 @@ namespace RpgGridUserControls
 
             info.AddValue(ModSizeSerializationName,ModSize,typeof(RpgSize));
             info.AddValue(IsSquaredSerializationName,IsSquared,typeof(bool));
+        }
+
+        public bool IsTemplateGenerated()
+        {
+            return UniqueID.Substring(0, TemplateGeneratePrefix.Length) == TemplateGeneratePrefix;
+        }
+
+        /// <summary>
+        /// Removes prefix given by template creation
+        /// </summary>
+        public void NormalizeUniqueID()
+        {
+            UniqueID = UniqueID.Substring(TemplateGeneratePrefix.Length);
         }
     }
 }

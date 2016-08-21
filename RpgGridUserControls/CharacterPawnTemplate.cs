@@ -214,15 +214,20 @@ namespace RpgGridUserControls
 
         public string generateUniqueName()
         {
-            return compact(DateTime.Now);
+            return Utils.generateUniqueName();
         }
 
-        private string compact(DateTime now)
-        {
-            return String.Format(   "{0}{1}{2}{3}{4}{5}", 
-                                    now.Year, now.Month, now.Day, 
-                                    now.Hour, now.Minute, now.Second);
-        }
+        //public string generateUniqueName()
+        //{
+        //    return compact(DateTime.Now);
+        //}
+
+        //private string compact(DateTime now)
+        //{
+        //    return String.Format(   "{0}{1}{2}{3}{4}{5}", 
+        //                            now.Year, now.Month, now.Day, 
+        //                            now.Hour, now.Minute, now.Second);
+        //}
 
         private void ComputeRectImage()
         {

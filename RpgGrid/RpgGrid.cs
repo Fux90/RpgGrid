@@ -42,12 +42,21 @@ namespace RpgGrid
                     OnVerboseDebugging(new VerboseDebugArgs(String.Format("Removed pawn: {0}", e.Pawn.Name)));
 #endif
                 };
-                mainGrid.PawnAdded += (s, e) =>
+                mainGrid.PawnDragDropped += (s, e) =>
                 {
-                    // TODO: Call method to tell pawn is added to grid
+                    LastTouchedPawn = e.Pawn;
 #if DEBUG
-                    OnVerboseDebugging(new VerboseDebugArgs("TODO: Call method to tell pawn is added to grid"));
+                    OnVerboseDebugging(new VerboseDebugArgs(String.Format("{0} added to grid [{1}]", LastTouchedPawn.Name, LastTouchedPawn.UniqueID)));
 #endif
+                    Connections.Current.Broadcast(  Connections.Commands.AddPawnToGrid, Connections.PAWN_ADDED_TO_GRID );
+                };
+                mainGrid.TemplateDragDropped += (s, e) =>
+                {
+                    LastTouchedPawn = e.Pawn;
+#if DEBUG
+                    OnVerboseDebugging(new VerboseDebugArgs(String.Format("{0} added to grid, from Template [{1}]", LastTouchedPawn.Name, LastTouchedPawn.UniqueID)));
+#endif
+                    Connections.Current.Broadcast(Connections.Commands.AddPawnFromTemplateToGrid, Connections.TEMPLATE_ADDED_TO_GRID);
                 };
                 mainGrid.PawnMoved += (s, e) =>
                 {
@@ -67,6 +76,25 @@ namespace RpgGrid
             }
         }
         public PawnManager MainPawnManager { get; private set; }
+
+        private GridPawn lastTouchedPawn;
+        public GridPawn LastTouchedPawn
+        {
+            get
+            {
+                if(lastTouchedPawn == null)
+                {
+                    throw new Exception("No pawn touched");
+                }
+
+                return lastTouchedPawn;
+            }
+
+            set
+            {
+                lastTouchedPawn = value;
+            }
+        }
 
         #endregion
 
@@ -301,8 +329,6 @@ namespace RpgGrid
             }
         }
 
-
-
         [ResponseMethods(Connections.TEMPLATES_SENDING)]
         private DataRes SendTemplates(byte[] buffer)
         {
@@ -318,9 +344,83 @@ namespace RpgGrid
             }
         }
 
+
+        [ResponseMethods(Connections.PAWN_CREATED_FROM_TEMPLATE)]
+        private DataRes PawnCreatedFromTemplate(byte[] buffer)
+        {
+            var pawnUniqueID = LastTouchedPawn.UniqueID;
+            var check = LastTouchedPawn.IsTemplateGenerated();
+#if DEBUG
+            OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn is {0}generated from template", check ? "" : "NOT ")));
+#endif
+            if (check)
+            {
+                return new DataRes(Connections.Commands.Yes.ToByteArray());
+            }
+            else
+            {
+                return new DataRes(Connections.Commands.No.ToByteArray());
+            }
+        }
+
+        [ResponseMethods(Connections.PAWN_ADDED_TO_GRID)]
+        private DataRes PawnAddedToGrid(byte[] buffer)
+        {
+            if (buffer == null)
+            {
+                // Telling that pawn is added
+                var pawnUniqueID = LastTouchedPawn.UniqueID;
+#if DEBUG
+                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn is added to grid: {0} [OUT]", pawnUniqueID)));
+#endif
+                return new DataRes(GetBytesFromString(pawnUniqueID));
+                
+            }
+            else
+            {
+                var pawnUniqueID = GetStringFromByteArray(buffer);
+                MainGrid.DragDropAdding(MainPawnManager.RemoveByUniqueID(pawnUniqueID), new Point());
+#if DEBUG
+                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn is added to grid: {0} [IN]", pawnUniqueID)));
+#endif
+                return DataRes.Empty;
+            }
+        }
+
+        [ResponseMethods(Connections.TEMPLATE_ADDED_TO_GRID)]
+        private DataRes TemplateAddedToGrid(byte[] buffer)
+        {
+            if (buffer == null)
+            {
+                // Telling that pawn is added
+                var pawnUniqueID = LastTouchedPawn.UniqueID;
+#if DEBUG
+                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn is added to grid: {0} [OUT]", pawnUniqueID)));
+#endif
+
+                using (var ms = new MemoryStream())
+                {
+                    BinaryFormatter.Serialize(ms, LastTouchedPawn);
+#if DEBUG
+                    OnVerboseDebugging(new VerboseDebugArgs("Pawn was generated: sent integrally"));
+#endif
+                    LastTouchedPawn.NormalizeUniqueID();
+                    return new DataRes(ms.ToArray());
+                }
+            }
+            else
+            {
+                throw new Exception("READ ENTIRE PAWN");
+#if DEBUG
+                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn is added to grid from template: {0} [IN]", "Name??")));
+#endif
+                return DataRes.Empty;
+            }
+        }
+
         #endregion
 
-        #region VERBOSE_DEBUGGING
+            #region VERBOSE_DEBUGGING
 #if DEBUG
         public class VerboseDebugArgs : EventArgs
         {

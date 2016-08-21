@@ -33,6 +33,10 @@ namespace NetUtils
         public const string PAWNS_RECEIVING = "pawnsRec";
         public const string TEMPLATES_SENDING = "templatesSend";
         public const string TEMPLATES_RECEIVING = "templatesRec";
+        public const string PAWN_CREATED_FROM_TEMPLATE = "pawnFromTemplate";
+        public const string PAWN_ADDED_TO_GRID = "pawnAddedToGrid";
+        public const string TEMPLATE_ADDED_TO_GRID = "templateAddedToGrid";
+        public const string MOVED_PAWN_IN_GRID = "pawnMoved";
 
         #endregion
 
@@ -54,9 +58,14 @@ namespace NetUtils
             InitialDataRequested,
             InitialDataReceived,
             MapReceived,
-            //PawnReceived, //???
             PawnsReceived,
             Templatesreceived,
+            AddPawnToGrid,
+            AddPawnFromTemplateToGrid,
+            MovePawnTo,
+            Broadcast,
+            Yes,
+            No,
             CloseChannel,
             ClosedChannel,
         };
@@ -97,6 +106,9 @@ namespace NetUtils
         private Dictionary<int, TcpListener> serverListeners;
         private Dictionary<int, TcpClient> serverSocks;
 
+        /// <summary>
+        /// Not null if it's a client
+        /// </summary>
         private TcpClient clientTCP;
 
         public delegate void ReceivedMessageDelegate(TcpClient tcpClient, BackgroundWorker bwListener);
@@ -127,7 +139,7 @@ namespace NetUtils
             }
         }
 
-        #region BEHAVIOURS
+        #region REACTIVE BEHAVIOURS
 
         [CommandBehaviour(Commands.Ping)]
         public void PingBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
@@ -230,6 +242,28 @@ namespace NetUtils
             ReceiveTemplates(tcpClient);
 
             Model.EndShowProcessing();
+            bwListener.RunWorkerAsync();
+        }
+
+        [CommandBehaviour(Commands.AddPawnToGrid)]
+        public void OnAddPawnToGrid(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            PawnAddedToGrid(tcpClient);
+            bwListener.RunWorkerAsync();
+        }
+
+        [CommandBehaviour(Commands.AddPawnFromTemplateToGrid)]
+        public void OnAddPawnFromTemplateToGrid(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            PawnAddedFromTemplateToGrid(tcpClient);
+            bwListener.RunWorkerAsync();
+        }
+
+        [CommandBehaviour(Commands.Broadcast)]
+        public void Broadcast(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            //Broadcast(); // How to receive command?
+            MessageBox.Show("How can client broadcast client's message?");
             bwListener.RunWorkerAsync();
         }
 
@@ -359,6 +393,30 @@ namespace NetUtils
             tcpClient.Client.Send(Commands.Done.ToByteArray());
         }
 
+        private void PawnAddedToGrid(TcpClient tcpClient)
+        {
+            byte[] sizeBuf = new byte[sizeof(int)];
+            tcpClient.Client.Receive(sizeBuf);
+            byte[] buffer = new byte[BitConverter.ToInt32(sizeBuf, 0)];
+            if (buffer.Length > 0)
+            {
+                tcpClient.Client.Receive(buffer);
+                Model.ProcessData(PAWN_ADDED_TO_GRID, buffer);
+            }
+        }
+
+        private void PawnAddedFromTemplateToGrid(TcpClient tcpClient)
+        {
+            byte[] sizeBuf = new byte[sizeof(int)];
+            tcpClient.Client.Receive(sizeBuf);
+            byte[] buffer = new byte[BitConverter.ToInt32(sizeBuf, 0)];
+            if (buffer.Length > 0)
+            {
+                tcpClient.Client.Receive(buffer);
+                Model.ProcessData(TEMPLATE_ADDED_TO_GRID, buffer);
+            }
+        }
+
         #endregion
 
         public string InvitePlayer(out Int32 sockID, out BackgroundWorker waitingPlayerBw, out Button closeConnectionButton)
@@ -469,7 +527,6 @@ namespace NetUtils
             AcceptInvite(IPAddress.Parse(serverAddress), int.Parse(serverPort));
         }
 
-        
         public void CloseByID(int sockID)
         {
             if (serverListeners.ContainsKey(sockID))
@@ -540,7 +597,57 @@ namespace NetUtils
 
             return false;
         }
-        
+
+        public bool Broadcast(Commands commandToBroadcast, string semantic)
+        {
+            return Broadcast(commandToBroadcast, new string[] { semantic });
+        }
+
+        public bool Broadcast(Commands commandToBroadcast, string[] semantics)
+        {
+            if(clientTCP != null) // If I'm a Client
+            {
+                var tcpClient = clientTCP.Client;
+                clientTCP.Client.Send(Commands.Broadcast.ToByteArray());
+                // Send what to broadcast
+                // 1 - command to broadcast
+                clientTCP.Client.Send(commandToBroadcast.ToByteArray());
+                // 2 - buffer to send after that
+                throw new Exception("FINISH BROADCASTING");
+            }
+            else // I'm a server
+            {
+                var lstData = new DataRes[semantics.Length];
+
+                for (int i = 0; i < semantics.Length; i++)
+                {
+                    lstData[i] = Model.ProcessData(semantics[i], null);
+                }
+
+                foreach (var sockID in serverSocks.Keys)
+                {
+                    var bw = new BackgroundWorker();
+                    var localID = sockID;
+
+                    bw.DoWork += (s, e) =>
+                    {
+                        var tcpClient = serverSocks[localID].Client;
+                        tcpClient.Send(commandToBroadcast.ToByteArray());
+                        for (int i = 0; i < lstData.Length; i++)
+                        {
+                            var curData = lstData[i];
+
+                            tcpClient.Send(curData.Length);
+                            tcpClient.Send(curData.Buffer);
+                        }
+                    };
+
+                    bw.RunWorkerAsync();
+                }
+            }
+            return false;
+        }
+
         #endregion
     }
 }

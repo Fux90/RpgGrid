@@ -44,6 +44,14 @@ namespace RpgGridUserControls
 
         public const float baseDim = 30.0f;
 
+        public ControlCollection GridPawnControls
+        {
+            get
+            {
+                return pnlMain.Controls;
+            }
+        }
+
         public int Columns
         {
             get
