@@ -4,6 +4,7 @@ using RpgGridUserControls;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -19,11 +20,53 @@ namespace RpgGrid
 #if DEBUG
         public event EventHandler<VerboseDebugArgs> VerboseDebugging;
 #endif
+
+        #region CONTROLS
         public Form ViewContainer { get; private set; }
 
         public ResourceManager ResourceManager{ get; private set; }
         public Grid MainGrid { get; private set; }
         public PawnManager MainPawnManager { get; private set; }
+
+        #endregion
+
+        #region PATHS
+
+        private string mapsFolder;
+        public string MapsFolder
+        {
+            get
+            {
+                return CreateIfNotExistAndGetFolder(ref mapsFolder);
+            }
+
+            set
+            {
+                mapsFolder = value;
+            }
+        }
+        
+        private string CreateDefaultMapFolder()
+        {
+            return Path.Combine("Data", "Maps");
+        }
+
+        private string CreateIfNotExistAndGetFolder(ref string folder)
+        {
+            if (folder == null)
+            {
+                folder = CreateDefaultMapFolder();
+            }
+            
+            if (!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
+
+            return folder;
+        }
+
+        #endregion
 
         private BinaryFormatter binaryFormatter;
         private BinaryFormatter BinaryFormatter
@@ -78,28 +121,99 @@ namespace RpgGrid
             }
         }
 
+        [ResponseMethods(Connections.MAP_NAME_SENDING)]
+        private DataRes SendMapName(byte[] buffer)
+        {            
+#if DEBUG
+            OnVerboseDebugging(new VerboseDebugArgs(String.Format("Sent map name: {0}", MainGrid.ImagePath)));
+#endif
+            return new DataRes(GetBytesFromString(MainGrid.ImagePath));
+        }
+
+        [ResponseMethods(Connections.MAP_EXTRAINFO_SENDING)]
+        private DataRes SendMapExtraInfo(byte[] buffer)
+        {
+            var content = File.ReadAllText(Path.ChangeExtension(MainGrid.ImagePath, Grid.metricInfoExt));
+#if DEBUG
+            OnVerboseDebugging(new VerboseDebugArgs("Sending map extra info: " + content));
+#endif
+            return new DataRes(GetBytesFromString(content));
+        }
+
         [ResponseMethods(Connections.MAP_SENDING)]
-        private DataRes SendMap(byte[] buffer)
+        private DataRes SendMapData(byte[] buffer)
         {
             using (var ms = new MemoryStream())
             {
                 MainGrid.Image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+#if DEBUG
+                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Sent map: {0}x{1}", MainGrid.Image.Width, MainGrid.Image.Height)));
+#endif
                 return new DataRes(ms.ToArray());
             }
+        }
+
+        string tmpMapName;
+        [ResponseMethods(Connections.MAP_NAME_RECEIVING)]
+        private DataRes ReceiveMapName(byte[] buffer)
+        {
+            tmpMapName = GetStringFromByteArray(buffer);
 #if DEBUG
-            OnVerboseDebugging(new VerboseDebugArgs(String.Format("Sent map: {0}x{1}", MainGrid.Image.Width, MainGrid.Image.Height)));
+            OnVerboseDebugging(new VerboseDebugArgs(String.Format("Received map name: {0}", tmpMapName)));
 #endif
             return DataRes.Empty;
         }
 
-        [ResponseMethods(Connections.MAP_RECEIVING)]
-        private DataRes ReceiveMap(byte[] buffer)
+        [ResponseMethods(Connections.MAP_EXTRAINFO_RECEIVING)]
+        private DataRes ReceiveMapExtraInfo(byte[] buffer)
         {
-            var ms = new MemoryStream(buffer);
-            MainGrid.Image = Image.FromStream(ms);
+            if (tmpMapName == null)
+            {
+                throw new Exception("Not received MapName");
+            }
+            else
+            {
+                var outpath = Path.Combine(MapsFolder, Path.ChangeExtension(tmpMapName, Grid.metricInfoExt));
+                var content = GetStringFromByteArray(buffer);
+
+                File.WriteAllText(outpath, content);
 #if DEBUG
-            OnVerboseDebugging(new VerboseDebugArgs(String.Format("Received map: {0}x{1}", MainGrid.Image.Width, MainGrid.Image.Height)));
+                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Received extra info: {0}", outpath)));
 #endif
+            }
+            return DataRes.Empty;
+        }
+
+        [ResponseMethods(Connections.MAP_RECEIVING)]
+        private DataRes ReceiveMapData(byte[] buffer)
+        {
+            if (tmpMapName == null)
+            {
+                throw new Exception("Not received MapName");
+            }
+            else
+            {
+                var outpath = Path.Combine(MapsFolder, Path.ChangeExtension(tmpMapName, "png"));
+
+                using (var ms = new MemoryStream(buffer))
+                {
+                    using (var fs = new FileStream(outpath, FileMode.OpenOrCreate))
+                    {
+                        ms.WriteTo(fs);
+                        fs.Flush();
+                        fs.Close();
+                    }
+
+                    ms.Close();
+                    ms.Flush();
+                }
+
+                MainGrid.ImagePath = outpath;
+                tmpMapName = null;
+#if DEBUG
+                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Received map: {0}x{1}", MainGrid.Image.Width, MainGrid.Image.Height)));
+#endif
+            }
             return DataRes.Empty;
         }
 

@@ -127,7 +127,7 @@ namespace RpgGridUserControls
                 return image;
             }
 
-            set
+            private set
             {
                 ResizeToFitImage(value);
                 ZoomFactor = 1.0f;
@@ -198,7 +198,7 @@ namespace RpgGridUserControls
             get;
             private set;
         }
-        private const string metricInfoExt = "metricInfo";
+        public const string metricInfoExt = "metricInfo";
         private string imagePath;
         public string ImagePath
         {

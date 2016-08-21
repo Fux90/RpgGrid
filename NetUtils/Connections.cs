@@ -23,8 +23,12 @@ namespace NetUtils
     {
         #region COMMUNICATION_SEMANTICS
 
-        public const string MAP_RECEIVING = "mapRec";
+        public const string MAP_NAME_SENDING = "mapNameSend";
+        public const string MAP_EXTRAINFO_SENDING = "mapExtraSend";
         public const string MAP_SENDING = "mapSend";
+        public const string MAP_NAME_RECEIVING = "mapNameReceive";
+        public const string MAP_EXTRAINFO_RECEIVING = "mapExtraReceive";
+        public const string MAP_RECEIVING = "mapRec";
         public const string PAWNS_AND_TEMPLATES_RECEIVING = "pawnsAndTemplatesRec";
         public const string PAWNS_AND_TEMPLATES_SENDING = "pawnsAndTemplatesSend";
 
@@ -162,17 +166,13 @@ namespace NetUtils
         [CommandBehaviour(Commands.InitialDataRequested)]
         public void OnInitialDataRequestedBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
         {
-            MessageBox.Show("I was asked for initial data");
+            //MessageBox.Show("I was asked for initial data");
             tcpClient.Client.Send(Commands.InitialDataReceived.ToByteArray());
             // Send initial data
             var checkpoint = new byte[1];
 
             // Map
-            var mapData = Model.ProcessData(MAP_SENDING, null);
-            tcpClient.Client.Send(mapData.Length);
-            tcpClient.Client.Send(mapData.Buffer);
-
-            tcpClient.Client.Receive(checkpoint);
+            SendMapData(tcpClient, checkpoint);
 
             // Pawns and templates
             var pawnsTemplatesData = Model.ProcessData(PAWNS_AND_TEMPLATES_SENDING, null);
@@ -184,6 +184,27 @@ namespace NetUtils
             bwListener.RunWorkerAsync();
         }
 
+        private void SendMapData(TcpClient tcpClient, byte[] checkpoint)
+        {
+            var mapName = Model.ProcessData(MAP_NAME_SENDING, null);
+            tcpClient.Client.Send(mapName.Length);
+            tcpClient.Client.Send(mapName.Buffer);
+
+            tcpClient.Client.Receive(checkpoint);
+
+            var mapExtraInfo = Model.ProcessData(MAP_EXTRAINFO_SENDING, null);
+            tcpClient.Client.Send(mapExtraInfo.Length);
+            tcpClient.Client.Send(mapExtraInfo.Buffer);
+
+            tcpClient.Client.Receive(checkpoint);
+
+            var mapData = Model.ProcessData(MAP_SENDING, null);
+            tcpClient.Client.Send(mapData.Length);
+            tcpClient.Client.Send(mapData.Buffer);
+
+            tcpClient.Client.Receive(checkpoint);
+        }
+
         [CommandBehaviour(Commands.InitialDataReceived)]
         public void OnInitialDataReceivedBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
         {
@@ -191,9 +212,8 @@ namespace NetUtils
             Model.ShowProcessing();
 
             ReceiveMap(tcpClient);
-            tcpClient.Client.Send(Commands.Done.ToByteArray());
+            
             //ReceivePawnsAndTemplates(tcpClient);
-            //tcpClient.Client.Send(Commands.Done.ToByteArray());
 
             Model.EndShowProcessing();
 
@@ -213,6 +233,41 @@ namespace NetUtils
 
         private void ReceiveMap(TcpClient tcpClient)
         {
+            ReceiveMapName(tcpClient);
+            ReceiveMapExtraInfo(tcpClient);
+            ReceiveMapData(tcpClient);
+        }
+
+        private void ReceiveMapName(TcpClient tcpClient)
+        {
+            byte[] sizeBuf = new byte[sizeof(int)];
+            tcpClient.Client.Receive(sizeBuf);
+            byte[] buffer = new byte[BitConverter.ToInt32(sizeBuf, 0)];
+            if (buffer.Length > 0)
+            {
+                tcpClient.Client.Receive(buffer);
+                Model.ProcessData(MAP_NAME_RECEIVING, buffer);
+            }
+
+            tcpClient.Client.Send(Commands.Done.ToByteArray());
+        }
+
+        private void ReceiveMapExtraInfo(TcpClient tcpClient)
+        {
+            byte[] sizeBuf = new byte[sizeof(int)];
+            tcpClient.Client.Receive(sizeBuf);
+            byte[] buffer = new byte[BitConverter.ToInt32(sizeBuf, 0)];
+            if (buffer.Length > 0)
+            {
+                tcpClient.Client.Receive(buffer);
+                Model.ProcessData(MAP_EXTRAINFO_RECEIVING, buffer);
+            }
+
+            tcpClient.Client.Send(Commands.Done.ToByteArray());
+        }
+
+        private void ReceiveMapData(TcpClient tcpClient)
+        {
             byte[] sizeBuf = new byte[sizeof(int)];
             tcpClient.Client.Receive(sizeBuf);
             byte[] buffer = new byte[BitConverter.ToInt32(sizeBuf, 0)];
@@ -221,6 +276,8 @@ namespace NetUtils
                 tcpClient.Client.Receive(buffer);
                 Model.ProcessData(MAP_RECEIVING, buffer);
             }
+
+            tcpClient.Client.Send(Commands.Done.ToByteArray());
         }
 
         private void ReceivePawnsAndTemplates(TcpClient tcpClient)
@@ -233,6 +290,8 @@ namespace NetUtils
                 tcpClient.Client.Receive(buffer);
                 Model.ProcessData(PAWNS_AND_TEMPLATES_RECEIVING, buffer);
             }
+
+            tcpClient.Client.Send(Commands.Done.ToByteArray());
         }
 
         #endregion
