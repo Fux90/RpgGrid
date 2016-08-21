@@ -254,7 +254,7 @@ namespace NetUtils
             }
 #endif
             var s = new TcpListener(localAddr, port);
-
+            
             s.Start();
             var task = s.AcceptTcpClientAsync();
             
@@ -289,6 +289,7 @@ namespace NetUtils
             bwWaitForConnection.DoWork += (s, e) =>
             {
                 var tcpClient = task.Result;
+                tcpClient.Client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
 
                 e.Result = new object[]
                 {
@@ -307,6 +308,8 @@ namespace NetUtils
                     var tcpClient = (TcpClient)results[1];
 
                     serverSocks[id] = tcpClient;
+
+                    serverListeners[id].Stop();
                     serverListeners.Remove(id);
 
                     StartListeningThread(tcpClient);
