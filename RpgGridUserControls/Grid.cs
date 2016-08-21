@@ -129,6 +129,7 @@ namespace RpgGridUserControls
 
             private set
             {
+                OnBackgroundImageChanged(EventArgs.Empty);
                 ResizeToFitImage(value);
                 ZoomFactor = 1.0f;
                 _vieportAtComplete = value == null ? new Rectangle(): new Rectangle(new Point(), new Size(value.Width, value.Height));
@@ -282,11 +283,13 @@ namespace RpgGridUserControls
             }
         }
 
-        public void Remove(GridPawn ctrl)
+        public GridPawn Remove(GridPawn ctrl)
         {
             ctrl.Rotate90Degrees -= Ctrl_Rotate90Degrees;
             ctrl.MouseUp -= Pawn_MouseUp;
             Controls.Remove(ctrl);
+
+            return ctrl;
         }
 
         private void Ctrl_Rotate90Degrees(object sender, EventArgs e)
@@ -480,6 +483,25 @@ namespace RpgGridUserControls
             {
                 ComputeControlsLocation();
                 ShowAllControls();
+            }
+            else if (e.Button == MouseButtons.Right)
+            {
+                ChangeImageDialog();
+            }
+        }
+
+        private void ChangeImageDialog()
+        {
+            using (var oDlg = new OpenFileDialog())
+            {
+                oDlg.Title = "Change Map";
+                oDlg.Multiselect = false;
+                oDlg.Filter = "Jpg Files|*.jpg|Png Files|*.png|Bmp Files|*.bmp|All Files|*.*";
+
+                if (oDlg.ShowDialog() == DialogResult.OK)
+                {
+                    this.ImagePath = oDlg.FileName;
+                }
             }
         }
 

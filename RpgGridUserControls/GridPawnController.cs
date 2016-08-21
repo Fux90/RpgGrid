@@ -195,6 +195,7 @@ namespace RpgGridUserControls
                 {
                     using (var oDlg = new OpenFileDialog())
                     {
+                        oDlg.Title = String.Format("Change {0}'s image", currentPawn.Name);
                         oDlg.Multiselect = false;
                         oDlg.Filter = "Jpg Files|*.jpg|Png Files|*.png|Bmp Files|*.bmp|All Files|*.*";
 

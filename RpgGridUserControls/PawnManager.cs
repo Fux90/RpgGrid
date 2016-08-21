@@ -70,6 +70,11 @@ namespace RpgGridUserControls
             this.SetStyle(ControlStyles.UserPaint, true);
         }
 
+        public void LoadPawn(GridPawn gridPawn)
+        {
+            LoadPawns(new GridPawn[] { gridPawn });
+        }
+
         public void LoadPawns(GridPawn[] gridPawns)
         {
             pawnContainer1.LoadPawns(gridPawns);

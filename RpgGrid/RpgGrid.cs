@@ -25,7 +25,27 @@ namespace RpgGrid
         public Form ViewContainer { get; private set; }
 
         public ResourceManager ResourceManager{ get; private set; }
-        public Grid MainGrid { get; private set; }
+        private Grid mainGrid;
+        public Grid MainGrid
+        {
+            get
+            {
+                return mainGrid;
+            }
+
+            private set
+            {
+                mainGrid = value;
+                mainGrid.BackgroundImageChanged += (s, e) =>
+                {
+                    for (int i = 0; i < mainGrid.Controls.Count; i++)
+                    {
+                        var removed = mainGrid.Remove((GridPawn)mainGrid.Controls[i]);
+                        MainPawnManager.LoadPawn(removed);
+                    }
+                };
+            }
+        }
         public PawnManager MainPawnManager { get; private set; }
 
         #endregion
@@ -123,11 +143,12 @@ namespace RpgGrid
 
         [ResponseMethods(Connections.MAP_NAME_SENDING)]
         private DataRes SendMapName(byte[] buffer)
-        {            
+        {
+            var name = Path.GetFileName(MainGrid.ImagePath);            
 #if DEBUG
-            OnVerboseDebugging(new VerboseDebugArgs(String.Format("Sent map name: {0}", MainGrid.ImagePath)));
+            OnVerboseDebugging(new VerboseDebugArgs(String.Format("Sent map name: {0}", name)));
 #endif
-            return new DataRes(GetBytesFromString(MainGrid.ImagePath));
+            return new DataRes(GetBytesFromString(name));
         }
 
         [ResponseMethods(Connections.MAP_EXTRAINFO_SENDING)]
@@ -135,7 +156,7 @@ namespace RpgGrid
         {
             var content = File.ReadAllText(Path.ChangeExtension(MainGrid.ImagePath, Grid.metricInfoExt));
 #if DEBUG
-            OnVerboseDebugging(new VerboseDebugArgs("Sending map extra info: " + content));
+            OnVerboseDebugging(new VerboseDebugArgs("Sending map extra info: " + Environment. NewLine + content));
 #endif
             return new DataRes(GetBytesFromString(content));
         }
