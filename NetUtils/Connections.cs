@@ -42,12 +42,14 @@ namespace NetUtils
 
         public enum Commands : byte
         {
+            Done,
             Ping,
             Pong,
             InitialDataRequested,
             InitialDataReceived,
-            Done,
+            MapReceived,
             CloseChannel,
+            ClosedChannel,
         };
 
         private static Connections current;
@@ -133,6 +135,30 @@ namespace NetUtils
             bwListener.RunWorkerAsync();
         }
 
+        [CommandBehaviour(Commands.CloseChannel)]
+        public void CloseBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            MessageBox.Show("They want me to be closed");
+            tcpClient.Client.Send(Commands.ClosedChannel.ToByteArray());
+            tcpClient.Client.Shutdown(SocketShutdown.Both);
+            tcpClient.Client.Close();
+            tcpClient.Close();
+        }
+
+        [CommandBehaviour(Commands.ClosedChannel)]
+        public void ClosedChannelBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            tcpClient.Client.Shutdown(SocketShutdown.Both);
+            tcpClient.Client.Close();
+            tcpClient.Close();
+            if(serverSocks.ContainsValue(tcpClient))
+            {
+                var item = serverSocks.First(kvp => kvp.Value == tcpClient);
+                serverSocks.Remove(item.Key);
+            }
+            MessageBox.Show("Closed!");
+        }
+
         [CommandBehaviour(Commands.InitialDataRequested)]
         public void OnInitialDataRequestedBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
         {
@@ -171,6 +197,17 @@ namespace NetUtils
 
             Model.EndShowProcessing();
 
+            bwListener.RunWorkerAsync();
+        }
+
+        [CommandBehaviour(Commands.MapReceived)]
+        public void OnMapReceivedBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            Model.ShowProcessing();
+
+            ReceiveMap(tcpClient);
+
+            Model.EndShowProcessing();
             bwListener.RunWorkerAsync();
         }
 
@@ -315,7 +352,7 @@ namespace NetUtils
             }
             else if(serverSocks.ContainsKey(sockID))
             {
-                serverSocks[sockID].Close();
+                serverSocks[sockID].Client.Send(Commands.CloseChannel.ToByteArray());
             }
             else
             {
@@ -368,7 +405,7 @@ namespace NetUtils
 
         public bool PingServer()
         {
-            if(clientTCP.Connected)
+            if(clientTCP != null && clientTCP.Connected)
             {
                 clientTCP.Client.Send(Commands.Ping.ToByteArray());
                 return true;

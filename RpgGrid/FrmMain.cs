@@ -266,7 +266,7 @@ namespace RpgGrid
             Button closeConnectionBtn;
             var inviteInfo = Connections.Current.InvitePlayer(out sockID, out waitPlayerBw, out closeConnectionBtn);
             waitPlayerBw.RunWorkerAsync();
-            MessageBox.Show("Opened socket");
+            //MessageBox.Show("Opened socket");
             lblConnectionAddress.Text = String.Format("Address {0}", inviteInfo);
 
             ManageCloseConnectionButton(closeConnectionBtn, inviteInfo);

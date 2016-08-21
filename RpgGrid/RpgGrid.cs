@@ -78,13 +78,27 @@ namespace RpgGrid
             }
         }
 
+        [ResponseMethods(Connections.MAP_SENDING)]
+        private DataRes SendMap(byte[] buffer)
+        {
+            using (var ms = new MemoryStream())
+            {
+                MainGrid.Image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                return new DataRes(ms.ToArray());
+            }
+#if DEBUG
+            OnVerboseDebugging(new VerboseDebugArgs(String.Format("Sent map: {0}x{1}", MainGrid.Image.Width, MainGrid.Image.Height)));
+#endif
+            return DataRes.Empty;
+        }
+
         [ResponseMethods(Connections.MAP_RECEIVING)]
         private DataRes ReceiveMap(byte[] buffer)
         {
             var ms = new MemoryStream(buffer);
             MainGrid.Image = Image.FromStream(ms);
 #if DEBUG
-            OnVerboseDebugging(new VerboseDebugArgs("Receive map"));
+            OnVerboseDebugging(new VerboseDebugArgs(String.Format("Received map: {0}x{1}", MainGrid.Image.Width, MainGrid.Image.Height)));
 #endif
             return DataRes.Empty;
         }
@@ -99,19 +113,7 @@ namespace RpgGrid
             return DataRes.Empty;
         }
 
-        [ResponseMethods(Connections.MAP_SENDING)]
-        private DataRes SendMap(byte[] buffer)
-        {
-            using (var ms = new MemoryStream())
-            {
-                MainGrid.Image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
-                return new DataRes(ms.ToArray());
-            }
-#if DEBUG
-            OnVerboseDebugging(new VerboseDebugArgs("Receive map"));
-#endif
-            return DataRes.Empty;
-        }
+        
 
         [ResponseMethods(Connections.PAWNS_AND_TEMPLATES_SENDING)]
         private DataRes SendPawnsAndTemplates(byte[] buffer)
@@ -125,6 +127,7 @@ namespace RpgGrid
 
         #endregion
 
+        #region VERBOSE_DEBUGGING
 #if DEBUG
         public class VerboseDebugArgs : EventArgs
         {
@@ -149,5 +152,6 @@ namespace RpgGrid
             }
         }
 #endif
+        #endregion
     }
 }
