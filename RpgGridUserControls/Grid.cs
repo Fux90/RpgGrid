@@ -97,6 +97,31 @@ namespace RpgGridUserControls
             }
         }
 
+        #region EVENT ARGS
+
+        public class PawnEventArgs : EventArgs
+        {
+            public GridPawn Pawn { get; private set; }
+
+            public PawnEventArgs(GridPawn pawn)
+            {
+                Pawn = pawn;
+            }
+        }
+
+        public class PawnAndLocationEventArgs : PawnEventArgs
+        {
+            public Point Location { get; private set; }
+
+            public PawnAndLocationEventArgs(GridPawn pawn, Point location)
+                : base(pawn)
+            {
+                Location = location;
+            }
+        }
+
+        #endregion
+
         public CharacterPawnListener PawnListener { get; set; }
         public CharacterPawnController PawnController { get; set; }
 
@@ -255,6 +280,10 @@ namespace RpgGridUserControls
 
         private Control PreviousFocused { get; set; }
 
+        public event EventHandler<PawnEventArgs> PawnAdded;
+        public event EventHandler<PawnEventArgs> PawnRemoved;
+        public event EventHandler<PawnAndLocationEventArgs> PawnMoved;
+
         public Grid()
         {
             InitializeComponent();
@@ -275,6 +304,8 @@ namespace RpgGridUserControls
             if (!Controls.Contains(ctrl))
             {
                 Controls.Add(ctrl);
+                OnPawnAdded(new PawnEventArgs(ctrl));
+
                 ctrl.SetSizeAtNoZoom(PixelsInFiveFeet);
                 SetPawnSize(ctrl);
                 ctrl.Rotate90Degrees += Ctrl_Rotate90Degrees;
@@ -288,6 +319,7 @@ namespace RpgGridUserControls
             ctrl.Rotate90Degrees -= Ctrl_Rotate90Degrees;
             ctrl.MouseUp -= Pawn_MouseUp;
             Controls.Remove(ctrl);
+            OnPawnRemoved(new PawnEventArgs(ctrl));
 
             return ctrl;
         }
@@ -302,6 +334,16 @@ namespace RpgGridUserControls
             SetPawnSize(pawn);
 
             this.Invalidate();
+        }
+
+        protected override void OnControlRemoved(ControlEventArgs e)
+        {
+            if(typeof(GridPawn).IsAssignableFrom(e.Control.GetType()))
+            {
+                OnPawnRemoved(new PawnEventArgs((GridPawn)e.Control));
+            }
+
+            base.OnControlRemoved(e);
         }
 
         protected override void OnDragEnter(DragEventArgs e)
@@ -337,31 +379,6 @@ namespace RpgGridUserControls
                 InvalidatePawnsImage();
             }
         }
-
-        //private bool IsGridPawn(DragEventArgs e, out Type type)
-        //{
-        //    Type parent = typeof(GridPawn);
-        //    var types = Assembly.GetExecutingAssembly().GetTypes(); // Maybe select some other assembly here, depending on what you need
-        //    var inheritingTypes = types.Where(t => parent.IsAssignableFrom(t));
-
-        //    foreach (var item in inheritingTypes)
-        //    {
-        //        if (e.Data.GetDataPresent(item))
-        //        {
-        //            type = item;
-        //            return true;
-        //        }
-        //    }
-
-        //    type = null;
-        //    return false;
-        //}
-
-        //private bool IsGridPawn(DragEventArgs e)
-        //{
-        //    Type dummy;
-        //    return IsGridPawn(e, out dummy);
-        //}
 
         private bool IsOfType<T>(DragEventArgs e, out Type type)
         {
@@ -601,6 +618,7 @@ namespace RpgGridUserControls
             }
 
             ctrl.Location = point;
+            OnPawnMoved(new PawnAndLocationEventArgs(ctrl, point));
         }
 
         private void ComputeControlsSize()
@@ -747,6 +765,33 @@ namespace RpgGridUserControls
                     //g.DrawImage(Image, ClientRectangle, Viewport, GraphicsUnit.Pixel);
                     g.DrawImage(Image, ClientRectangle, Viewport, GraphicsUnit.Pixel);
                 }
+            }
+        }
+
+        protected void OnPawnAdded(PawnEventArgs e)
+        {
+            var tmp = PawnAdded;
+            if (tmp != null)
+            {
+                tmp(this, e);
+            }
+        }
+
+        protected void OnPawnRemoved(PawnEventArgs e)
+        {
+            var tmp = PawnRemoved;
+            if (tmp != null)
+            {
+                tmp(this, e);
+            }
+        }
+
+        protected void OnPawnMoved(PawnAndLocationEventArgs e)
+        {
+            var tmp = PawnMoved;
+            if (tmp != null)
+            {
+                tmp(this, e);
             }
         }
 

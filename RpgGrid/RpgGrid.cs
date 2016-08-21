@@ -36,6 +36,26 @@ namespace RpgGrid
             private set
             {
                 mainGrid = value;
+                mainGrid.PawnRemoved += (s, e) =>
+                {
+#if DEBUG
+                    OnVerboseDebugging(new VerboseDebugArgs(String.Format("Removed pawn: {0}", e.Pawn.Name)));
+#endif
+                };
+                mainGrid.PawnAdded += (s, e) =>
+                {
+                    // TODO: Call method to tell pawn is added to grid
+#if DEBUG
+                    OnVerboseDebugging(new VerboseDebugArgs("TODO: Call method to tell pawn is added to grid"));
+#endif
+                };
+                mainGrid.PawnMoved += (s, e) =>
+                {
+                    // TODO: Call method to tell pawn is moved
+#if DEBUG
+                    OnVerboseDebugging(new VerboseDebugArgs("TODO: Call method to tell pawn is moved"));
+#endif
+                };
                 mainGrid.BackgroundImageChanged += (s, e) =>
                 {
                     for (int i = 0; i < mainGrid.Controls.Count; i++)
