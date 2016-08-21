@@ -164,6 +164,24 @@ namespace RpgGridUserControls
 
         public CharacterPawn()
         {
+            init();
+        }
+
+        public CharacterPawn(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+            init();
+
+            CurrentPf = info.GetInt32(CurrentPfSerializationKey);
+            MaxPf = info.GetInt32(MaxPfSerializationKey);
+            Facing = (GridDirections)info.GetValue(FacingSerializationKey, typeof(GridDirections));
+            Notes = info.GetString(NotesSerializationKey);
+
+            ComputeRectImage();
+        }
+
+        private void init()
+        {
             InitializeComponent();
 
             this.DoubleBuffered = true;
@@ -173,12 +191,6 @@ namespace RpgGridUserControls
             pointFace = new Dictionary<GridDirections, Rectangle>();
 
             this.DoubleClick += OnDoubleClick;
-        }
-
-        public CharacterPawn(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-
         }
 
         public override void PerformRotate90Degrees()
