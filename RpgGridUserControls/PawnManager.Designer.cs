@@ -1,4 +1,6 @@
-﻿namespace RpgGridUserControls
+﻿using System;
+
+namespace RpgGridUserControls
 {
     partial class PawnManager
     {

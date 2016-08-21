@@ -84,5 +84,15 @@ namespace RpgGridUserControls
         {
             templateContainer1.LoadPawns(gridPawnTemplates);
         }
+
+        public GridPawn[] GetPawns()
+        {
+            return pawnContainer1.GetAll();
+        }
+
+        public CharacterPawnTemplate[] GetPawnTemplates()
+        {
+            return templateContainer1.GetAll();
+        }
     }
 }

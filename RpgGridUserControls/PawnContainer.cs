@@ -41,32 +41,6 @@ namespace RpgGridUserControls
 
         #region DELEGATION
 
-        //public new event DragEventHandler DragDrop
-        //{
-        //    add
-        //    {
-        //        scrollableContainerGridPawns.DragDrop += value;
-        //    }
-
-        //    remove
-        //    {
-        //        scrollableContainerGridPawns.DragDrop -= value;
-        //    }
-        //}
-
-        //public new event DragEventHandler DragEnter
-        //{
-        //    add
-        //    {
-        //        scrollableContainerGridPawns.DragEnter += value;
-        //    }
-
-        //    remove
-        //    {
-        //        scrollableContainerGridPawns.DragEnter -= value;
-        //    }
-        //}
-
         public float CellHeight
         {
             get { return scrollableContainerGridPawns.CellHeight; }
@@ -90,6 +64,11 @@ namespace RpgGridUserControls
                 }
             };
             bw.RunWorkerAsync();
+        }
+
+        public GridPawn[] GetAll()
+        {
+            return scrollableContainerGridPawns.All();
         }
 
         #endregion

@@ -88,6 +88,19 @@ namespace RpgGridUserControls
             this.DoubleBuffered = true;
         }
 
+        public T[] All()
+        {
+            var lst = new List<T>(Controls.Count);
+            for (int i = 0; i < pnlMain.Controls.Count; i++)
+            {
+                if(typeof(T).IsAssignableFrom(pnlMain.Controls[i].GetType()))
+                {
+                    lst.Add((T)pnlMain.Controls[i]);
+                }
+            }
+            return lst.ToArray();
+        }
+
         private void InitCellDimensions()
         {
             CellWidth = SetToIfZero(CellWidth, baseDim);

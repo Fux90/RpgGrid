@@ -29,8 +29,10 @@ namespace NetUtils
         public const string MAP_NAME_RECEIVING = "mapNameReceive";
         public const string MAP_EXTRAINFO_RECEIVING = "mapExtraReceive";
         public const string MAP_RECEIVING = "mapRec";
-        public const string PAWNS_AND_TEMPLATES_RECEIVING = "pawnsAndTemplatesRec";
-        public const string PAWNS_AND_TEMPLATES_SENDING = "pawnsAndTemplatesSend";
+        public const string PAWNS_SENDING = "pawnsSend";
+        public const string PAWNS_RECEIVING = "pawnsRec";
+        public const string TEMPLATES_SENDING = "templatesSend";
+        public const string TEMPLATES_RECEIVING = "templatesRec";
 
         #endregion
 
@@ -52,6 +54,9 @@ namespace NetUtils
             InitialDataRequested,
             InitialDataReceived,
             MapReceived,
+            //PawnReceived, //???
+            PawnsReceived,
+            Templatesreceived,
             CloseChannel,
             ClosedChannel,
         };
@@ -172,19 +177,63 @@ namespace NetUtils
             var checkpoint = new byte[1];
 
             // Map
-            SendMapData(tcpClient, checkpoint);
+            SendMap(tcpClient, checkpoint);
 
             // Pawns and templates
-            var pawnsTemplatesData = Model.ProcessData(PAWNS_AND_TEMPLATES_SENDING, null);
-            //tcpClient.Client.Send(pawnsTemplatesData.Length);
-            //tcpClient.Client.Send(pawnsTemplatesData.Buffer);
-            //tcpClient.Client.Receive(checkpoint);
+            SendPawnAndTemplates(tcpClient, checkpoint);
 
             // -----------------
             bwListener.RunWorkerAsync();
         }
 
-        private void SendMapData(TcpClient tcpClient, byte[] checkpoint)
+        [CommandBehaviour(Commands.InitialDataReceived)]
+        public void OnInitialDataReceivedBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            // Wait for initial data - Can do synch
+            Model.ShowProcessing();
+
+            ReceiveMap(tcpClient);
+            ReceivePawnsAndTemplates(tcpClient);
+
+            Model.EndShowProcessing();
+
+            bwListener.RunWorkerAsync();
+        }
+
+        [CommandBehaviour(Commands.MapReceived)]
+        public void OnMapReceivedBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            Model.ShowProcessing();
+
+            ReceiveMap(tcpClient);
+
+            Model.EndShowProcessing();
+            bwListener.RunWorkerAsync();
+        }
+
+        [CommandBehaviour(Commands.PawnsReceived)]
+        public void OnPawnsReceived(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            Model.ShowProcessing();
+
+            ReceivePawns(tcpClient);
+
+            Model.EndShowProcessing();
+            bwListener.RunWorkerAsync();
+        }
+
+        [CommandBehaviour(Commands.Templatesreceived)]
+        public void OnTemplatesReceived(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            Model.ShowProcessing();
+
+            ReceiveTemplates(tcpClient);
+
+            Model.EndShowProcessing();
+            bwListener.RunWorkerAsync();
+        }
+
+        private void SendMap(TcpClient tcpClient, byte[] checkpoint)
         {
             var mapName = Model.ProcessData(MAP_NAME_SENDING, null);
             tcpClient.Client.Send(mapName.Length);
@@ -203,32 +252,6 @@ namespace NetUtils
             tcpClient.Client.Send(mapData.Buffer);
 
             tcpClient.Client.Receive(checkpoint);
-        }
-
-        [CommandBehaviour(Commands.InitialDataReceived)]
-        public void OnInitialDataReceivedBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
-        {
-            // Wait for initial data - Can do synch
-            Model.ShowProcessing();
-
-            ReceiveMap(tcpClient);
-            
-            //ReceivePawnsAndTemplates(tcpClient);
-
-            Model.EndShowProcessing();
-
-            bwListener.RunWorkerAsync();
-        }
-
-        [CommandBehaviour(Commands.MapReceived)]
-        public void OnMapReceivedBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
-        {
-            Model.ShowProcessing();
-
-            ReceiveMap(tcpClient);
-
-            Model.EndShowProcessing();
-            bwListener.RunWorkerAsync();
         }
 
         private void ReceiveMap(TcpClient tcpClient)
@@ -280,7 +303,35 @@ namespace NetUtils
             tcpClient.Client.Send(Commands.Done.ToByteArray());
         }
 
+        private void SendPawnAndTemplates(TcpClient tcpClient, byte[] checkpoint)
+        {
+            SendPawns(tcpClient, checkpoint);
+            //SendTemplates(tcpClient, checkpoint);
+        }
+
+        private void SendPawns(TcpClient tcpClient, byte[] checkpoint)
+        {
+            var pawnsData = Model.ProcessData(PAWNS_SENDING, null);
+            tcpClient.Client.Send(pawnsData.Length);
+            tcpClient.Client.Send(pawnsData.Buffer);
+            tcpClient.Client.Receive(checkpoint);
+        }
+
+        private void SendTemplates(TcpClient tcpClient, byte[] checkpoint)
+        {
+            var templatesData = Model.ProcessData(TEMPLATES_SENDING, null);
+            tcpClient.Client.Send(templatesData.Length);
+            tcpClient.Client.Send(templatesData.Buffer);
+            tcpClient.Client.Receive(checkpoint);
+        }
+
         private void ReceivePawnsAndTemplates(TcpClient tcpClient)
+        {
+            ReceivePawns(tcpClient);
+            //ReceiveTemplates(tcpClient);
+        }
+
+        private void ReceivePawns(TcpClient tcpClient)
         {
             byte[] sizeBuf = new byte[sizeof(int)];
             tcpClient.Client.Receive(sizeBuf);
@@ -288,7 +339,21 @@ namespace NetUtils
             if (buffer.Length > 0)
             {
                 tcpClient.Client.Receive(buffer);
-                Model.ProcessData(PAWNS_AND_TEMPLATES_RECEIVING, buffer);
+                Model.ProcessData(PAWNS_RECEIVING, buffer);
+            }
+
+            tcpClient.Client.Send(Commands.Done.ToByteArray());
+        }
+
+        private void ReceiveTemplates(TcpClient tcpClient)
+        {
+            byte[] sizeBuf = new byte[sizeof(int)];
+            tcpClient.Client.Receive(sizeBuf);
+            byte[] buffer = new byte[BitConverter.ToInt32(sizeBuf, 0)];
+            if (buffer.Length > 0)
+            {
+                tcpClient.Client.Receive(buffer);
+                Model.ProcessData(TEMPLATES_RECEIVING, buffer);
             }
 
             tcpClient.Client.Send(Commands.Done.ToByteArray());

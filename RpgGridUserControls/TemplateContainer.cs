@@ -66,6 +66,11 @@ namespace RpgGridUserControls
             bw.RunWorkerAsync();
         }
 
+        public CharacterPawnTemplate[] GetAll()
+        {
+            return scrollableContainerGridPawnTemplates.All();
+        }
+
         #endregion
     }
 }

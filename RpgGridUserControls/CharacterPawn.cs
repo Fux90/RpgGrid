@@ -11,6 +11,7 @@ using System.Text;
 
 namespace RpgGridUserControls
 {
+    [Serializable]
     public partial class CharacterPawn : /*UserControl,*/ GridPawn
     {
         private const string CurrentPfSerializationKey = "currPf";

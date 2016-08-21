@@ -258,24 +258,51 @@ namespace RpgGrid
             return DataRes.Empty;
         }
 
-        [ResponseMethods(Connections.PAWNS_AND_TEMPLATES_RECEIVING)]
-        private DataRes ReceivePawnsAndTemplates(byte[] buffer)
+        [ResponseMethods(Connections.PAWNS_RECEIVING)]
+        private DataRes ReceivePawns(byte[] buffer)
         {
-            
+            var ms = new MemoryStream(buffer);
+            var pawns = (GridPawn[])BinaryFormatter.Deserialize(ms);
+            MainPawnManager.LoadPawns(pawns);
 #if DEBUG
-            OnVerboseDebugging(new VerboseDebugArgs("Receive pawn and templates"));
+            OnVerboseDebugging(new VerboseDebugArgs(String.Format("Received pawns: {0} bytes, {1} items", buffer.Length, pawns.Length)));
+#endif
+            return DataRes.Empty;
+        }
+        
+        [ResponseMethods(Connections.PAWNS_SENDING)]
+        private DataRes SendPawns(byte[] buffer)
+        {
+            var pawns = this.MainPawnManager.GetPawns();
+
+            using (var ms = new MemoryStream())
+            {
+                BinaryFormatter.Serialize(ms, pawns);
+#if DEBUG
+                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Sent pawns: {0} items, {1} bytes", pawns.Length, ms.Length)));
+#endif
+                return new DataRes(ms.ToArray());
+            }
+        }
+
+        [ResponseMethods(Connections.TEMPLATES_RECEIVING)]
+        private DataRes ReceiveTemplates(byte[] buffer)
+        {
+
+#if DEBUG
+            OnVerboseDebugging(new VerboseDebugArgs("Receive templates"));
 #endif
             return DataRes.Empty;
         }
 
-        
 
-        [ResponseMethods(Connections.PAWNS_AND_TEMPLATES_SENDING)]
-        private DataRes SendPawnsAndTemplates(byte[] buffer)
+
+        [ResponseMethods(Connections.TEMPLATES_SENDING)]
+        private DataRes SendTemplates(byte[] buffer)
         {
 
 #if DEBUG
-            OnVerboseDebugging(new VerboseDebugArgs("Receive pawn and templates"));
+            OnVerboseDebugging(new VerboseDebugArgs("Sent templates"));
 #endif
             return DataRes.Empty;
         }
