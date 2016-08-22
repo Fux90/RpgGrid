@@ -282,8 +282,8 @@ namespace RpgGridUserControls
         private Control PreviousFocused { get; set; }
 
         public event EventHandler<PawnEventArgs> PawnAdded;
-        public event EventHandler<PawnEventArgs> PawnDragDropped;
-        public event EventHandler<PawnEventArgs> TemplateDragDropped;
+        public event EventHandler<PawnAndLocationEventArgs> PawnDragDropped;
+        public event EventHandler<PawnAndLocationEventArgs> TemplateDragDropped;
         public event EventHandler<PawnEventArgs> PawnRemoved;
         public event EventHandler<PawnAndLocationEventArgs> PawnMoved;
 
@@ -324,6 +324,21 @@ namespace RpgGridUserControls
             }
 
             return true;
+        }
+
+        public GridPawn GetByUniqueID(string ID)
+        {
+            for (int i = 0; i < Controls.Count; i++)
+            {
+                var gridPawn = (GridPawn)Controls[i];
+
+                if (gridPawn.UniqueID == ID)
+                {
+                    return gridPawn;
+                }
+            }
+
+            return null;
         }
 
         public GridPawn Remove(GridPawn ctrl)
@@ -374,26 +389,40 @@ namespace RpgGridUserControls
         protected override void OnDragDrop(DragEventArgs drgevent)
         {
             Type t;
+            var pt = new Point(drgevent.X, drgevent.Y);
+
             if (IsOfType<GridPawn>(drgevent, out t))
             {
                 var ctrl = (GridPawn)drgevent.Data.GetData(t);
-                var ptClient = this.PointToClient(new Point(drgevent.X, drgevent.Y));
-                var contained = DragDropAdding(ctrl, ptClient);
-                OnPawnDragDropped(new PawnAndLocationEventArgs(ctrl, contained, ptClient));
+                //var ptClient = this.PointToClient(new Point(drgevent.X, drgevent.Y));
+                //var contained = DragDropAdding(ctrl, ptClient);
+                var contained = DragDropAdding(ctrl, pt);
+                OnPawnDragDropped(new PawnAndLocationEventArgs(ctrl, contained, ctrl.PositionAtNoZoom));
             }
             else if(IsOfType<CharacterPawnTemplate>(drgevent, out t))
             {
                 var ctrl = ((CharacterPawnTemplate)drgevent.Data.GetData(t)).Build();
-                var ptClient = this.PointToClient(new Point(drgevent.X, drgevent.Y));
-                var contained = DragDropAdding(ctrl, ptClient);
-                OnTemplateDragDropped(new PawnAndLocationEventArgs(ctrl, contained, ptClient));
+                //var ptClient = this.PointToClient(new Point(drgevent.X, drgevent.Y));
+                //var contained = DragDropAdding(ctrl, ptClient);
+                var contained = DragDropAdding(ctrl, pt);
+                OnTemplateDragDropped(new PawnAndLocationEventArgs(ctrl, contained, ctrl.PositionAtNoZoom));
             }
         }
 
-        public bool DragDropAdding(GridPawn ctrl, Point ptClient)
+        public bool DragDropAdding(GridPawn ctrl, Point? pt, bool receivedFromOutside = false)
         {
             var res = AddIfNotPresent(ctrl);
-            SetLocation(ctrl, ptClient.X, ptClient.Y);
+
+            if (pt == null)
+            {
+                SetLocation(ctrl, propagateEvent: false);
+            }
+            else
+            {
+                var ptClient = this.PointToClient((Point)pt);
+                SetLocation(ctrl, ptClient.X, ptClient.Y);
+            }
+
             InvalidatePawnsImage();
 
             return res;
@@ -589,13 +618,13 @@ namespace RpgGridUserControls
                 var ctrl = Controls[i];
                 if (typeof(GridPawn).IsAssignableFrom(ctrl.GetType()))
                 {
-                    SetLocation((GridPawn)ctrl);
+                    SetLocation((GridPawn)ctrl, propagateEvent: false);
                 }
             }
             this.Invalidate();
         }
 
-        private void SetLocation(GridPawn ctrl, int mouseX = -1, int mouseY = -1)
+        private void SetLocation(GridPawn ctrl, int mouseX = -1, int mouseY = -1, bool propagateEvent = true)
         {
             Point point;
 
@@ -637,7 +666,10 @@ namespace RpgGridUserControls
             }
 
             ctrl.Location = point;
-            OnPawnMoved(new PawnAndLocationEventArgs(ctrl, true, point));
+            if (propagateEvent)
+            {
+                OnPawnMoved(new PawnAndLocationEventArgs(ctrl, true, ctrl.PositionAtNoZoom));
+            }
         }
 
         private void ComputeControlsSize()
@@ -796,7 +828,7 @@ namespace RpgGridUserControls
             }
         }
 
-        protected void OnPawnDragDropped(PawnEventArgs e)
+        protected void OnPawnDragDropped(PawnAndLocationEventArgs e)
         {
             var tmp = PawnDragDropped;
             if (tmp != null)
@@ -805,7 +837,7 @@ namespace RpgGridUserControls
             }
         }
 
-        protected void OnTemplateDragDropped(PawnEventArgs e)
+        protected void OnTemplateDragDropped(PawnAndLocationEventArgs e)
         {
             var tmp = TemplateDragDropped;
             if (tmp != null)

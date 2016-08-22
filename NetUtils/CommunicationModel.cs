@@ -75,12 +75,12 @@ namespace NetUtils
 
         protected abstract void InitReceiveProcessingMethods();
 
-        protected byte[] GetBytesFromString(string str)
+        public byte[] GetBytesFromString(string str)
         {
             return Encoding.UTF8.GetBytes(str);
         }
 
-        protected string GetStringFromByteArray(byte[] bytes)
+        public string GetStringFromByteArray(byte[] bytes)
         {
             return Encoding.UTF8.GetString(bytes);
         }

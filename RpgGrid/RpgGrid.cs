@@ -12,6 +12,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Utils;
 
 namespace RpgGrid
 {
@@ -36,15 +37,19 @@ namespace RpgGrid
             private set
             {
                 mainGrid = value;
+#region PAWN_REMOVED
                 mainGrid.PawnRemoved += (s, e) =>
                 {
 #if DEBUG
                     OnVerboseDebugging(new VerboseDebugArgs(String.Format("Removed pawn: {0}", e.Pawn.Name)));
 #endif
                 };
+                #endregion
+#region PAWN_DRAG_DROPPED
                 mainGrid.PawnDragDropped += (s, e) =>
                 {
                     LastTouchedPawn = e.Pawn;
+                    LastPositionOfGivenPawn = new TaggedObject<Point, string>(e.Location, LastTouchedPawn.UniqueID);
 
                     if (e.AlreadyContained)
                     {
@@ -55,14 +60,22 @@ namespace RpgGrid
                     else
                     {
 #if DEBUG
-                        OnVerboseDebugging(new VerboseDebugArgs(String.Format("{0} added to grid [{1}]", LastTouchedPawn.Name, LastTouchedPawn.UniqueID)));
+                        OnVerboseDebugging(new VerboseDebugArgs(String.Format(  "{0} added to grid in ({2};{3})[{1}]", 
+                                                                                LastTouchedPawn.Name, 
+                                                                                LastTouchedPawn.UniqueID,
+                                                                                LastPositionOfGivenPawn.Obj.X,
+                                                                                LastPositionOfGivenPawn.Obj.Y)));
 #endif
-                        Connections.Current.Broadcast(Connections.Commands.AddPawnToGrid, Connections.PAWN_ADDED_TO_GRID);
+                        Connections.Current.Broadcast(  Connections.Commands.AddPawnToGrid, 
+                                                        new string[] { Connections.PAWN_ADDED_TO_GRID, Connections.PAWN_CLIENT_LOCATION, });
                     }
                 };
+                #endregion
+#region TEMPLATE_DRAG_DROPPED
                 mainGrid.TemplateDragDropped += (s, e) =>
                 {
                     LastTouchedPawn = e.Pawn;
+                    LastPositionOfGivenPawn = new TaggedObject<Point, string>(e.Location, LastTouchedPawn.UniqueID);
                     if (e.AlreadyContained)
                     {
 #if DEBUG
@@ -74,16 +87,30 @@ namespace RpgGrid
 #if DEBUG
                         OnVerboseDebugging(new VerboseDebugArgs(String.Format("{0} added to grid, from Template [{1}]", LastTouchedPawn.Name, LastTouchedPawn.UniqueID)));
 #endif
-                        Connections.Current.Broadcast(Connections.Commands.AddPawnFromTemplateToGrid, Connections.TEMPLATE_ADDED_TO_GRID);
+                        Connections.Current.Broadcast(  Connections.Commands.AddPawnFromTemplateToGrid, 
+                                                        new string[] {  Connections.TEMPLATE_ADDED_TO_GRID,
+                                                                        Connections.PAWN_CLIENT_LOCATION, });
                     }
                 };
+                #endregion
+#region PAWN_MOVED
                 mainGrid.PawnMoved += (s, e) =>
                 {
-                    // TODO: Call method to tell pawn is moved
+                    LastTouchedPawn = e.Pawn;
+                    LastPositionOfGivenPawn = new TaggedObject<Point, string>(e.Location, LastTouchedPawn.UniqueID);
+
 #if DEBUG
-                    OnVerboseDebugging(new VerboseDebugArgs("TODO: Call method to tell pawn is moved"));
+                    OnVerboseDebugging(new VerboseDebugArgs(String.Format(  "{0} moved to ({1};{2}) [ID: {3}]",
+                                                                            LastTouchedPawn.Name,
+                                                                            LastPositionOfGivenPawn.Obj.X,
+                                                                            LastPositionOfGivenPawn.Obj.Y,
+                                                                            LastTouchedPawn.UniqueID)));
 #endif
+                    Connections.Current.Broadcast(Connections.Commands.MovePawnTo,
+                                                    Connections.PAWN_CLIENT_LOCATION);
                 };
+#endregion
+#region BACKGROUND_IMAGE_CHANGED
                 mainGrid.BackgroundImageChanged += (s, e) =>
                 {
                     for (int i = 0; i < mainGrid.Controls.Count; i++)
@@ -92,6 +119,7 @@ namespace RpgGrid
                         MainPawnManager.LoadPawn(removed);
                     }
                 };
+#endregion
             }
         }
         public PawnManager MainPawnManager { get; private set; }
@@ -112,6 +140,25 @@ namespace RpgGrid
             set
             {
                 lastTouchedPawn = value;
+            }
+        }
+
+        private TaggedObject<Point, string> lastPositionOfGivenPawn;
+        public TaggedObject<Point, string> LastPositionOfGivenPawn
+        {
+            get
+            {
+                if (lastPositionOfGivenPawn == null)
+                {
+                    throw new Exception("No pawn moved");
+                }
+
+                return lastPositionOfGivenPawn;
+            }
+
+            set
+            {
+                lastPositionOfGivenPawn = value;
             }
         }
 
@@ -363,25 +410,6 @@ namespace RpgGrid
             }
         }
 
-
-        [ResponseMethods(Connections.PAWN_CREATED_FROM_TEMPLATE)]
-        private DataRes PawnCreatedFromTemplate(byte[] buffer)
-        {
-            var pawnUniqueID = LastTouchedPawn.UniqueID;
-            var check = LastTouchedPawn.IsTemplateGenerated();
-#if DEBUG
-            OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn is {0}generated from template", check ? "" : "NOT ")));
-#endif
-            if (check)
-            {
-                return new DataRes(Connections.Commands.Yes.ToByteArray());
-            }
-            else
-            {
-                return new DataRes(Connections.Commands.No.ToByteArray());
-            }
-        }
-
         [ResponseMethods(Connections.PAWN_ADDED_TO_GRID)]
         private DataRes PawnAddedToGrid(byte[] buffer)
         {
@@ -393,7 +421,6 @@ namespace RpgGrid
                 OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn is added to grid: {0} [OUT]", pawnUniqueID)));
 #endif
                 return new DataRes(GetBytesFromString(pawnUniqueID));
-                
             }
             else
             {
@@ -437,9 +464,65 @@ namespace RpgGrid
             }
         }
 
+        [ResponseMethods(Connections.PAWN_CLIENT_LOCATION)]
+        private DataRes PawnClientLocation(byte[] buffer)
+        {
+            if (buffer == null)
+            {
+                // Telling that pawn is moved
+                using (var ms = new MemoryStream())
+                {
+                    BinaryFormatter.Serialize(ms, LastPositionOfGivenPawn);
+#if DEBUG
+                    OnVerboseDebugging(new VerboseDebugArgs(String.Format("Sent movement: {0} in ({1};{2})", LastPositionOfGivenPawn.Obj, LastPositionOfGivenPawn.Obj.X, LastPositionOfGivenPawn.Obj.Y)));
+#endif
+                    return new DataRes(ms.ToArray());
+                }
+            }
+            else
+            {
+                using (var ms = new MemoryStream(buffer))
+                {
+                    var locationOfMoved = (TaggedObject<Point, string>)BinaryFormatter.Deserialize(ms);
+                    var movedPawn = MainGrid.GetByUniqueID(locationOfMoved.Tag);
+                    if (movedPawn != null)
+                    {
+                        movedPawn.SetPositionAtNoZoom(locationOfMoved.Obj);
+                        MainGrid.DragDropAdding(movedPawn, null);
+                    }
+#if DEBUG
+                    OnVerboseDebugging(new VerboseDebugArgs(String.Format("Moved pawn [{0}] to ({1};{2})", locationOfMoved.Tag, locationOfMoved.Obj.X, locationOfMoved.Obj.Y)));
+#endif
+                    return DataRes.Empty;
+                }
+            }
+        }
+
+        [ResponseMethods(Connections.WARNING)]
+        private DataRes Warning(byte[] buffer)
+        {
+            var msg = GetStringFromByteArray(buffer);
+#if DEBUG
+            OnVerboseDebugging(new VerboseDebugArgs(String.Format("[WARNING] {0}", msg)));
+#endif
+            return DataRes.Empty;
+        }
+
+        [ResponseMethods(Connections.ERROR)]
+        private DataRes Error(byte[] buffer)
+        {
+            var msg = GetStringFromByteArray(buffer);
+#if DEBUG
+            OnVerboseDebugging(new VerboseDebugArgs(String.Format("[ERROR] {0}", msg)));
+#else
+            throw new Exception(msg);
+#endif
+            return DataRes.Empty;
+        }
+
         #endregion
 
-            #region VERBOSE_DEBUGGING
+        #region VERBOSE_DEBUGGING
 #if DEBUG
         public class VerboseDebugArgs : EventArgs
         {

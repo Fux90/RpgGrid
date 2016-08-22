@@ -33,10 +33,13 @@ namespace NetUtils
         public const string PAWNS_RECEIVING = "pawnsRec";
         public const string TEMPLATES_SENDING = "templatesSend";
         public const string TEMPLATES_RECEIVING = "templatesRec";
-        public const string PAWN_CREATED_FROM_TEMPLATE = "pawnFromTemplate";
         public const string PAWN_ADDED_TO_GRID = "pawnAddedToGrid";
+        public const string PAWN_CLIENT_LOCATION = "pawnClientLocation";
         public const string TEMPLATE_ADDED_TO_GRID = "templateAddedToGrid";
         public const string MOVED_PAWN_IN_GRID = "pawnMoved";
+
+        public const string WARNING = "warning";
+        public const string ERROR = "error";
 
         #endregion
 
@@ -249,6 +252,7 @@ namespace NetUtils
         public void OnAddPawnToGrid(TcpClient tcpClient, BackgroundWorker bwListener)
         {
             PawnAddedToGrid(tcpClient);
+            PawnMovedInGrid(tcpClient);
             bwListener.RunWorkerAsync();
         }
 
@@ -256,6 +260,14 @@ namespace NetUtils
         public void OnAddPawnFromTemplateToGrid(TcpClient tcpClient, BackgroundWorker bwListener)
         {
             PawnAddedFromTemplateToGrid(tcpClient);
+            PawnMovedInGrid(tcpClient);
+            bwListener.RunWorkerAsync();
+        }
+
+        [CommandBehaviour(Commands.MovePawnTo)]
+        public void OnMovePawn(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            PawnMovedInGrid(tcpClient);
             bwListener.RunWorkerAsync();
         }
 
@@ -402,6 +414,18 @@ namespace NetUtils
             {
                 tcpClient.Client.Receive(buffer);
                 Model.ProcessData(PAWN_ADDED_TO_GRID, buffer);
+            }
+        }
+
+        private void PawnMovedInGrid(TcpClient tcpClient)
+        {
+            byte[] sizeBuf = new byte[sizeof(int)];
+            tcpClient.Client.Receive(sizeBuf);
+            byte[] buffer = new byte[BitConverter.ToInt32(sizeBuf, 0)];
+            if (buffer.Length > 0)
+            {
+                tcpClient.Client.Receive(buffer);
+                Model.ProcessData(PAWN_CLIENT_LOCATION, buffer);
             }
         }
 
@@ -607,13 +631,15 @@ namespace NetUtils
         {
             if(clientTCP != null) // If I'm a Client
             {
-                var tcpClient = clientTCP.Client;
-                clientTCP.Client.Send(Commands.Broadcast.ToByteArray());
-                // Send what to broadcast
-                // 1 - command to broadcast
-                clientTCP.Client.Send(commandToBroadcast.ToByteArray());
-                // 2 - buffer to send after that
-                throw new Exception("FINISH BROADCASTING");
+                //var tcpClient = clientTCP.Client;
+                //clientTCP.Client.Send(Commands.Broadcast.ToByteArray());
+                //// Send what to broadcast
+                //// 1 - command to broadcast
+                //clientTCP.Client.Send(commandToBroadcast.ToByteArray());
+                //// 2 - buffer to send after that
+                //throw new Exception("FINISH BROADCASTING");
+
+                Model.ProcessData(ERROR, Model.GetBytesFromString("FINISH BROADCASTING"));
             }
             else // I'm a server
             {
