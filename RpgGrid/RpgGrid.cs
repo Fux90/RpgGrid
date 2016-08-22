@@ -425,7 +425,7 @@ namespace RpgGrid
             else
             {
                 var pawnUniqueID = GetStringFromByteArray(buffer);
-                MainGrid.DragDropAdding(MainPawnManager.GetByUniqueID(pawnUniqueID), new Point());
+                MainGrid.DragDropAdding(MainPawnManager.GetByUniqueID(pawnUniqueID), new Point(), receivedFromOutside: true);
 #if DEBUG
                 OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn is added to grid: {0} [IN]", pawnUniqueID)));
 #endif
@@ -488,7 +488,7 @@ namespace RpgGrid
                     if (movedPawn != null)
                     {
                         movedPawn.SetPositionAtNoZoom(locationOfMoved.Obj);
-                        MainGrid.DragDropAdding(movedPawn, null);
+                        MainGrid.DragDropAdding(movedPawn, null, receivedFromOutside: true);
                     }
 #if DEBUG
                     OnVerboseDebugging(new VerboseDebugArgs(String.Format("Moved pawn [{0}] to ({1};{2})", locationOfMoved.Tag, locationOfMoved.Obj.X, locationOfMoved.Obj.Y)));

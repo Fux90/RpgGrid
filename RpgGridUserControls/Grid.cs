@@ -420,7 +420,7 @@ namespace RpgGridUserControls
             else
             {
                 var ptClient = this.PointToClient((Point)pt);
-                SetLocation(ctrl, ptClient.X, ptClient.Y);
+                SetLocation(ctrl, ptClient.X, ptClient.Y, propagateEvent: !receivedFromOutside);
             }
 
             InvalidatePawnsImage();
