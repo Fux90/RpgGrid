@@ -102,10 +102,11 @@ namespace RpgGridUserControls
         public class PawnEventArgs : EventArgs
         {
             public GridPawn Pawn { get; private set; }
-
-            public PawnEventArgs(GridPawn pawn)
+            public bool AlreadyContained { get; private set; }
+            public PawnEventArgs(GridPawn pawn, bool alreadyContained)
             {
                 Pawn = pawn;
+                AlreadyContained = alreadyContained;
             }
         }
 
@@ -113,8 +114,8 @@ namespace RpgGridUserControls
         {
             public Point Location { get; private set; }
 
-            public PawnAndLocationEventArgs(GridPawn pawn, Point location)
-                : base(pawn)
+            public PawnAndLocationEventArgs(GridPawn pawn, bool alreadyContained, Point location)
+                : base(pawn, alreadyContained)
             {
                 Location = location;
             }
@@ -301,19 +302,28 @@ namespace RpgGridUserControls
 #endif
         }
 
-        public void AddIfNotPresent(GridPawn ctrl)
+        /// <summary>
+        /// Returns false if pawn was not present
+        /// </summary>
+        /// <param name="ctrl"></param>
+        /// <returns></returns>
+        public bool AddIfNotPresent(GridPawn ctrl)
         {
             if (!Controls.Contains(ctrl))
             {
                 Controls.Add(ctrl);
-                OnPawnAdded(new PawnEventArgs(ctrl));
+                OnPawnAdded(new PawnEventArgs(ctrl, false));
 
                 ctrl.SetSizeAtNoZoom(PixelsInFiveFeet);
                 SetPawnSize(ctrl);
                 ctrl.Rotate90Degrees += Ctrl_Rotate90Degrees;
                 ctrl.MouseUp += Pawn_MouseUp;
                 this.Invalidate();
+
+                return false;
             }
+
+            return true;
         }
 
         public GridPawn Remove(GridPawn ctrl)
@@ -321,7 +331,7 @@ namespace RpgGridUserControls
             ctrl.Rotate90Degrees -= Ctrl_Rotate90Degrees;
             ctrl.MouseUp -= Pawn_MouseUp;
             Controls.Remove(ctrl);
-            OnPawnRemoved(new PawnEventArgs(ctrl));
+            OnPawnRemoved(new PawnEventArgs(ctrl, true));
 
             return ctrl;
         }
@@ -342,7 +352,7 @@ namespace RpgGridUserControls
         {
             if(typeof(GridPawn).IsAssignableFrom(e.Control.GetType()))
             {
-                OnPawnRemoved(new PawnEventArgs((GridPawn)e.Control));
+                OnPawnRemoved(new PawnEventArgs((GridPawn)e.Control, true));
             }
 
             base.OnControlRemoved(e);
@@ -368,23 +378,25 @@ namespace RpgGridUserControls
             {
                 var ctrl = (GridPawn)drgevent.Data.GetData(t);
                 var ptClient = this.PointToClient(new Point(drgevent.X, drgevent.Y));
-                DragDropAdding(ctrl, ptClient);
-                OnPawnDragDropped(new PawnAndLocationEventArgs(ctrl, ptClient));
+                var contained = DragDropAdding(ctrl, ptClient);
+                OnPawnDragDropped(new PawnAndLocationEventArgs(ctrl, contained, ptClient));
             }
             else if(IsOfType<CharacterPawnTemplate>(drgevent, out t))
             {
                 var ctrl = ((CharacterPawnTemplate)drgevent.Data.GetData(t)).Build();
                 var ptClient = this.PointToClient(new Point(drgevent.X, drgevent.Y));
-                DragDropAdding(ctrl, ptClient);
-                OnTemplateDragDropped(new PawnAndLocationEventArgs(ctrl, ptClient));
+                var contained = DragDropAdding(ctrl, ptClient);
+                OnTemplateDragDropped(new PawnAndLocationEventArgs(ctrl, contained, ptClient));
             }
         }
 
-        public void DragDropAdding(GridPawn ctrl, Point ptClient)
+        public bool DragDropAdding(GridPawn ctrl, Point ptClient)
         {
-            AddIfNotPresent(ctrl);
+            var res = AddIfNotPresent(ctrl);
             SetLocation(ctrl, ptClient.X, ptClient.Y);
             InvalidatePawnsImage();
+
+            return res;
         }
 
         private bool IsOfType<T>(DragEventArgs e, out Type type)
@@ -625,7 +637,7 @@ namespace RpgGridUserControls
             }
 
             ctrl.Location = point;
-            OnPawnMoved(new PawnAndLocationEventArgs(ctrl, point));
+            OnPawnMoved(new PawnAndLocationEventArgs(ctrl, true, point));
         }
 
         private void ComputeControlsSize()

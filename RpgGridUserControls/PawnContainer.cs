@@ -71,21 +71,19 @@ namespace RpgGridUserControls
             return scrollableContainerGridPawns.All();
         }
 
-        public GridPawn RemoveByUniqueID(string ID)
+        public GridPawn GetByUniqueID(string ID)
         {
             var controls = scrollableContainerGridPawns.GridPawnControls;
-            GridPawn res = null;
 
             for (int i = 0; i < controls.Count; i++)
             {
                 if(((GridPawn)controls[i]).UniqueID == ID)
                 {
-                    res = (GridPawn)controls[i];
-                    controls.RemoveAt(i);
+                    return (GridPawn)controls[i];
                 }
             }
 
-            return res;
+            return null;
         }
 
         #endregion

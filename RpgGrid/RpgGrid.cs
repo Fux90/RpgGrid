@@ -45,18 +45,37 @@ namespace RpgGrid
                 mainGrid.PawnDragDropped += (s, e) =>
                 {
                     LastTouchedPawn = e.Pawn;
+
+                    if (e.AlreadyContained)
+                    {
 #if DEBUG
-                    OnVerboseDebugging(new VerboseDebugArgs(String.Format("{0} added to grid [{1}]", LastTouchedPawn.Name, LastTouchedPawn.UniqueID)));
+                        OnVerboseDebugging(new VerboseDebugArgs(String.Format("{0} was already in grid [{1}]", LastTouchedPawn.Name, LastTouchedPawn.UniqueID)));
 #endif
-                    Connections.Current.Broadcast(  Connections.Commands.AddPawnToGrid, Connections.PAWN_ADDED_TO_GRID );
+                    }
+                    else
+                    {
+#if DEBUG
+                        OnVerboseDebugging(new VerboseDebugArgs(String.Format("{0} added to grid [{1}]", LastTouchedPawn.Name, LastTouchedPawn.UniqueID)));
+#endif
+                        Connections.Current.Broadcast(Connections.Commands.AddPawnToGrid, Connections.PAWN_ADDED_TO_GRID);
+                    }
                 };
                 mainGrid.TemplateDragDropped += (s, e) =>
                 {
                     LastTouchedPawn = e.Pawn;
+                    if (e.AlreadyContained)
+                    {
 #if DEBUG
-                    OnVerboseDebugging(new VerboseDebugArgs(String.Format("{0} added to grid, from Template [{1}]", LastTouchedPawn.Name, LastTouchedPawn.UniqueID)));
+                        OnVerboseDebugging(new VerboseDebugArgs(String.Format("{0} from Template was already in grid [{1}]", LastTouchedPawn.Name, LastTouchedPawn.UniqueID)));
 #endif
-                    Connections.Current.Broadcast(Connections.Commands.AddPawnFromTemplateToGrid, Connections.TEMPLATE_ADDED_TO_GRID);
+                    }
+                    else
+                    {
+#if DEBUG
+                        OnVerboseDebugging(new VerboseDebugArgs(String.Format("{0} added to grid, from Template [{1}]", LastTouchedPawn.Name, LastTouchedPawn.UniqueID)));
+#endif
+                        Connections.Current.Broadcast(Connections.Commands.AddPawnFromTemplateToGrid, Connections.TEMPLATE_ADDED_TO_GRID);
+                    }
                 };
                 mainGrid.PawnMoved += (s, e) =>
                 {
@@ -379,7 +398,7 @@ namespace RpgGrid
             else
             {
                 var pawnUniqueID = GetStringFromByteArray(buffer);
-                MainGrid.DragDropAdding(MainPawnManager.RemoveByUniqueID(pawnUniqueID), new Point());
+                MainGrid.DragDropAdding(MainPawnManager.GetByUniqueID(pawnUniqueID), new Point());
 #if DEBUG
                 OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn is added to grid: {0} [IN]", pawnUniqueID)));
 #endif
