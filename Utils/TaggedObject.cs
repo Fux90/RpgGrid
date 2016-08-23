@@ -5,7 +5,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Utils
+namespace UtilsData
 {
     [Serializable]
     public class TaggedObject<T, S> : ISerializable

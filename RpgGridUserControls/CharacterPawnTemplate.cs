@@ -79,7 +79,7 @@ namespace RpgGridUserControls
             {
                 //defaultImage = Utils.ApplyCircleMask((Bitmap)value);
                 var sem = new Semaphore(0,1);
-                Utils.ApplyCircleMask((Bitmap)value, (res) =>
+                RpgGridControlUtils.ApplyCircleMask((Bitmap)value, (res) =>
                 {
                     if(res == null)
                     {
@@ -214,7 +214,7 @@ namespace RpgGridUserControls
 
         public string generateUniqueName()
         {
-            return Utils.generateUniqueName();
+            return UtilsData.Utils.generateUniqueName();
         }
 
         //public string generateUniqueName()

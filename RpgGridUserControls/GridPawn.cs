@@ -86,7 +86,7 @@ namespace RpgGridUserControls
 
         private string generateUniqueID()
         {
-            return Utils.generateUniqueName();
+            return UtilsData.Utils.generateUniqueName();
         }
 
         protected void OnDescriptionInvalidate(EventArgs e)

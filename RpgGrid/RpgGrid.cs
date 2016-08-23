@@ -1,5 +1,6 @@
 ﻿#define PATCH_OVERLAPPING_NAMES
 #define STRANGE_EXCEPTION_ON_PAWN_RECEIVING_ANALYSIS
+//#define STRANGE_EXCEPTION_ON_MAP_RECEIVING_ANALYSIS
 
 using NetUtils;
 using ResourceManagement;
@@ -15,7 +16,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Utils;
+using UtilsData;
 
 namespace RpgGrid
 {
@@ -354,23 +355,34 @@ namespace RpgGrid
                 }
 #endif
 
-                using (var ms = new MemoryStream(buffer))
+#if DEBUG && STRANGE_EXCEPTION_ON_MAP_RECEIVING_ANALYSIS
+                try
                 {
-                    using (var fs = new FileStream(outpath, FileMode.OpenOrCreate))
+#endif
+                    using (var ms = new MemoryStream(buffer))
                     {
-                        ms.WriteTo(fs);
-                        fs.Flush();
-                        fs.Close();
+                        using (var fs = new FileStream(outpath, FileMode.OpenOrCreate))
+                        {
+                            ms.WriteTo(fs);
+                            fs.Flush();
+                            fs.Close();
+                        }
+
+                        ms.Close();
+                        ms.Flush();
                     }
 
-                    ms.Close();
-                    ms.Flush();
-                }
-
-                MainGrid.ImagePath = outpath;
-                tmpMapName = null;
+                    MainGrid.ImagePath = outpath;
+                    tmpMapName = null;
 #if DEBUG
-                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Received map: {0}x{1}", MainGrid.Image.Width, MainGrid.Image.Height)));
+                    OnVerboseDebugging(new VerboseDebugArgs(String.Format("Received map: {0}x{1}", MainGrid.Image.Width, MainGrid.Image.Height)));
+#endif
+#if DEBUG && STRANGE_EXCEPTION_ON_MAP_RECEIVING_ANALYSIS
+                }
+                catch(Exception ex)
+                {
+                    OnVerboseDebugging(new VerboseDebugArgs(ex.Message));
+                }
 #endif
             }
             return DataRes.Empty;
@@ -421,10 +433,21 @@ namespace RpgGrid
         {
             using (var ms = new MemoryStream(buffer))
             {
-                var templates = (CharacterPawnTemplate[])BinaryFormatter.Deserialize(ms);
-                MainPawnManager.LoadPawnTemplates(templates);
+#if DEBUG && STRANGE_EXCEPTION_ON_PAWN_RECEIVING_ANALYSIS
+                try
+                {
+#endif
+                    var templates = (CharacterPawnTemplate[])BinaryFormatter.Deserialize(ms);
+                    MainPawnManager.LoadPawnTemplates(templates);
 #if DEBUG
-                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Received templates: {0} bytes, {1} items", buffer.Length, templates.Length)));
+                    OnVerboseDebugging(new VerboseDebugArgs(String.Format("Received templates: {0} bytes, {1} items", buffer.Length, templates.Length)));
+#endif
+#if DEBUG && STRANGE_EXCEPTION_ON_PAWN_RECEIVING_ANALYSIS
+                }
+                catch (Exception ex)
+                {
+                    Message(GetBytesFromString(ex.Message));
+                }
 #endif
                 return DataRes.Empty;
             }

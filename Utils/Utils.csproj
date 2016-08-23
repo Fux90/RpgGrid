@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Directions.cs" />
+    <Compile Include="GlobalUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TaggedObject.cs" />
   </ItemGroup>

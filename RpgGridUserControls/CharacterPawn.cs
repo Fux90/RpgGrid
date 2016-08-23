@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Drawing.Imaging;
-using Utils;
+using UtilsData;
 using System.Runtime.Serialization;
 using System.Threading;
 using RpgGridUserControls.Utilities;
@@ -115,7 +115,7 @@ namespace RpgGridUserControls
             set
             {
                 var sem = new Semaphore(0, 1);
-                Utils.ApplyCircleMask((Bitmap)value, (res) =>
+                RpgGridControlUtils.ApplyCircleMask((Bitmap)value, (res) =>
                 {
                     if (res == null)
                     {

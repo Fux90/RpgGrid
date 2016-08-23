@@ -261,6 +261,34 @@ namespace RpgGrid
         private void btnAcceptInvite_Click(object sender, EventArgs e)
         {
             Connections.Current.AcceptInvite(txtIpServer.Text, txtPortServer.Text);
+
+            AfterAcceptInviteOperations();
+        }
+
+        
+        private void btnLeave_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Leaved (TODO: Implement closing socket...)");
+
+            AfterLeaveInviteOperations();
+        }
+
+        private void AfterLeaveInviteOperations()
+        {
+            btnAcceptInvite.Text = "Accept Invite";
+            btnAcceptInvite.Click += btnAcceptInvite_Click;
+            txtIpServer.Enabled = true;
+            txtPortServer.Enabled = true;
+            btnAcceptInvite.Click -= btnLeave_Click;
+        }
+
+        private void AfterAcceptInviteOperations()
+        {
+            btnAcceptInvite.Text = "Leave";
+            btnAcceptInvite.Click += btnLeave_Click;
+            txtIpServer.Enabled = false;
+            txtPortServer.Enabled = false;
+            btnAcceptInvite.Click -= btnAcceptInvite_Click;
         }
 
         private void btnStartTcpListener_Click(object sender, EventArgs e)
@@ -270,7 +298,6 @@ namespace RpgGrid
             Button closeConnectionBtn;
             var inviteInfo = Connections.Current.InvitePlayer(out sockID, out waitPlayerBw, out closeConnectionBtn);
             waitPlayerBw.RunWorkerAsync();
-            //MessageBox.Show("Opened socket");
             lblConnectionAddress.Text = String.Format("Address {0}", inviteInfo);
 
             ManageCloseConnectionButton(closeConnectionBtn, inviteInfo);

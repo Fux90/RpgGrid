@@ -11,6 +11,7 @@ using System.Net;
 using System.ComponentModel;
 using System.Windows.Forms;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace NetUtils
 {
@@ -282,11 +283,41 @@ namespace NetUtils
             bwListener.RunWorkerAsync();
         }
 
+        List<string> DoneTickets = new List<string>();
+
         [CommandBehaviour(Commands.Done)]
         public void Done(TcpClient tcpClient, BackgroundWorker bwListener)
         {
-            Model.ProcessData(MESSAGE, Model.GetBytesFromString("Recieved DONE"));
+            ReceiveTicketAck(tcpClient);
             bwListener.RunWorkerAsync();
+        }
+
+        private void ReceiveTicketAck(TcpClient tcpClient)
+        {
+            var sizeOfBuf = new byte[sizeof(int)];
+            tcpClient.Client.Receive(sizeOfBuf);
+            var ticketBuffer = new byte[BitConverter.ToInt32(sizeOfBuf, 0)];
+
+            if (ticketBuffer.Length > 0)
+            {
+                tcpClient.Client.Receive(ticketBuffer);
+
+                var ticket = Model.GetStringFromByteArray(ticketBuffer);
+
+                if (DoneTickets.Contains(ticket))
+                {
+                    DoneTickets.Remove(ticket);
+                    Model.ProcessData(MESSAGE, Model.GetBytesFromString(String.Format("Acked ticket {0}", ticket)));
+                }
+                else
+                {
+                    Model.ProcessData(WARNING, Model.GetBytesFromString(String.Format("No ticket {0}", ticket)));
+                }
+            }
+            else
+            {
+                Model.ProcessData(ERROR, Model.GetBytesFromString("Received void ticket"));
+            }
         }
 
         private void SendMap(TcpClient tcpClient, byte[] checkpoint)
@@ -488,7 +519,17 @@ namespace NetUtils
 
 #if CLIENT_BROADCASTING_EXPECTS_ACK
             // 5 - Send ack
-            tcpClient.Client.Send(Commands.Done.ToByteArray());
+            byte[] sizeTicketBuf = new byte[sizeof(int)];
+            client.Receive(sizeTicketBuf);
+            byte[] ticketBuffer = new byte[BitConverter.ToInt32(sizeTicketBuf, 0)];
+            if (ticketBuffer.Length > 0)
+            {
+                client.Receive(ticketBuffer);
+                tcpClient.Client.Send(Commands.Done.ToByteArray());
+                var ticketData = new DataRes(ticketBuffer);
+                tcpClient.Client.Send(ticketData.Length);
+                tcpClient.Client.Send(ticketData.Buffer);
+            }
 #if DEBUG
             Model.ProcessData(MESSAGE, Model.GetBytesFromString("Sent ack"));
 #endif
@@ -720,6 +761,8 @@ namespace NetUtils
 #if PREVENT_CLIENT_BROADCASTING
                 Model.ProcessData(ERROR, Model.GetBytesFromString("FINISH BROADCASTING"));
 #else
+                // 0 - Create ticket
+                var ticket = GenerateTicket();
                 // 1 - Ask to broadcast message
                 tcpClient.Send(Commands.Broadcast.ToByteArray());
                 // 2 - Command to be broadcasted
@@ -735,13 +778,13 @@ namespace NetUtils
                 // 4 - Actual data
                 SendDataTo(lstData, tcpClient);
 #if CLIENT_BROADCASTING_EXPECTS_ACK
-                // 5 - Waiting for ack (message is broadcasted) (??)
+                // 5 - Waiting for ack (message is broadcasted)
+                var ticketData = new DataRes(Model.GetBytesFromString(ticket));
+                tcpClient.Send(ticketData.Length);
+                tcpClient.Send(ticketData.Buffer);
 #if DEBUG
-                Model.ProcessData(MESSAGE, Model.GetBytesFromString("Waiting for ack"));
+                Model.ProcessData(MESSAGE, Model.GetBytesFromString(String.Format("Waiting for ack on ticket {0}", ticket)));
 #endif
-                var checkpoint = new byte[1];
-                //tcpClient.Receive(checkpoint);
-                Model.ProcessData(MESSAGE, Model.GetBytesFromString("Received ack from server"));
 #endif
 #endif
             }
@@ -750,6 +793,14 @@ namespace NetUtils
                 Broadcast(commandToBroadcast, lstData);
             }
             return false;
+        }
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        private string GenerateTicket()
+        {
+            var ticket = UtilsData.Utils.generateUniqueName();
+            DoneTickets.Add(ticket);
+            return ticket;
         }
 
         private static void SendDataTo(DataRes[] lstData, Socket tcpClient)
