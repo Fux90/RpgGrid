@@ -1,4 +1,7 @@
-﻿using NetUtils;
+﻿#define PATCH_OVERLAPPING_NAMES
+#define STRANGE_EXCEPTION_ON_PAWN_RECEIVING_ANALYSIS
+
+using NetUtils;
 using ResourceManagement;
 using RpgGridUserControls;
 using System;
@@ -308,7 +311,17 @@ namespace RpgGrid
             }
             else
             {
-                var outpath = Path.Combine(MapsFolder, Path.ChangeExtension(tmpMapName, Grid.metricInfoExt));
+                var name = Path.ChangeExtension(tmpMapName, Grid.metricInfoExt);
+                var outpath = Path.Combine(MapsFolder, name);
+#if DEBUG && PATCH_OVERLAPPING_NAMES
+                if(File.Exists(outpath))
+                {
+                    var noExtName = Path.GetFileNameWithoutExtension(name);
+                    var ext = Path.GetExtension(outpath);
+                    var count = Directory.GetFiles(MapsFolder, noExtName + "*" + ext).Length;
+                    outpath = Path.Combine(MapsFolder, String.Format("{0}_{1}{2}", noExtName, count, ext));
+                }
+#endif
                 var content = GetStringFromByteArray(buffer);
 
                 File.WriteAllText(outpath, content);
@@ -328,7 +341,18 @@ namespace RpgGrid
             }
             else
             {
-                var outpath = Path.Combine(MapsFolder, Path.ChangeExtension(tmpMapName, "png"));
+                var name = Path.ChangeExtension(tmpMapName, "png");
+                var outpath = Path.Combine(MapsFolder, name);
+
+#if DEBUG && PATCH_OVERLAPPING_NAMES
+                if (File.Exists(outpath))
+                {
+                    var noExtName = Path.GetFileNameWithoutExtension(name);
+                    var ext = Path.GetExtension(outpath);
+                    var count = Directory.GetFiles(MapsFolder, noExtName + "*" + ext).Length;
+                    outpath = Path.Combine(MapsFolder, String.Format("{0}_{1}{2}", noExtName, count, ext));
+                }
+#endif
 
                 using (var ms = new MemoryStream(buffer))
                 {
@@ -357,10 +381,21 @@ namespace RpgGrid
         {
             using (var ms = new MemoryStream(buffer))
             {
-                var pawns = (GridPawn[])BinaryFormatter.Deserialize(ms);
-                MainPawnManager.LoadPawns(pawns);
+#if DEBUG && STRANGE_EXCEPTION_ON_PAWN_RECEIVING_ANALYSIS
+                try
+                {
+#endif
+                    var pawns = (GridPawn[])BinaryFormatter.Deserialize(ms);
+                    MainPawnManager.LoadPawns(pawns);
 #if DEBUG
-                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Received pawns: {0} bytes, {1} items", buffer.Length, pawns.Length)));
+                    OnVerboseDebugging(new VerboseDebugArgs(String.Format("Received pawns: {0} bytes, {1} items", buffer.Length, pawns.Length)));
+#endif
+#if DEBUG && STRANGE_EXCEPTION_ON_PAWN_RECEIVING_ANALYSIS
+                }
+                catch (Exception ex)
+                {
+                    Message(GetBytesFromString(ex.Message));
+                }
 #endif
                 return DataRes.Empty;
             }
@@ -496,6 +531,16 @@ namespace RpgGrid
                     return DataRes.Empty;
                 }
             }
+        }
+
+        [ResponseMethods(Connections.MESSAGE)]
+        private DataRes Message(byte[] buffer)
+        {
+            var msg = GetStringFromByteArray(buffer);
+#if DEBUG
+            OnVerboseDebugging(new VerboseDebugArgs(String.Format("[MESSAGE] {0}", msg)));
+#endif
+            return DataRes.Empty;
         }
 
         [ResponseMethods(Connections.WARNING)]

@@ -1,4 +1,7 @@
-﻿using System;
+﻿//#define PREVENT_CLIENT_BROADCASTING
+#define CLIENT_BROADCASTING_EXPECTS_ACK
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -38,6 +41,7 @@ namespace NetUtils
         public const string TEMPLATE_ADDED_TO_GRID = "templateAddedToGrid";
         public const string MOVED_PAWN_IN_GRID = "pawnMoved";
 
+        public const string MESSAGE = "message";
         public const string WARNING = "warning";
         public const string ERROR = "error";
 
@@ -274,8 +278,14 @@ namespace NetUtils
         [CommandBehaviour(Commands.Broadcast)]
         public void Broadcast(TcpClient tcpClient, BackgroundWorker bwListener)
         {
-            //Broadcast(); // How to receive command?
-            MessageBox.Show("How can client broadcast client's message?");
+            ReceiveDataAndBroadcast(tcpClient);
+            bwListener.RunWorkerAsync();
+        }
+
+        [CommandBehaviour(Commands.Done)]
+        public void Done(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            Model.ProcessData(MESSAGE, Model.GetBytesFromString("Recieved DONE"));
             bwListener.RunWorkerAsync();
         }
 
@@ -441,6 +451,50 @@ namespace NetUtils
             }
         }
 
+        private void ReceiveDataAndBroadcast(TcpClient tcpClient)
+        {
+            var client = tcpClient.Client;
+
+            // 1 - Command to be broadcasted
+            var commandToBroadcast = new byte[1];
+            client.Receive(commandToBroadcast);
+#if DEBUG
+            Model.ProcessData(MESSAGE, Model.GetBytesFromString(((Commands)commandToBroadcast[0]).ToString()));
+#endif
+            // 2 - How many data are sent
+            var howManyDataBuffer = new byte[sizeof(int)];
+            client.Receive(howManyDataBuffer);
+            var howManyData = BitConverter.ToInt32(howManyDataBuffer, 0);
+#if DEBUG
+            Model.ProcessData(MESSAGE, Model.GetBytesFromString(String.Format("Sent {0} DataRes", howManyData)));
+#endif
+            // 3 - Actual data
+            var lstData = new DataRes[howManyData];
+            for (int i = 0; i < lstData.Length; i++)
+            {
+                byte[] sizeBuf = new byte[sizeof(int)];
+                client.Receive(sizeBuf);
+                byte[] receivedBuffer = new byte[BitConverter.ToInt32(sizeBuf, 0)];
+                if (receivedBuffer.Length > 0)
+                {
+                    client.Receive(receivedBuffer);
+                }
+
+                lstData[i] = new DataRes(receivedBuffer);
+            }
+
+            // 4 - Do broadcast
+            Broadcast((Commands)commandToBroadcast[0], lstData, tcpClient);
+
+#if CLIENT_BROADCASTING_EXPECTS_ACK
+            // 5 - Send ack
+            tcpClient.Client.Send(Commands.Done.ToByteArray());
+#if DEBUG
+            Model.ProcessData(MESSAGE, Model.GetBytesFromString("Sent ack"));
+#endif
+#endif
+        }
+
         #endregion
 
         public string InvitePlayer(out Int32 sockID, out BackgroundWorker waitingPlayerBw, out Button closeConnectionButton)
@@ -482,10 +536,13 @@ namespace NetUtils
             return strB.ToString();
         }
 
+#if DEBUG
+        private static int currFreePort = 8888;
+#endif
         private int GeneratePort()
         {
             // TODO: Generate random port (one for each player)
-            return 8888;
+            return currFreePort++;
         }
 
         private BackgroundWorker AwaitPlayer(int sockID, Task<TcpClient> task, Button closeConnectionBtn)
@@ -622,58 +679,127 @@ namespace NetUtils
             return false;
         }
 
+        /// <summary>
+        /// External invoked broadcasting method
+        /// </summary>
+        /// <param name="commandToBroadcast">Command to broadcast</param>
+        /// <param name="semantic">Single semantic to perform</param>
+        /// <returns></returns>
         public bool Broadcast(Commands commandToBroadcast, string semantic)
         {
             return Broadcast(commandToBroadcast, new string[] { semantic });
         }
 
-        public bool Broadcast(Commands commandToBroadcast, string[] semantics)
+        /// <summary>
+        /// External invoked broadcasting method
+        /// </summary>
+        /// <param name="commandToBroadcast">Command to broadcast</param>
+        /// <param name="semantics">List of semantics to broadcast</param>
+        /// /// <param name="serverHasToKnow">If message has been sent by client, tells if server needs to receive informations</param>
+        /// <returns></returns>
+        public bool Broadcast(Commands commandToBroadcast, string[] semantics, bool serverHasToKnow = true)
         {
-            if(clientTCP != null) // If I'm a Client
-            {
-                //var tcpClient = clientTCP.Client;
-                //clientTCP.Client.Send(Commands.Broadcast.ToByteArray());
-                //// Send what to broadcast
-                //// 1 - command to broadcast
-                //clientTCP.Client.Send(commandToBroadcast.ToByteArray());
-                //// 2 - buffer to send after that
-                //throw new Exception("FINISH BROADCASTING");
+            var lstData = new DataRes[semantics.Length];
 
+            for (int i = 0; i < semantics.Length; i++)
+            {
+                lstData[i] = Model.ProcessData(semantics[i], null);
+            }
+
+            if (clientTCP != null) // If I'm a Client
+            {
+                var tcpClient = clientTCP.Client;
+
+                // A - Tell server, if need to [Send data twice, good for now]
+                if (serverHasToKnow)
+                {
+                    tcpClient.Send(commandToBroadcast.ToByteArray());
+                    SendDataTo(lstData, tcpClient);
+                }
+                // B - Ask server to broadcast
+#if PREVENT_CLIENT_BROADCASTING
                 Model.ProcessData(ERROR, Model.GetBytesFromString("FINISH BROADCASTING"));
+#else
+                // 1 - Ask to broadcast message
+                tcpClient.Send(Commands.Broadcast.ToByteArray());
+                // 2 - Command to be broadcasted
+                tcpClient.Send(commandToBroadcast.ToByteArray());
+#if DEBUG
+                Model.ProcessData(MESSAGE, Model.GetBytesFromString(String.Format("Wanted to broadcast {0}", commandToBroadcast)));
+#endif
+                // 3 - How many data are sent
+                tcpClient.Send(BitConverter.GetBytes(lstData.Length));
+#if DEBUG
+                Model.ProcessData(MESSAGE, Model.GetBytesFromString(String.Format("Sent {0} DataRes", lstData.Length)));
+#endif
+                // 4 - Actual data
+                SendDataTo(lstData, tcpClient);
+#if CLIENT_BROADCASTING_EXPECTS_ACK
+                // 5 - Waiting for ack (message is broadcasted) (??)
+#if DEBUG
+                Model.ProcessData(MESSAGE, Model.GetBytesFromString("Waiting for ack"));
+#endif
+                var checkpoint = new byte[1];
+                //tcpClient.Receive(checkpoint);
+                Model.ProcessData(MESSAGE, Model.GetBytesFromString("Received ack from server"));
+#endif
+#endif
             }
             else // I'm a server
             {
-                var lstData = new DataRes[semantics.Length];
-
-                for (int i = 0; i < semantics.Length; i++)
-                {
-                    lstData[i] = Model.ProcessData(semantics[i], null);
-                }
-
-                foreach (var sockID in serverSocks.Keys)
-                {
-                    var bw = new BackgroundWorker();
-                    var localID = sockID;
-
-                    bw.DoWork += (s, e) =>
-                    {
-                        var tcpClient = serverSocks[localID].Client;
-                        tcpClient.Send(commandToBroadcast.ToByteArray());
-                        for (int i = 0; i < lstData.Length; i++)
-                        {
-                            var curData = lstData[i];
-
-                            tcpClient.Send(curData.Length);
-                            tcpClient.Send(curData.Buffer);
-                        }
-                    };
-
-                    bw.RunWorkerAsync();
-                }
+                Broadcast(commandToBroadcast, lstData);
             }
             return false;
         }
 
-        #endregion
+        private static void SendDataTo(DataRes[] lstData, Socket tcpClient)
+        {
+            for (int i = 0; i < lstData.Length; i++)
+            {
+                var curData = lstData[i];
+
+                tcpClient.Send(curData.Length);
+                tcpClient.Send(curData.Buffer);
+            }
+        }
+
+        /// <summary>
+        /// Actual broadcasting method
+        /// </summary>
+        /// <param name="commandToBroadcast">Command that has to be broadcasted</param>
+        /// <param name="lstData">Actual data to broadcast</param>
+        private void Broadcast(Commands commandToBroadcast, DataRes[] lstData, TcpClient clientToSkip = null)
+        {
+            foreach (var sockID in serverSocks.Keys)
+            {
+                var localID = sockID;
+                if (clientToSkip != null && serverSocks[localID] == clientToSkip)
+                {
+                    Model.ProcessData(MESSAGE, Model.GetBytesFromString("Skipped client"));
+                    continue;
+                }
+
+                var bw = new BackgroundWorker();
+                
+
+                bw.DoWork += (s, e) =>
+                {
+                    var tcpClient = serverSocks[localID].Client;
+                    tcpClient.Send(commandToBroadcast.ToByteArray());
+                    // Not used SendDataTo() on purpose
+                    for (int i = 0; i < lstData.Length; i++)
+                    {
+                        var curData = lstData[i];
+
+                        tcpClient.Send(curData.Length);
+                        tcpClient.Send(curData.Buffer);
+                    }
+                };
+
+                bw.RunWorkerAsync();
+            }
+        }
+
+#endregion
     }
 }
