@@ -24,6 +24,7 @@ namespace RpgGrid
                                 grid1,
                                 pawnManager1);
 
+            gridPawnController1.ValueChanged += GridPawnController1_ValueChanged;
 #if DEBUG
 #if  VERBOSE_DEBUGGING
             ShowVerboseDebuggingForm();
@@ -265,7 +266,6 @@ namespace RpgGrid
             AfterAcceptInviteOperations();
         }
 
-        
         private void btnLeave_Click(object sender, EventArgs e)
         {
             MessageBox.Show("Leaved (TODO: Implement closing socket...)");
@@ -325,6 +325,11 @@ namespace RpgGrid
         private void chkPawnController_CheckedChanged(object sender, EventArgs e)
         {
             tableLayoutPanel1.ColumnStyles[0].Width = chkPawnController.Checked ? 388 : 0;
+        }
+
+        private void GridPawnController1_ValueChanged(object sender, RpgGridUserControls.GridPawnValueChangedEventArgs e)
+        {
+            MessageBox.Show("Send info that values are changed");
         }
     }
 }

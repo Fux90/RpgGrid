@@ -41,6 +41,7 @@ namespace NetUtils
         public const string PAWN_CLIENT_LOCATION = "pawnClientLocation";
         public const string TEMPLATE_ADDED_TO_GRID = "templateAddedToGrid";
         public const string MOVED_PAWN_IN_GRID = "pawnMoved";
+        public const string SEND_PAWN_VALUE = "pawnValue";
 
         public const string MESSAGE = "message";
         public const string WARNING = "warning";
@@ -71,6 +72,7 @@ namespace NetUtils
             AddPawnToGrid,
             AddPawnFromTemplateToGrid,
             MovePawnTo,
+            PawnValueReceived,
             Broadcast,
             Yes,
             No,
@@ -726,7 +728,7 @@ namespace NetUtils
         /// <param name="commandToBroadcast">Command to broadcast</param>
         /// <param name="semantic">Single semantic to perform</param>
         /// <returns></returns>
-        public bool Broadcast(Commands commandToBroadcast, string semantic)
+        public bool Broadcast(Commands commandToBroadcast, string semantic, object data = null)
         {
             return Broadcast(commandToBroadcast, new string[] { semantic });
         }

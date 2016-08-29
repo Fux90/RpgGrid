@@ -37,36 +37,44 @@ namespace RpgGridUserControls
             ShowAll();
         }
 
+        public event EventHandler<GridPawnValueChangedEventArgs> ValueChanged;
+
         #region CONTROLLER
 
         public void SetImage(Image image)
         {
             currentPawn.Image = image;
+            OnValueChanged(new GridPawnValueChangedEventArgs(currentPawn, GridPawnValueChangedEventArgs.ChangeableItems.Image, image));
         }
 
         public void SetPf(int pf)
         {
             currentPawn.CurrentPf = pf;
+            OnValueChanged(new GridPawnValueChangedEventArgs(currentPawn, GridPawnValueChangedEventArgs.ChangeableItems.Pf, pf));
         }
 
         public void SetMaxPf(int maxPf)
         {
-            currentPawn.MaxPf = maxPf; 
+            currentPawn.MaxPf = maxPf;
+            OnValueChanged(new GridPawnValueChangedEventArgs(currentPawn, GridPawnValueChangedEventArgs.ChangeableItems.MaxPf, maxPf));
         }
 
         public void SetName(string name)
         {
             currentPawn.Name = name;
+            OnValueChanged(new GridPawnValueChangedEventArgs(currentPawn, GridPawnValueChangedEventArgs.ChangeableItems.Name, name));
         }
 
         public void SetNotes(string notes)
         {
             currentPawn.Notes = notes;
+            OnValueChanged(new GridPawnValueChangedEventArgs(currentPawn, GridPawnValueChangedEventArgs.ChangeableItems.Notes, notes));
         }
 
         public void SetSize(GridPawn.RpgSize size)
         {
             currentPawn.ModSize = size;
+            OnValueChanged(new GridPawnValueChangedEventArgs(currentPawn, GridPawnValueChangedEventArgs.ChangeableItems.Size, size));
         }
 
         #endregion
@@ -219,5 +227,38 @@ namespace RpgGridUserControls
         }
 
         #endregion
+
+        protected void OnValueChanged(GridPawnValueChangedEventArgs e)
+        {
+            var tmp = ValueChanged;
+            if(tmp != null)
+            {
+                tmp(this, e);
+            }
+        }
+    }
+
+    public class GridPawnValueChangedEventArgs
+    {
+        public enum ChangeableItems
+        {
+            Name,
+            Pf,
+            MaxPf,
+            Image,
+            Size,
+            Notes,
+        }
+
+        public GridPawn Pawn { get; private set; }
+        public ChangeableItems ValueChanged { get; private set; }
+        public object Value { get; private set; }
+
+        public GridPawnValueChangedEventArgs(GridPawn pawn, ChangeableItems valueChanged, object value)
+        {
+            Pawn = pawn;
+            ValueChanged = valueChanged;
+            Value = value;
+        }
     }
 }
