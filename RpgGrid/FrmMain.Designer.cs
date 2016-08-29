@@ -39,7 +39,7 @@ namespace RpgGrid
             this.chkMaster = new System.Windows.Forms.CheckBox();
             this.pawnManager1 = new RpgGridUserControls.PawnManager();
             this.chkPawnController = new System.Windows.Forms.CheckBox();
-            this.gridPawnController1 = new RpgGridUserControls.GridPawnController();
+            this.gridPawnController1 = new RpgGridUserControls.GridPawnValueController();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.grid1 = new RpgGridUserControls.Grid();
             this.pagInvitation = new System.Windows.Forms.TabPage();
@@ -530,7 +530,7 @@ namespace RpgGrid
         private System.Windows.Forms.Button btnPing;
         private RpgGridUserControls.PawnManager pawnManager1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-        private GridPawnController gridPawnController1;
+        private GridPawnValueController gridPawnController1;
         private System.Windows.Forms.CheckBox chkPawnController;
         private System.Windows.Forms.Label lblConnectionAddress;
         private System.Windows.Forms.GroupBox grpConnections;

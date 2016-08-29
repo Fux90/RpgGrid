@@ -1,6 +1,6 @@
 ﻿namespace RpgGridUserControls
 {
-    partial class GridPawnController
+    partial class GridPawnValueController
     {
         /// <summary> 
         /// Variabile di progettazione necessaria.

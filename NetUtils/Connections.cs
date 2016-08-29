@@ -41,7 +41,9 @@ namespace NetUtils
         public const string PAWN_CLIENT_LOCATION = "pawnClientLocation";
         public const string TEMPLATE_ADDED_TO_GRID = "templateAddedToGrid";
         public const string MOVED_PAWN_IN_GRID = "pawnMoved";
-        public const string SEND_PAWN_VALUE = "pawnValue";
+        public const string PAWN_THAT_CHANGED = "pawnThatChanged";
+        public const string PAWN_VALUE_TYPE_CHANGED = "pawnValueTypeChanged";
+        public const string PAWN_VALUE_CHANGED = "pawnValue";
 
         public const string MESSAGE = "message";
         public const string WARNING = "warning";
@@ -72,7 +74,7 @@ namespace NetUtils
             AddPawnToGrid,
             AddPawnFromTemplateToGrid,
             MovePawnTo,
-            PawnValueReceived,
+            PawnValueChanged,
             Broadcast,
             Yes,
             No,
@@ -278,7 +280,14 @@ namespace NetUtils
             bwListener.RunWorkerAsync();
         }
 
-        [CommandBehaviour(Commands.Broadcast)]
+        [CommandBehaviour(Commands.PawnValueChanged)]
+        public void OnPawnValueChanged(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            PawnValueChanged(tcpClient);
+            bwListener.RunWorkerAsync();
+        }
+
+       [CommandBehaviour(Commands.Broadcast)]
         public void Broadcast(TcpClient tcpClient, BackgroundWorker bwListener)
         {
             ReceiveDataAndBroadcast(tcpClient);
@@ -482,6 +491,29 @@ namespace NetUtils
                 tcpClient.Client.Receive(buffer);
                 Model.ProcessData(TEMPLATE_ADDED_TO_GRID, buffer);
             }
+        }
+
+        private void PawnValueChanged(TcpClient tcpClient)
+        {
+            var client = tcpClient.Client;
+            // 1 - Which one
+            var lenWhichBuffer = new byte[sizeof(int)];
+            client.Receive(lenWhichBuffer);
+            var whichOneBuffer = new byte[BitConverter.ToInt32(lenWhichBuffer, 0)];
+            client.Receive(whichOneBuffer);
+            Model.ProcessData(PAWN_THAT_CHANGED, whichOneBuffer);
+            // 2 - Which value content
+            var lenWhichContentTypeBuffer = new byte[sizeof(int)];
+            client.Receive(lenWhichContentTypeBuffer);
+            var whichContentTypeBuffer = new byte[BitConverter.ToInt32(lenWhichContentTypeBuffer, 0)];
+            client.Receive(whichContentTypeBuffer);
+            Model.ProcessData(PAWN_VALUE_TYPE_CHANGED, whichContentTypeBuffer);
+            // 3 - Which value
+            var lenWhichContentBuffer = new byte[sizeof(int)];
+            client.Receive(lenWhichContentBuffer);
+            var whichContentBuffer = new byte[BitConverter.ToInt32(lenWhichContentBuffer, 0)];
+            client.Receive(whichContentBuffer);
+            Model.ProcessData(PAWN_VALUE_CHANGED, whichContentBuffer);
         }
 
         private void ReceiveDataAndBroadcast(TcpClient tcpClient)

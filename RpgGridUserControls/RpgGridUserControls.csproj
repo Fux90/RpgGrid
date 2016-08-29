@@ -73,6 +73,7 @@
     <Compile Include="GridPawnController.Designer.cs">
       <DependentUpon>GridPawnController.cs</DependentUpon>
     </Compile>
+    <Compile Include="GridPawnValueChanger.cs" />
     <Compile Include="TemplateContainer.cs">
       <SubType>UserControl</SubType>
     </Compile>

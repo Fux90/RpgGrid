@@ -7,14 +7,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
+using UtilsData;
 
 namespace RpgGridUserControls
 {
-    public partial class GridPawnController : UserControl, CharacterPawnController, CharacterPawnListener
+    public partial class GridPawnValueController : UserControl, CharacterPawnController, CharacterPawnListener
     {
         private CharacterPawn currentPawn;
 
-        public GridPawnController()
+        public GridPawnValueController()
         {
             InitializeComponent();
             InitComboSize();
@@ -240,7 +242,7 @@ namespace RpgGridUserControls
 
     public class GridPawnValueChangedEventArgs
     {
-        public enum ChangeableItems
+        public enum ChangeableItems : byte
         {
             Name,
             Pf,
@@ -253,6 +255,54 @@ namespace RpgGridUserControls
         public GridPawn Pawn { get; private set; }
         public ChangeableItems ValueChanged { get; private set; }
         public object Value { get; private set; }
+
+        public byte[] GetValueBuffer(StringSerializationMethod strConversion)
+        {
+            switch(ValueChanged)
+            {
+                case ChangeableItems.Image:
+                    return Utils.serializeImage((Image)Value);
+                case ChangeableItems.MaxPf:
+                case ChangeableItems.Pf:
+                    return Utils.serializeInt32((int)Value);
+                case ChangeableItems.Name:
+                case ChangeableItems.Notes:
+                    return Utils.serializeString((string)Value, strConversion);
+                case ChangeableItems.Size:
+                    return serializeRpgSize((GridPawn.RpgSize)Value);
+                default:
+                    throw new Exception("Unexpected changed value");
+            }
+        }
+
+        public static object Deserialize(ChangeableItems valueType, byte[] buffer, StringDeserializationMethod strConversion)
+        {
+            switch (valueType)
+            {
+                case ChangeableItems.Image:
+                    return Utils.deserializeImage(buffer);
+                case ChangeableItems.MaxPf:
+                case ChangeableItems.Pf:
+                    return Utils.derializeInt32(buffer);
+                case ChangeableItems.Name:
+                case ChangeableItems.Notes:
+                    return Utils.deserializeString(buffer, strConversion);
+                case ChangeableItems.Size:
+                    return deserializeRpgSize(buffer);
+                default:
+                    throw new Exception("Unexpected changed value");
+            }
+        }
+
+        private static GridPawn.RpgSize deserializeRpgSize(byte[] buffer)
+        {
+            return (GridPawn.RpgSize)buffer[0];
+        }
+
+        private byte[] serializeRpgSize(GridPawn.RpgSize value)
+        {
+            return new byte[] { (byte)value };
+        }
 
         public GridPawnValueChangedEventArgs(GridPawn pawn, ChangeableItems valueChanged, object value)
         {

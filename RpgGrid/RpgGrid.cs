@@ -147,6 +147,10 @@ namespace RpgGrid
             }
         }
 
+        public GridPawn LastModifiedPawn { get; private set; }
+        public GridPawnValueChangedEventArgs.ChangeableItems LastChangedValueType { get; private set; }
+        public byte[] LastChangedValue { get; private set; }
+
         private TaggedObject<Point, string> lastPositionOfGivenPawn;
         public TaggedObject<Point, string> LastPositionOfGivenPawn
         {
@@ -166,6 +170,31 @@ namespace RpgGrid
             }
         }
 
+        private GridPawnValueController gridPawnController;
+        public GridPawnValueController GridPawnController
+        {
+            get
+            {
+                return gridPawnController;
+            }
+
+            private set
+            {
+                gridPawnController = value;
+                gridPawnController.ValueChanged += (s, e) =>
+                {
+                    LastModifiedPawn = e.Pawn;
+                    LastChangedValueType = e.ValueChanged;
+                    LastChangedValue = e.GetValueBuffer(GetBytesFromString);
+                    Connections.Current.Broadcast(  Connections.Commands.PawnValueChanged, 
+                                                    new string[] {
+                                                        Connections.PAWN_THAT_CHANGED,
+                                                        Connections.PAWN_VALUE_TYPE_CHANGED,
+                                                        Connections.PAWN_VALUE_CHANGED,
+                                                    });
+                };
+            }
+        }
         #endregion
 
         #region PATHS
@@ -221,7 +250,8 @@ namespace RpgGrid
 
         public RpgGrid( Form viewContainer,
                         Grid mainGrid,
-                        PawnManager mainPawnManager)
+                        PawnManager mainPawnManager,
+                        GridPawnValueController gridPawnController)
             : base()
         {
             ResourceManager = ResourceManager.Current;
@@ -229,6 +259,7 @@ namespace RpgGrid
             ViewContainer = viewContainer;
             MainGrid = mainGrid;
             MainPawnManager = mainPawnManager;
+            GridPawnController = gridPawnController;
         }
 
         public override void ShowProcessing()
@@ -553,6 +584,77 @@ namespace RpgGrid
 #endif
                     return DataRes.Empty;
                 }
+            }
+        }
+
+        [ResponseMethods(Connections.PAWN_THAT_CHANGED)]
+        private DataRes PawnThatChanged(byte[] buffer)
+        {
+            if (buffer == null)
+            {
+                // Telling which pawn has been modified
+                var pawnUniqueID = LastModifiedPawn.UniqueID;
+#if DEBUG
+                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn modified - Which one: {0}", pawnUniqueID)));
+#endif
+                return new DataRes(GetBytesFromString(pawnUniqueID));
+            }
+            else
+            {
+                // Which pawn will be modified
+                var pawnUniqueID = GetStringFromByteArray(buffer);
+                LastTouchedPawn = MainPawnManager.GetByUniqueID(pawnUniqueID);
+#if DEBUG
+                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn modified: {0} [IN]", LastTouchedPawn.UniqueID)));
+#endif
+                return DataRes.Empty;
+            }
+        }
+
+        [ResponseMethods(Connections.PAWN_VALUE_TYPE_CHANGED)]
+        private DataRes PawnValueTypeChanged(byte[] buffer)
+        {
+            if (buffer == null)
+            {
+                // Telling which value has been modified
+#if DEBUG
+                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn modified - Which value: {0}", LastChangedValueType)));
+#endif
+                return new DataRes(new byte[] { (byte)LastChangedValueType });
+            }
+            else
+            {
+                // Which value type will be modified
+                LastChangedValueType = (GridPawnValueChangedEventArgs.ChangeableItems)buffer[0];
+#if DEBUG
+                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn has been modified in {0}", LastChangedValueType)));
+#endif
+                return DataRes.Empty;
+            }
+        }
+
+        [ResponseMethods(Connections.PAWN_VALUE_CHANGED)]
+        private DataRes PawnValueChanged(byte[] buffer)
+        {
+            if (buffer == null)
+            {
+                // Telling the content of the modification
+#if DEBUG
+                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn modified - Value [{0} Bytes]", LastChangedValue.Length)));
+#endif
+                return new DataRes(LastChangedValue);
+            }
+            else
+            {
+                // Receiveing the content of the modification
+                LastChangedValue = buffer;
+                var deserializedResult = GridPawnValueChangedEventArgs.Deserialize(LastChangedValueType, LastChangedValue, GetStringFromByteArray);
+                GridPawnValueChanger.GetCurrent((CharacterPawn)LastModifiedPawn).SetValueByType(LastChangedValueType, deserializedResult);
+
+#if DEBUG
+                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn modified - Value [{0} Bytes]", LastChangedValue.Length)));
+#endif
+                return DataRes.Empty;
             }
         }
 
