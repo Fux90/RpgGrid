@@ -1,6 +1,6 @@
 ﻿#define PATCH_OVERLAPPING_NAMES
 #define STRANGE_EXCEPTION_ON_PAWN_RECEIVING_ANALYSIS
-//#define STRANGE_EXCEPTION_ON_MAP_RECEIVING_ANALYSIS
+#define STRANGE_EXCEPTION_ON_MAP_RECEIVING_ANALYSIS
 
 using NetUtils;
 using ResourceManagement;
@@ -603,9 +603,9 @@ namespace RpgGrid
             {
                 // Which pawn will be modified
                 var pawnUniqueID = GetStringFromByteArray(buffer);
-                LastTouchedPawn = MainPawnManager.GetByUniqueID(pawnUniqueID);
+                LastModifiedPawn = MainGrid.GetByUniqueID(pawnUniqueID);
 #if DEBUG
-                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn modified: {0} [IN]", LastTouchedPawn.UniqueID)));
+                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn modified: {0} [IN]", LastModifiedPawn.UniqueID)));
 #endif
                 return DataRes.Empty;
             }

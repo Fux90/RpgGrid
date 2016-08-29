@@ -24,7 +24,7 @@ namespace RpgGridUserControls
 
         private GridPawnValueChanger(CharacterPawn pawn)
         {
-            current.RegisterCharacterPawn(pawn);
+            RegisterCharacterPawn(pawn);
         }
 
         public void RegisterCharacterPawn(CharacterPawn pawn)
@@ -36,32 +36,32 @@ namespace RpgGridUserControls
 
         public void SetImage(Image image)
         {
-            throw new NotImplementedException();
+            currentPawn.Image = image;
         }
 
         public void SetMaxPf(int maxPf)
         {
-            throw new NotImplementedException();
+            currentPawn.MaxPf = maxPf;
         }
 
         public void SetName(string name)
         {
-            throw new NotImplementedException();
+            currentPawn.Name = name;
         }
 
         public void SetNotes(string notes)
         {
-            throw new NotImplementedException();
+            currentPawn.Notes = notes;
         }
 
         public void SetPf(int pf)
         {
-            throw new NotImplementedException();
+            currentPawn.CurrentPf = pf;
         }
 
         public void SetSize(GridPawn.RpgSize size)
         {
-            throw new NotImplementedException();
+            currentPawn.ModSize = size;
         }
 
         #endregion
