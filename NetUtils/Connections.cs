@@ -45,6 +45,7 @@ namespace NetUtils
         public const string PAWN_VALUE_TYPE_CHANGED = "pawnValueTypeChanged";
         public const string PAWN_VALUE_CHANGED = "pawnValue";
         public const string PAWN_ROTATION_90_DEGREES = "pawnRotated";
+        public const string PAWN_BORDER_COLOR = "pawnBOrderColor";
 
         public const string MESSAGE = "message";
         public const string WARNING = "warning";
@@ -83,6 +84,7 @@ namespace NetUtils
             CloseChannel,
             ClosedChannel,
             DoneWithTicket,
+            PawnChangedBorderColor,
         };
 
         private static Connections current;
@@ -213,6 +215,11 @@ namespace NetUtils
             bwListener.RunWorkerAsync();
         }
 
+        public void Broadcast(object pawnChangedBorderColor, string pAWN_ROTATION_90_DEGREES)
+        {
+            throw new NotImplementedException();
+        }
+
         [CommandBehaviour(Commands.InitialDataReceived)]
         public void OnInitialDataReceivedBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
         {
@@ -294,6 +301,13 @@ namespace NetUtils
         public void OnPawnRotated90Degrees(TcpClient tcpClient, BackgroundWorker bwListener)
         {
             PawnRotated90Degrees(tcpClient);
+            bwListener.RunWorkerAsync();
+        }
+
+        [CommandBehaviour(Commands.PawnChangedBorderColor)]
+        public void OnPawnChangedBorderColor(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            PawnBorderColorChanged(tcpClient);
             bwListener.RunWorkerAsync();
         }
 
@@ -542,6 +556,23 @@ namespace NetUtils
             var whichOneBuffer = new byte[BitConverter.ToInt32(lenWhichBuffer, 0)];
             client.Receive(whichOneBuffer);
             Model.ProcessData(PAWN_ROTATION_90_DEGREES, whichOneBuffer);
+        }
+
+        private void PawnBorderColorChanged(TcpClient tcpClient)
+        {
+            var client = tcpClient.Client;
+
+            var lenWhichBuffer = new byte[sizeof(int)];
+            client.Receive(lenWhichBuffer);
+            var whichOneBuffer = new byte[BitConverter.ToInt32(lenWhichBuffer, 0)];
+            client.Receive(whichOneBuffer);
+            Model.ProcessData(PAWN_THAT_CHANGED, whichOneBuffer);
+
+            var lenWhichColorBuffer = new byte[sizeof(int)];
+            client.Receive(lenWhichColorBuffer);
+            var whichColorBuffer = new byte[BitConverter.ToInt32(lenWhichColorBuffer, 0)];
+            client.Receive(whichColorBuffer);
+            Model.ProcessData(PAWN_BORDER_COLOR, whichColorBuffer);
         }
 
         private void ReceiveDataAndBroadcast(TcpClient tcpClient)

@@ -129,6 +129,23 @@ namespace RpgGridUserControls
             }
         }
 
+        public class PawnAndColorEventArgs : PawnEventArgs
+        {
+            public Color Color { get; private set; }
+
+            public PawnAndColorEventArgs(GridPawn pawn, bool alreadyContained, bool propagate, Color color)
+                : base(pawn, alreadyContained, propagate)
+            {
+                Color = color;
+            }
+
+            public PawnAndColorEventArgs(GridPawn pawn, Color color)
+                : this(pawn, true, false, color)
+            {
+
+            }
+        }
+
         public class ImageEventArgs : EventArgs
         {
             public Image InvolvedImage { get; private set; }
@@ -306,6 +323,7 @@ namespace RpgGridUserControls
         public event EventHandler<PawnAndLocationEventArgs> PawnMoved;
 
         public event EventHandler<PawnEventArgs> PawnRotated90Degrees;
+        public event EventHandler<PawnAndColorEventArgs> PawnBorderColorChanged;
 
         public event EventHandler<ImageEventArgs> GridImageChangedByDialog;
 
@@ -338,14 +356,35 @@ namespace RpgGridUserControls
 
                 ctrl.SetSizeAtNoZoom(PixelsInFiveFeet);
                 SetPawnSize(ctrl);
-                ctrl.Rotate90Degrees += Ctrl_Rotate90Degrees;
-                ctrl.MouseUp += Pawn_MouseUp;
+                AssignEvents(ctrl);
                 this.Invalidate();
 
                 return false;
             }
 
             return true;
+        }
+
+        private void AssignEvents(GridPawn ctrl)
+        {
+            ctrl.Rotate90Degrees += Ctrl_Rotate90Degrees;
+            ctrl.MouseUp += Pawn_MouseUp;
+            if(ctrl.GetType() == typeof(CharacterPawn))
+            {
+                var cP = (CharacterPawn)ctrl;
+                cP.AssignedBorderColor += CP_AssignedBorderColor;
+            }
+        }
+
+        private void RemoveEvents(GridPawn ctrl)
+        {
+            ctrl.Rotate90Degrees -= Ctrl_Rotate90Degrees;
+            ctrl.MouseUp -= Pawn_MouseUp;
+            if (ctrl.GetType() == typeof(CharacterPawn))
+            {
+                var cP = (CharacterPawn)ctrl;
+                cP.AssignedBorderColor -= CP_AssignedBorderColor;
+            }
         }
 
         public GridPawn GetByUniqueID(string ID)
@@ -365,12 +404,15 @@ namespace RpgGridUserControls
 
         public GridPawn Remove(GridPawn ctrl)
         {
-            ctrl.Rotate90Degrees -= Ctrl_Rotate90Degrees;
-            ctrl.MouseUp -= Pawn_MouseUp;
-            Controls.Remove(ctrl);
+            RemoveEvents(ctrl); Controls.Remove(ctrl);
             OnPawnRemoved(new PawnEventArgs(ctrl, true));
 
             return ctrl;
+        }
+
+        private void CP_AssignedBorderColor(object sender, CharacterPawn.AssignedBorderColorEventArgs e)
+        {
+            OnPawnBorderColorChanged(new PawnAndColorEventArgs((GridPawn)sender, true, true, e.Color));
         }
 
         private void Ctrl_Rotate90Degrees(object sender, EventArgs e)
@@ -907,6 +949,16 @@ namespace RpgGridUserControls
                 tmp(this, e);
             }
         }
+
+        protected void OnPawnBorderColorChanged(PawnAndColorEventArgs e)
+        {
+            var tmp = PawnBorderColorChanged;
+            if (tmp != null)
+            {
+                tmp(this, e);
+            }
+        }
+
         protected void OnPawnMoved(PawnAndLocationEventArgs e)
         {
             var tmp = PawnMoved;

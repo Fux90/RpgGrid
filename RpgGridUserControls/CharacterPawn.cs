@@ -23,6 +23,12 @@ namespace RpgGridUserControls
         private readonly Brush underZeroBrush = Brushes.Yellow;
         private readonly Brush damageBrush = Brushes.Red;
         private Pen circlePen = new Pen(Brushes.Black, 2.0f);
+        public Color CirclePenColor
+        {
+            get { return circlePen.Color; }
+            set { circlePen.Color = value; this.Invalidate(); }
+        }
+
         private readonly Pen highlightPen = new Pen(Brushes.YellowGreen, 2.0f);
 
         private bool dying;
@@ -300,6 +306,33 @@ namespace RpgGridUserControls
             dim = baseDim - 2 * border_2;
         }
 
+#region CONTEXT_MENU_EVENTS
+        #region ARGS
+        public class AssignedBorderColorEventArgs : EventArgs
+        {
+            public Color Color { get; private set; }
+
+            public AssignedBorderColorEventArgs(Color color)
+            {
+                Color = color;
+            }
+        }
+        #endregion
+        #region EVENTS
+        public event EventHandler<AssignedBorderColorEventArgs> AssignedBorderColor;
+        #endregion
+        #region METHODS
+        protected void OnAssignedBorderColor(AssignedBorderColorEventArgs abcE)
+        {
+            var tmp = AssignedBorderColor;
+            if(tmp != null)
+            {
+                tmp(this, abcE);
+            }
+        }
+        #endregion
+#endregion
+
         private ContextMenuStrip CreateContextMenu()
         {
             var menu = new ContextMenuStrip();
@@ -312,6 +345,7 @@ namespace RpgGridUserControls
                 {
                     this.circlePen.Color = clrPicker.ChosenColor;
                     this.Invalidate();
+                    OnAssignedBorderColor(new AssignedBorderColorEventArgs(this.circlePen.Color));
                 }
 
             });

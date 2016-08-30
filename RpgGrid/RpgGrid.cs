@@ -125,7 +125,7 @@ namespace RpgGrid
 #endif
                     if (e.Propagate)
                     {
-                        Connections.Current.Broadcast(  Connections.Commands.PawnRotated90Degrees,
+                        Connections.Current.Broadcast(Connections.Commands.PawnRotated90Degrees,
                                                         Connections.PAWN_ROTATION_90_DEGREES);
                     }
                     else
@@ -138,7 +138,34 @@ namespace RpgGrid
                     }
                 };
 #endregion
-#region BACKGROUND_IMAGE_CHANGED
+#region PAWN_BORDER_COLOR_CHANGED
+                mainGrid.PawnBorderColorChanged += (s, e) =>
+                {
+                    LastModifiedPawn = e.Pawn;
+#if DEBUG
+                    OnVerboseDebugging(new VerboseDebugArgs(String.Format("{0} changed border color [ID: {1}]",
+                                                                            LastModifiedPawn.Name,
+                                                                            LastModifiedPawn.UniqueID)));
+#endif
+                    if (e.Propagate)
+                    {
+                        Connections.Current.Broadcast(  Connections.Commands.PawnChangedBorderColor,
+                                                        new string[] {
+                                                            Connections.PAWN_THAT_CHANGED,
+                                                            Connections.PAWN_BORDER_COLOR,
+                                                        });
+                    }
+                    else
+                    {
+#if DEBUG
+                        OnVerboseDebugging(new VerboseDebugArgs(String.Format("{0} border color received  received [ID: {1}]",
+                                                                                LastModifiedPawn.Name,
+                                                                                LastModifiedPawn.UniqueID)));
+#endif
+                    }
+                };
+#endregion
+                #region BACKGROUND_IMAGE_CHANGED
                 mainGrid.BackgroundImageChanged += (s, e) =>
                 {
                     for (int i = 0; i < mainGrid.Controls.Count; i++)
@@ -719,6 +746,31 @@ namespace RpgGrid
                 LastModifiedPawn.PerformRotate90Degrees(hasToBePropagated: false);
 #if DEBUG
                 OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn {0} rotated [ID {0}]", LastModifiedPawn.Name, LastModifiedPawn.UniqueID)));
+#endif
+                return DataRes.Empty;
+            }
+        }
+
+        [ResponseMethods(Connections.PAWN_BORDER_COLOR)]
+        private DataRes PawnBorderColor(byte[] buffer)
+        {
+            if (buffer == null)
+            {
+                // Telling which pawn has been modified
+                var color = ((CharacterPawn)LastModifiedPawn).CirclePenColor;
+                var strColor = ColorTranslator.ToHtml(color);
+#if DEBUG
+                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn border color modified: {0}", color)));
+#endif
+                return new DataRes(GetBytesFromString(strColor));
+            }
+            else
+            {
+                // Which pawn will be modified
+                var strColor = GetStringFromByteArray(buffer);
+                ((CharacterPawn)LastModifiedPawn).CirclePenColor = ColorTranslator.FromHtml(strColor);
+#if DEBUG
+                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn {0} color modified", LastModifiedPawn.UniqueID)));
 #endif
                 return DataRes.Empty;
             }
