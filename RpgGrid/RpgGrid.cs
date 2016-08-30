@@ -44,11 +44,25 @@ namespace RpgGrid
 #region PAWN_REMOVED
                 mainGrid.PawnRemoved += (s, e) =>
                 {
+                    LastModifiedPawn = e.Pawn;
 #if DEBUG
                     OnVerboseDebugging(new VerboseDebugArgs(String.Format("Removed pawn: {0}", e.Pawn.Name)));
 #endif
+                    if (e.Propagate)
+                    {
+                        Connections.Current.Broadcast(  Connections.Commands.PawnRemoved,
+                                                        Connections.PAWN_REMOVED);
+                    }
+                    else
+                    {
+#if DEBUG
+                        OnVerboseDebugging(new VerboseDebugArgs(String.Format("{0} has been removed [ID: {1}]",
+                                                                                LastModifiedPawn.Name,
+                                                                                LastModifiedPawn.UniqueID)));
+#endif
+                    }
                 };
-                #endregion
+#endregion
 #region PAWN_DRAG_DROPPED
                 mainGrid.PawnDragDropped += (s, e) =>
                 {
@@ -170,7 +184,7 @@ namespace RpgGrid
                 {
                     for (int i = 0; i < mainGrid.Controls.Count; i++)
                     {
-                        var removed = mainGrid.Remove((GridPawn)mainGrid.Controls[i]);
+                        var removed = mainGrid.Remove((GridPawn)mainGrid.Controls[i], false);
                         MainPawnManager.LoadPawn(removed);
                     }
                 };
@@ -774,6 +788,60 @@ namespace RpgGrid
 #endif
                 return DataRes.Empty;
             }
+        }
+
+        [ResponseMethods(Connections.PAWN_REMOVED)]
+        private DataRes PawnRemoved(byte[] buffer)
+        {
+            if (buffer == null)
+            {
+                // Telling which pawn has been modified
+                var pawnUniqueID = LastModifiedPawn.UniqueID;
+#if DEBUG
+                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn modified - Which one: {0}", pawnUniqueID)));
+#endif
+                return new DataRes(GetBytesFromString(pawnUniqueID));
+            }
+            else
+            {
+                // Which pawn will be modified
+                var pawnUniqueID = GetStringFromByteArray(buffer);
+                LastModifiedPawn = MainGrid.GetByUniqueID(pawnUniqueID);
+                if (LastModifiedPawn != null)
+                {
+                    var removed = mainGrid.Remove(LastModifiedPawn, propagate: false);
+                    MainPawnManager.LoadPawn(removed);
+#if DEBUG
+                    OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn modified: {0} [IN]", LastModifiedPawn.UniqueID)));
+#endif
+                }
+                return DataRes.Empty;
+            }
+        }
+
+        [ResponseMethods(Connections.PAWN_DELETED)]
+        private DataRes PawnDeleted(byte[] buffer)
+        {
+            throw new NotImplementedException();
+//            if (buffer == null)
+//            {
+//                // Telling which pawn has been modified
+//                var pawnUniqueID = LastModifiedPawn.UniqueID;
+//#if DEBUG
+//                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn modified - Which one: {0}", pawnUniqueID)));
+//#endif
+//                return new DataRes(GetBytesFromString(pawnUniqueID));
+//            }
+//            else
+//            {
+//                // Which pawn will be modified
+//                var pawnUniqueID = GetStringFromByteArray(buffer);
+//                LastModifiedPawn = MainGrid.GetByUniqueID(pawnUniqueID);
+//#if DEBUG
+//                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn modified: {0} [IN]", LastModifiedPawn.UniqueID)));
+//#endif
+//                return DataRes.Empty;
+//            }
         }
 
         [ResponseMethods(Connections.MESSAGE)]

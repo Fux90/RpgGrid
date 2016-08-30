@@ -46,6 +46,8 @@ namespace NetUtils
         public const string PAWN_VALUE_CHANGED = "pawnValue";
         public const string PAWN_ROTATION_90_DEGREES = "pawnRotated";
         public const string PAWN_BORDER_COLOR = "pawnBOrderColor";
+        public const string PAWN_REMOVED = "pawnRemoved";
+        public const string PAWN_DELETED = "pawnDeleted";
 
         public const string MESSAGE = "message";
         public const string WARNING = "warning";
@@ -78,6 +80,8 @@ namespace NetUtils
             MovePawnTo,
             PawnValueChanged,
             PawnRotated90Degrees,
+            PawnRemoved, // Removed from grid and put into pawnManager
+            PawnDeleted, // Removed permanently
             Broadcast,
             Yes,
             No,
@@ -308,6 +312,20 @@ namespace NetUtils
         public void OnPawnChangedBorderColor(TcpClient tcpClient, BackgroundWorker bwListener)
         {
             PawnBorderColorChanged(tcpClient);
+            bwListener.RunWorkerAsync();
+        }
+
+        [CommandBehaviour(Commands.PawnRemoved)]
+        public void OnPawnRemoved(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            RemovePawn(tcpClient);
+            bwListener.RunWorkerAsync();
+        }
+
+        [CommandBehaviour(Commands.PawnDeleted)]
+        public void OnPawnDeleted(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            DeletePawn(tcpClient);
             bwListener.RunWorkerAsync();
         }
 
@@ -573,6 +591,28 @@ namespace NetUtils
             var whichColorBuffer = new byte[BitConverter.ToInt32(lenWhichColorBuffer, 0)];
             client.Receive(whichColorBuffer);
             Model.ProcessData(PAWN_BORDER_COLOR, whichColorBuffer);
+        }
+
+        private void RemovePawn(TcpClient tcpClient)
+        {
+            var client = tcpClient.Client;
+
+            var lenWhichBuffer = new byte[sizeof(int)];
+            client.Receive(lenWhichBuffer);
+            var whichOneBuffer = new byte[BitConverter.ToInt32(lenWhichBuffer, 0)];
+            client.Receive(whichOneBuffer);
+            Model.ProcessData(PAWN_REMOVED, whichOneBuffer);
+        }
+
+        private void DeletePawn(TcpClient tcpClient)
+        {
+            var client = tcpClient.Client;
+
+            var lenWhichBuffer = new byte[sizeof(int)];
+            client.Receive(lenWhichBuffer);
+            var whichOneBuffer = new byte[BitConverter.ToInt32(lenWhichBuffer, 0)];
+            client.Receive(whichOneBuffer);
+            Model.ProcessData(PAWN_DELETED, whichOneBuffer);
         }
 
         private void ReceiveDataAndBroadcast(TcpClient tcpClient)

@@ -402,10 +402,11 @@ namespace RpgGridUserControls
             return null;
         }
 
-        public GridPawn Remove(GridPawn ctrl)
+        public GridPawn Remove(GridPawn ctrl, bool propagate = true)
         {
-            RemoveEvents(ctrl); Controls.Remove(ctrl);
-            OnPawnRemoved(new PawnEventArgs(ctrl, true));
+            RemoveEvents(ctrl);
+            Controls.Remove(ctrl);
+            OnPawnRemoved(new PawnEventArgs(ctrl, true, propagate));
 
             return ctrl;
         }
@@ -442,7 +443,7 @@ namespace RpgGridUserControls
         {
             if(typeof(GridPawn).IsAssignableFrom(e.Control.GetType()))
             {
-                OnPawnRemoved(new PawnEventArgs((GridPawn)e.Control, true));
+                OnPawnRemoved(new PawnEventArgs((GridPawn)e.Control, true, true));
             }
 
             base.OnControlRemoved(e);
