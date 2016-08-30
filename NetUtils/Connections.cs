@@ -180,11 +180,6 @@ namespace NetUtils
             tcpClient.Close();
         }
 
-        public void Broadcast(object pawnRotated90Degrees, string[] v, string pAWN_CLIENT_LOCATION)
-        {
-            throw new NotImplementedException();
-        }
-
         [CommandBehaviour(Commands.ClosedChannel)]
         public void ClosedChannelBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
         {

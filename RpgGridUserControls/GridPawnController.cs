@@ -168,8 +168,8 @@ namespace RpgGridUserControls
             if (currentPawn != null)
             {
                 var newSize = (GridPawn.RpgSize)cmbSizes.SelectedIndex;
-                //MessageBox.Show(String.Format("->{0}", newSize));
-                currentPawn.ModSize = newSize;
+                //currentPawn.ModSize = newSize;
+                SetSize(newSize);
             }
         }
 
@@ -211,7 +211,8 @@ namespace RpgGridUserControls
 
                         if(oDlg.ShowDialog() == DialogResult.OK)
                         {
-                            currentPawn.Image = Image.FromFile(oDlg.FileName);
+                            //currentPawn.Image = Image.FromFile(oDlg.FileName);
+                            SetImage(Image.FromFile(oDlg.FileName));
                             ShowImage();
                         }
                     }
