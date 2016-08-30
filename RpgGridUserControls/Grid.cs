@@ -129,6 +129,16 @@ namespace RpgGridUserControls
             }
         }
 
+        public class ImageEventArgs : EventArgs
+        {
+            public Image InvolvedImage { get; private set; }
+
+            public ImageEventArgs(Image involvedImage)
+            {
+                InvolvedImage = involvedImage;
+            }
+        }
+
         #endregion
 
         public CharacterPawnListener PawnListener { get; set; }
@@ -296,6 +306,8 @@ namespace RpgGridUserControls
         public event EventHandler<PawnAndLocationEventArgs> PawnMoved;
 
         public event EventHandler<PawnEventArgs> PawnRotated90Degrees;
+
+        public event EventHandler<ImageEventArgs> GridImageChangedByDialog;
 
         public Grid()
         {
@@ -473,6 +485,16 @@ namespace RpgGridUserControls
             Type dummy;
             return IsOfType<T>(e, out dummy);
         }
+
+        protected void OnGridImageChangedByDialog(ImageEventArgs iE)
+        {
+            var tmp = GridImageChangedByDialog;
+            if(tmp != null)
+            {
+                tmp(this, iE);
+            }
+        }
+
         protected override void OnMouseEnter(EventArgs e)
         {
             this.Focus();
@@ -587,6 +609,7 @@ namespace RpgGridUserControls
                 if (oDlg.ShowDialog() == DialogResult.OK)
                 {
                     this.ImagePath = oDlg.FileName;
+                    OnGridImageChangedByDialog(new ImageEventArgs(Image));
                 }
             }
         }

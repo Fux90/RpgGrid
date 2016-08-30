@@ -82,6 +82,7 @@ namespace NetUtils
             No,
             CloseChannel,
             ClosedChannel,
+            DoneWithTicket,
         };
 
         private static Connections current;
@@ -307,6 +308,13 @@ namespace NetUtils
 
         [CommandBehaviour(Commands.Done)]
         public void Done(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            Model.ProcessData(ERROR, Model.GetBytesFromString("Received void ticket"));
+            bwListener.RunWorkerAsync();
+        }
+
+        [CommandBehaviour(Commands.DoneWithTicket)]
+        public void DoneWithTicket(TcpClient tcpClient, BackgroundWorker bwListener)
         {
             ReceiveTicketAck(tcpClient);
             bwListener.RunWorkerAsync();
@@ -579,7 +587,7 @@ namespace NetUtils
             if (ticketBuffer.Length > 0)
             {
                 client.Receive(ticketBuffer);
-                tcpClient.Client.Send(Commands.Done.ToByteArray());
+                tcpClient.Client.Send(Commands.DoneWithTicket.ToByteArray());
                 var ticketData = new DataRes(ticketBuffer);
                 tcpClient.Client.Send(ticketData.Length);
                 tcpClient.Client.Send(ticketData.Buffer);

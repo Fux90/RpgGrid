@@ -114,7 +114,7 @@ namespace RpgGrid
                                                     Connections.PAWN_CLIENT_LOCATION);
                 };
                 #endregion
-                #region PAWN_ROTATED
+#region PAWN_ROTATED
                 mainGrid.PawnRotated90Degrees += (s, e) =>
                 {
                     LastModifiedPawn = e.Pawn;
@@ -138,7 +138,7 @@ namespace RpgGrid
                     }
                 };
 #endregion
-                #region BACKGROUND_IMAGE_CHANGED
+#region BACKGROUND_IMAGE_CHANGED
                 mainGrid.BackgroundImageChanged += (s, e) =>
                 {
                     for (int i = 0; i < mainGrid.Controls.Count; i++)
@@ -146,6 +146,23 @@ namespace RpgGrid
                         var removed = mainGrid.Remove((GridPawn)mainGrid.Controls[i]);
                         MainPawnManager.LoadPawn(removed);
                     }
+                };
+                mainGrid.GridImageChangedByDialog += (s, e) =>
+                {
+                    //for (int i = 0; i < mainGrid.Controls.Count; i++)
+                    //{
+                    //    var removed = mainGrid.Remove((GridPawn)mainGrid.Controls[i]);
+                    //    MainPawnManager.LoadPawn(removed);
+                    //}
+#if DEBUG
+                    OnVerboseDebugging(new VerboseDebugArgs("Grid image has changed"));
+#endif
+                    Connections.Current.Broadcast(  Connections.Commands.MapReceived,
+                                                    new string[] {
+                                                        Connections.MAP_NAME_SENDING,
+                                                        Connections.MAP_EXTRAINFO_SENDING,
+                                                        Connections.MAP_SENDING,
+                                                    });
                 };
 #endregion
             }
