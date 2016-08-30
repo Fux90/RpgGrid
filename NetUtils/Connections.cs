@@ -219,11 +219,6 @@ namespace NetUtils
             bwListener.RunWorkerAsync();
         }
 
-        public void Broadcast(object pawnChangedBorderColor, string pAWN_ROTATION_90_DEGREES)
-        {
-            throw new NotImplementedException();
-        }
-
         [CommandBehaviour(Commands.InitialDataReceived)]
         public void OnInitialDataReceivedBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
         {

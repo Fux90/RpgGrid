@@ -304,7 +304,7 @@ namespace RpgGridUserControls
 
         public GridPawn Build(bool randomBuild = false)
         {
-            var newPawn = new CharacterPawn();
+            var newPawn = new CharacterPawn(true);
 
             newPawn.Name = String.Format("{0}_{1}", DefaultName, generateUniqueName());
             newPawn.Image = DefaultImage;

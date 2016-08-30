@@ -617,17 +617,20 @@ namespace RpgGrid
 
                 using (var ms = new MemoryStream())
                 {
+                    LastTouchedPawn.NormalizeUniqueID();
                     BinaryFormatter.Serialize(ms, LastTouchedPawn);
 #if DEBUG
                     OnVerboseDebugging(new VerboseDebugArgs("Pawn was generated: sent integrally"));
 #endif
-                    LastTouchedPawn.NormalizeUniqueID();
                     return new DataRes(ms.ToArray());
                 }
             }
             else
             {
-                throw new Exception("READ ENTIRE PAWN");
+                var ms = new MemoryStream(buffer);
+                var pawn = (GridPawn)BinaryFormatter.Deserialize(ms);
+                LastTouchedPawn = pawn;
+                MainGrid.AddIfNotPresent(pawn);
 #if DEBUG
                 OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn is added to grid from template: {0} [IN]", "Name??")));
 #endif

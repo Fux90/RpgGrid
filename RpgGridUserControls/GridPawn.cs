@@ -66,8 +66,9 @@ namespace RpgGridUserControls
 
         public GridPawn(bool generatedFromTemplate)
         {
-            UniqueID = String.Format(   "{0}_generateUniqueID()", 
-                                        generatedFromTemplate ? TemplateGeneratePrefix : NonTemplateGeneratePrefix);
+            UniqueID = String.Format(   "{0}{1}", 
+                                        generatedFromTemplate ? TemplateGeneratePrefix : NonTemplateGeneratePrefix,
+                                        generateUniqueID());
         }
 
         public GridPawn(SerializationInfo info, StreamingContext context)

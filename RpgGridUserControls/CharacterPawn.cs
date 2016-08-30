@@ -168,9 +168,15 @@ namespace RpgGridUserControls
             }
         }
 
-        public CharacterPawn()
+        public CharacterPawn(bool fromTemplate)
+            : base(fromTemplate)
         {
             init();
+        }
+
+        public CharacterPawn()
+            : this(false)
+        {
         }
 
         public CharacterPawn(SerializationInfo info, StreamingContext context)
