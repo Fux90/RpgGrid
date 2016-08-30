@@ -103,10 +103,18 @@ namespace RpgGridUserControls
         {
             public GridPawn Pawn { get; private set; }
             public bool AlreadyContained { get; private set; }
-            public PawnEventArgs(GridPawn pawn, bool alreadyContained)
+            public bool Propagate { get; private set; }
+
+            public PawnEventArgs(GridPawn pawn, bool alreadyContained, bool propagate)
             {
                 Pawn = pawn;
                 AlreadyContained = alreadyContained;
+                Propagate = propagate;
+            }
+
+            public PawnEventArgs(GridPawn pawn, bool alreadyContained)
+                : this(pawn, alreadyContained, true)
+            {
             }
         }
 
@@ -287,6 +295,8 @@ namespace RpgGridUserControls
         public event EventHandler<PawnEventArgs> PawnRemoved;
         public event EventHandler<PawnAndLocationEventArgs> PawnMoved;
 
+        public event EventHandler<PawnEventArgs> PawnRotated90Degrees;
+
         public Grid()
         {
             InitializeComponent();
@@ -355,12 +365,23 @@ namespace RpgGridUserControls
         {
             var pawn = (GridPawn)sender;
 
-            pawn.Width = (int)Math.Round(pawn.Width * _yControlToPixel);
-            pawn.Height = (int)Math.Round(pawn.Height * _xControlToPixel);
-            
-            SetPawnSize(pawn);
+            if (!pawn.IsSquared)
+            {
+                pawn.Width = (int)Math.Round(pawn.Width * _yControlToPixel);
+                pawn.Height = (int)Math.Round(pawn.Height * _xControlToPixel);
+
+                SetPawnSize(pawn);
+            }
 
             this.Invalidate();
+
+            var propagate = true;
+            if(e.GetType() == typeof(PawnRotationEventArgs))
+            {
+                propagate = ((PawnRotationEventArgs)e).Propagate;
+            }
+
+            OnPawnRotated90Degrees(new PawnEventArgs(pawn, true, propagate));
         }
 
         protected override void OnControlRemoved(ControlEventArgs e)
@@ -855,6 +876,14 @@ namespace RpgGridUserControls
             }
         }
 
+        protected void OnPawnRotated90Degrees(PawnEventArgs e)
+        {
+            var tmp = PawnRotated90Degrees;
+            if(tmp != null)
+            {
+                tmp(this, e);
+            }
+        }
         protected void OnPawnMoved(PawnAndLocationEventArgs e)
         {
             var tmp = PawnMoved;

@@ -44,6 +44,7 @@ namespace NetUtils
         public const string PAWN_THAT_CHANGED = "pawnThatChanged";
         public const string PAWN_VALUE_TYPE_CHANGED = "pawnValueTypeChanged";
         public const string PAWN_VALUE_CHANGED = "pawnValue";
+        public const string PAWN_ROTATION_90_DEGREES = "pawnRotated";
 
         public const string MESSAGE = "message";
         public const string WARNING = "warning";
@@ -75,6 +76,7 @@ namespace NetUtils
             AddPawnFromTemplateToGrid,
             MovePawnTo,
             PawnValueChanged,
+            PawnRotated90Degrees,
             Broadcast,
             Yes,
             No,
@@ -176,6 +178,11 @@ namespace NetUtils
             tcpClient.Client.Shutdown(SocketShutdown.Both);
             tcpClient.Client.Close();
             tcpClient.Close();
+        }
+
+        public void Broadcast(object pawnRotated90Degrees, string[] v, string pAWN_CLIENT_LOCATION)
+        {
+            throw new NotImplementedException();
         }
 
         [CommandBehaviour(Commands.ClosedChannel)]
@@ -287,7 +294,14 @@ namespace NetUtils
             bwListener.RunWorkerAsync();
         }
 
-       [CommandBehaviour(Commands.Broadcast)]
+        [CommandBehaviour(Commands.PawnRotated90Degrees)]
+        public void OnPawnRotated90Degrees(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            PawnRotated90Degrees(tcpClient);
+            bwListener.RunWorkerAsync();
+        }
+
+        [CommandBehaviour(Commands.Broadcast)]
         public void Broadcast(TcpClient tcpClient, BackgroundWorker bwListener)
         {
             ReceiveDataAndBroadcast(tcpClient);
@@ -514,6 +528,17 @@ namespace NetUtils
             var whichContentBuffer = new byte[BitConverter.ToInt32(lenWhichContentBuffer, 0)];
             client.Receive(whichContentBuffer);
             Model.ProcessData(PAWN_VALUE_CHANGED, whichContentBuffer);
+        }
+
+        private void PawnRotated90Degrees(TcpClient tcpClient)
+        {
+            var client = tcpClient.Client;
+
+            var lenWhichBuffer = new byte[sizeof(int)];
+            client.Receive(lenWhichBuffer);
+            var whichOneBuffer = new byte[BitConverter.ToInt32(lenWhichBuffer, 0)];
+            client.Receive(whichOneBuffer);
+            Model.ProcessData(PAWN_ROTATION_90_DEGREES, whichOneBuffer);
         }
 
         private void ReceiveDataAndBroadcast(TcpClient tcpClient)

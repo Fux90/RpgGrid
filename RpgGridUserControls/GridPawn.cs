@@ -158,7 +158,7 @@ namespace RpgGridUserControls
             }
         }
 
-        protected bool IsSquared { get; private set; }
+        public bool IsSquared { get; private set; }
 
         public bool MouseIsOver { get; private set; }
 
@@ -250,7 +250,7 @@ namespace RpgGridUserControls
             this.Invalidate();
         }
 
-        public virtual void PerformRotate90Degrees()
+        public virtual void PerformRotate90Degrees(bool hasToBePropagated = true)
         {
             if (!IsSquared)
             {
@@ -265,9 +265,9 @@ namespace RpgGridUserControls
                     Width = Size.Height,
                     Height = Size.Width
                 };
-
-                OnRotate90Degrees(EventArgs.Empty);
             }
+
+            OnRotate90Degrees(hasToBePropagated ? EventArgs.Empty : new PawnRotationEventArgs());
         }
 
         private void OnRotate90Degrees(EventArgs e)
@@ -318,6 +318,30 @@ namespace RpgGridUserControls
         public void NormalizeUniqueID()
         {
             UniqueID = UniqueID.Substring(TemplateGeneratePrefix.Length);
+        }
+    }
+
+    public class PawnRotationEventArgs : EventArgs
+    {
+        public bool Propagate { get; private set; }
+        public float RotationAngle { get; private set; }
+
+        public PawnRotationEventArgs(bool propagate, float rotationAngle)
+        {
+            Propagate = propagate;
+            RotationAngle = rotationAngle;
+        }
+
+        public PawnRotationEventArgs(bool propagate)
+            : this(propagate, 90.0f)
+        {
+
+        }
+
+        public PawnRotationEventArgs()
+            : this(false, 90.0f)
+        {
+
         }
     }
 }

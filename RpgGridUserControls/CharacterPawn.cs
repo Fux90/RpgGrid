@@ -193,10 +193,10 @@ namespace RpgGridUserControls
             this.DoubleClick += OnDoubleClick;
         }
 
-        public override void PerformRotate90Degrees()
+        public override void PerformRotate90Degrees(bool hasToBePropagated = true)
         {
             Facing = (GridDirections)(((int)Facing + 1) % NumGridDirections);
-            base.PerformRotate90Degrees();
+            base.PerformRotate90Degrees(hasToBePropagated);
         }
 
         private void CharacterPawn_Load(object sender, EventArgs e)

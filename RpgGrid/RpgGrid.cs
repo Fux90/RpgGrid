@@ -113,8 +113,32 @@ namespace RpgGrid
                     Connections.Current.Broadcast(Connections.Commands.MovePawnTo,
                                                     Connections.PAWN_CLIENT_LOCATION);
                 };
+                #endregion
+                #region PAWN_ROTATED
+                mainGrid.PawnRotated90Degrees += (s, e) =>
+                {
+                    LastModifiedPawn = e.Pawn;
+#if DEBUG
+                    OnVerboseDebugging(new VerboseDebugArgs(String.Format("{0} rotated 90° [ID: {1}]",
+                                                                            LastModifiedPawn.Name,
+                                                                            LastModifiedPawn.UniqueID)));
+#endif
+                    if (e.Propagate)
+                    {
+                        Connections.Current.Broadcast(  Connections.Commands.PawnRotated90Degrees,
+                                                        Connections.PAWN_ROTATION_90_DEGREES);
+                    }
+                    else
+                    {
+#if DEBUG
+                        OnVerboseDebugging(new VerboseDebugArgs(String.Format("{0} rotation 90°  received [ID: {1}]",
+                                                                                LastModifiedPawn.Name,
+                                                                                LastModifiedPawn.UniqueID)));
+#endif
+                    }
+                };
 #endregion
-#region BACKGROUND_IMAGE_CHANGED
+                #region BACKGROUND_IMAGE_CHANGED
                 mainGrid.BackgroundImageChanged += (s, e) =>
                 {
                     for (int i = 0; i < mainGrid.Controls.Count; i++)
@@ -653,6 +677,31 @@ namespace RpgGrid
 
 #if DEBUG
                 OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn modified - Value [{0} Bytes]", LastChangedValue.Length)));
+#endif
+                return DataRes.Empty;
+            }
+        }
+
+        [ResponseMethods(Connections.PAWN_ROTATION_90_DEGREES)]
+        private DataRes PawnRotated90Degrees(byte[] buffer)
+        {
+            if (buffer == null)
+            {
+                // Telling which pawn has been rotated
+                var pawnUniqueID = LastModifiedPawn.UniqueID;
+#if DEBUG
+                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn rotates - Value [{0} ID]", LastModifiedPawn)));
+#endif
+                return new DataRes(GetBytesFromString(pawnUniqueID));
+            }
+            else
+            {
+                // Which pawn will be rotated
+                var pawnUniqueID = GetStringFromByteArray(buffer);
+                LastModifiedPawn = MainGrid.GetByUniqueID(pawnUniqueID);
+                LastModifiedPawn.PerformRotate90Degrees(hasToBePropagated: false);
+#if DEBUG
+                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Pawn {0} rotated [ID {0}]", LastModifiedPawn.Name, LastModifiedPawn.UniqueID)));
 #endif
                 return DataRes.Empty;
             }
