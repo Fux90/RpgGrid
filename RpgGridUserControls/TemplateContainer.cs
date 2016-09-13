@@ -33,7 +33,7 @@ namespace RpgGridUserControls
 
             InitializeComponent();
 
-            this.Controls.Add(scrollableContainerGridPawnTemplates);
+            this.tableLayoutPanel1.Controls.Add(scrollableContainerGridPawnTemplates, 0, 0);
             scrollableContainerGridPawnTemplates.Dock = DockStyle.Fill;
         }
 

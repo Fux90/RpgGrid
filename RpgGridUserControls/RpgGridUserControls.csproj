@@ -66,6 +66,12 @@
     <Compile Include="FormCharacterPawnCreation.Designer.cs">
       <DependentUpon>FormCharacterPawnCreation.cs</DependentUpon>
     </Compile>
+    <Compile Include="FormCharacterPawnTemplateCreation.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormCharacterPawnTemplateCreation.Designer.cs">
+      <DependentUpon>FormCharacterPawnTemplateCreation.cs</DependentUpon>
+    </Compile>
     <Compile Include="Grid.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -83,9 +89,17 @@
       <DependentUpon>GridPawnController.cs</DependentUpon>
     </Compile>
     <Compile Include="GridPawnValueChanger.cs" />
+    <Compile Include="TemplateNewButton.cs" />
+    <Compile Include="TemplateNewButton.Designer.cs">
+      <DependentUpon>TemplateNewButton.cs</DependentUpon>
+    </Compile>
     <Compile Include="PawnNewButton.cs" />
     <Compile Include="PawnNewButton.Designer.cs">
       <DependentUpon>PawnNewButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TemplateSaver.cs" />
+    <Compile Include="TemplateSaver.Designer.cs">
+      <DependentUpon>TemplateSaver.cs</DependentUpon>
     </Compile>
     <Compile Include="PawnSaver.cs" />
     <Compile Include="PawnSaver.Designer.cs">
@@ -136,6 +150,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="FormCharacterPawnCreation.resx">
       <DependentUpon>FormCharacterPawnCreation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormCharacterPawnTemplateCreation.resx">
+      <DependentUpon>FormCharacterPawnTemplateCreation.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Grid.resx">
       <DependentUpon>Grid.cs</DependentUpon>
