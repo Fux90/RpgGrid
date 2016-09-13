@@ -36,6 +36,19 @@ namespace RpgGridUserControls
             }
         }
 
+        public event EventHandler<PawnCreateEventArgs> CreateNewPawn
+        {
+            add
+            {
+                this.pawnNewButton1.CreateNewPawn += value;
+            }
+
+            remove
+            {
+                this.pawnNewButton1.CreateNewPawn -= value;
+            }
+        }
+
         public PawnContainer()
         {
 #if TEST_NO_TEMPLATE

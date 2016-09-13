@@ -234,6 +234,11 @@ namespace RpgGrid
                         }
                     }
                 };
+
+                mainPawnManager.CreateNewPawn += (s, e) =>
+                {
+                    mainPawnManager.LoadPawn(e.Pawn);
+                };
             }
         }
 

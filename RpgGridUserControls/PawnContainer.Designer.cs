@@ -39,6 +39,7 @@ namespace RpgGridUserControls
             this.mainPanel = new System.Windows.Forms.TableLayoutPanel();
             this.cmdPanel = new System.Windows.Forms.TableLayoutPanel();
             this.pawnSaver1 = new RpgGridUserControls.PawnSaver();
+            this.pawnNewButton1 = new RpgGridUserControls.PawnNewButton();
             this.mainPanel.SuspendLayout();
             this.cmdPanel.SuspendLayout();
             this.SuspendLayout();
@@ -63,7 +64,8 @@ namespace RpgGridUserControls
             this.cmdPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.cmdPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.cmdPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.cmdPanel.Controls.Add(this.pawnSaver1, 0, 0);
+            this.cmdPanel.Controls.Add(this.pawnNewButton1, 0, 0);
+            this.cmdPanel.Controls.Add(this.pawnSaver1, 1, 0);
             this.cmdPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.cmdPanel.Location = new System.Drawing.Point(3, 159);
             this.cmdPanel.Name = "cmdPanel";
@@ -74,11 +76,20 @@ namespace RpgGridUserControls
             // 
             // pawnSaver1
             // 
+            this.pawnSaver1.AllowDrop = true;
             this.pawnSaver1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pawnSaver1.Location = new System.Drawing.Point(3, 3);
+            this.pawnSaver1.Location = new System.Drawing.Point(50, 3);
             this.pawnSaver1.Name = "pawnSaver1";
             this.pawnSaver1.Size = new System.Drawing.Size(41, 53);
             this.pawnSaver1.TabIndex = 0;
+            // 
+            // pawnNewButton1
+            // 
+            this.pawnNewButton1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pawnNewButton1.Location = new System.Drawing.Point(3, 3);
+            this.pawnNewButton1.Name = "pawnNewButton1";
+            this.pawnNewButton1.Size = new System.Drawing.Size(41, 53);
+            this.pawnNewButton1.TabIndex = 1;
             // 
             // PawnContainer
             // 
@@ -98,5 +109,6 @@ namespace RpgGridUserControls
         private TableLayoutPanel mainPanel;
         private TableLayoutPanel cmdPanel;
         private PawnSaver pawnSaver1;
+        private PawnNewButton pawnNewButton1;
     }
 }

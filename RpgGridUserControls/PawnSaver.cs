@@ -22,21 +22,13 @@ namespace RpgGridUserControls
         }
     }
 
-    public partial class PawnSaver : UserControl
+    public partial class PawnSaver : BackgroundedItem
     {
-        private Image backgroundImage;
-        private Image BackgroundImage
+        protected override string ImageResource
         {
             get
             {
-                if (backgroundImage == null)
-                {
-                    System.Reflection.Assembly myAssembly = System.Reflection.Assembly.GetExecutingAssembly();
-                    Stream myStream = myAssembly.GetManifestResourceStream("RpgGridUserControls.Images.1117551-floppy.png");
-                    backgroundImage = new Bitmap(myStream);
-                }
-
-                return backgroundImage;
+                return "RpgGridUserControls.Images.1117551-floppy.png";
             }
         }
 
@@ -88,17 +80,6 @@ namespace RpgGridUserControls
             if (tmp != null)
             {
                 tmp(this, spE);
-            }
-        }
-
-        protected override void OnPaintBackground(PaintEventArgs e)
-        {
-            base.OnPaintBackground(e);
-
-            if (!DesignMode)
-            {
-                var g = e.Graphics;
-                g.DrawImage(BackgroundImage, ClientRectangle);
             }
         }
     }
