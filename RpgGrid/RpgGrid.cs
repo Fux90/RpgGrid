@@ -239,6 +239,26 @@ namespace RpgGrid
                 {
                     mainPawnManager.LoadPawn(e.Pawn);
                 };
+
+                mainPawnManager.SaveTemplate += (s, e) =>
+                {
+                    using (var sDlg = new SaveFileDialog())
+                    {
+                        sDlg.InitialDirectory = Path.Combine(Application.StartupPath, ResourceManager.Current.TemplatesFolder);
+                        sDlg.Filter = "Template|" + ResourceManager.templateFilePattern;
+
+                        var result = sDlg.ShowDialog();
+                        if (result == DialogResult.OK)
+                        {
+                            ResourceManager.Current.SaveTemplate(e.Template, sDlg.FileName);
+                        }
+                    }
+                };
+
+                mainPawnManager.CreateNewTemplate += (s, e) =>
+                {
+                    MessageBox.Show("TODO - Create a Template");
+                };
             }
         }
 

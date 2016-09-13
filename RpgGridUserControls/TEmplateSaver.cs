@@ -32,7 +32,7 @@ namespace RpgGridUserControls
             }
         }
 
-        public event EventHandler<SavingPawnTemplateEventArgs> SavePawnTemplate;
+        public event EventHandler<SavingPawnTemplateEventArgs> SaveTemplate;
 
         public PawnTemplateSaver()
         {
@@ -76,7 +76,7 @@ namespace RpgGridUserControls
 
         protected void OnSavePawnTemplate(SavingPawnTemplateEventArgs sptE)
         {
-            var tmp = SavePawnTemplate;
+            var tmp = SaveTemplate;
             if (tmp != null)
             {
                 tmp(this, sptE);

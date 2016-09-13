@@ -31,7 +31,7 @@ namespace RpgGridUserControls
             }
         }
 
-        public event EventHandler<PawnTemplateCreateEventArgs> CreateNewPawnTemplate;
+        public event EventHandler<PawnTemplateCreateEventArgs> CreateNewTemplate;
 
         public PawnTemplateNewButton()
         {
@@ -58,7 +58,7 @@ namespace RpgGridUserControls
 
         protected void OmCreatedNewPawnTemplate(PawnTemplateCreateEventArgs ptcE)
         {
-            var tmp = CreateNewPawnTemplate;
+            var tmp = CreateNewTemplate;
             if (tmp != null)
             {
                 tmp(this, ptcE);

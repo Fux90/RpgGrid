@@ -23,6 +23,32 @@ namespace RpgGridUserControls
         private ScrollableContainer<CharacterPawnTemplate> scrollableContainerGridPawnTemplates;
 #endif
 
+        public event EventHandler<SavingPawnTemplateEventArgs> SaveTemplate
+        {
+            add
+            {
+                pawnTemplateSaver1.SaveTemplate += value;
+            }
+
+            remove
+            {
+                pawnTemplateSaver1.SaveTemplate -= value;
+            }
+        }
+
+        public event EventHandler<PawnTemplateCreateEventArgs> CreateNewTemplate
+        {
+            add
+            {
+                pawnTemplateNewButton1.CreateNewTemplate += value;
+            }
+
+            remove
+            {
+                pawnTemplateNewButton1.CreateNewTemplate -= value;
+            }
+        }
+
         public TemplateContainer()
         {
 #if TEST_NO_TEMPLATE

@@ -165,9 +165,11 @@ namespace ResourceManagement
 
         public CharacterPawnTemplate[] RetrievePawnTemplates()
         {
-            var pawns = new CharacterPawnTemplate[20];
+            var fileTemplates = Directory.GetFiles(TemplatesFolder, templateFilePattern);
 
-            var partition = Partitioner.Create(0, pawns.Length);
+            var templates = new CharacterPawnTemplate[fileTemplates.Length];
+
+            var partition = Partitioner.Create(0, templates.Length);
             var parOption = new ParallelOptions()
             {
                 MaxDegreeOfParallelism = ParallelExecution ? -1 : 1
@@ -176,26 +178,37 @@ namespace ResourceManagement
             Parallel.ForEach(partition, parOption, p => {
                 for (int i = p.Item1; i < p.Item2; i++)
                 {
-                    pawns[i] = CharacterPawnTemplate.Builder.Create();
+                    //templates[i] = CharacterPawnTemplate.Builder.Create();
+                    templates[i] = RetrieveTemplateFromFile(fileTemplates[i]);
                 };
             });
 
-            return pawns;
+            return templates;
+        }
+
+        private CharacterPawnTemplate RetrieveTemplateFromFile(string templateFile)
+        {
+            using (var fs = new FileStream(templateFile, FileMode.OpenOrCreate))
+            {
+                return (CharacterPawnTemplate)Utils.BinaryFormatter.Deserialize(fs);
+            }
         }
 
         public void SavePawn(CharacterPawn pawn, string path)
         {
             //var path = Path.ChangeExtension(Path.Combine(PawnsFolder, pawn.UniqueID), pawnExt);
-
             using (var fs = new FileStream(path, FileMode.OpenOrCreate))
             {
                 Utils.BinaryFormatter.Serialize(fs, pawn);
             }
         }
 
-        public void SaveTemplate(CharacterPawnTemplate template)
+        public void SaveTemplate(CharacterPawnTemplate template, string path)
         {
-            throw new NotImplementedException();
+            using (var fs = new FileStream(path, FileMode.OpenOrCreate))
+            {
+                Utils.BinaryFormatter.Serialize(fs, template);
+            }
         }
 
         public void AsyncRetrievePawns(GridPawnResultCallback callback, ErrorCallback onError = null)

@@ -90,6 +90,32 @@ namespace RpgGridUserControls
             }
         }
 
+        public event EventHandler<SavingPawnTemplateEventArgs> SaveTemplate
+        {
+            add
+            {
+                templateContainer1.SaveTemplate += value;
+            }
+
+            remove
+            {
+                templateContainer1.SaveTemplate -= value;
+            }
+        }
+
+        public event EventHandler<PawnTemplateCreateEventArgs> CreateNewTemplate
+        {
+            add
+            {
+                templateContainer1.CreateNewTemplate += value;
+            }
+
+            remove
+            {
+                templateContainer1.CreateNewTemplate -= value;
+            }
+        }
+
         public PawnManager()
         {
             InitializeComponent();
