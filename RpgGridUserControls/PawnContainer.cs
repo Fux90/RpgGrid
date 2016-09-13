@@ -23,6 +23,19 @@ namespace RpgGridUserControls
         private ScrollableContainer<GridPawn> scrollableContainerGridPawns;
 #endif
 
+        public event EventHandler<SavingPawnEventArgs> SavePawn
+        {
+            add
+            {
+                this.pawnSaver1.SavePawn += value;
+            }
+
+            remove
+            {
+                this.pawnSaver1.SavePawn -= value;
+            }
+        }
+
         public PawnContainer()
         {
 #if TEST_NO_TEMPLATE
@@ -33,7 +46,7 @@ namespace RpgGridUserControls
 
             InitializeComponent();
 
-            this.Controls.Add(scrollableContainerGridPawns);
+            this.mainPanel.Controls.Add(scrollableContainerGridPawns, 0, 0);
             scrollableContainerGridPawns.Dock = DockStyle.Fill;
         }
 

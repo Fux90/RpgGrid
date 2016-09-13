@@ -64,6 +64,19 @@ namespace RpgGridUserControls
             }
         }
 
+        public event EventHandler<SavingPawnEventArgs> SavePawn
+        {
+            add
+            {
+                pawnContainer1.SavePawn += value;
+            }
+
+            remove
+            {
+                pawnContainer1.SavePawn -= value;
+            }
+        }
+
         public PawnManager()
         {
             InitializeComponent();

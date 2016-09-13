@@ -13,6 +13,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.Globalization;
 using System.Reflection;
+using UtilsData;
 
 namespace RpgGridUserControls
 {
@@ -451,7 +452,7 @@ namespace RpgGridUserControls
 
         protected override void OnDragEnter(DragEventArgs e)
         {
-            if ((IsOfType<GridPawn>(e) || IsOfType<CharacterPawnTemplate>(e))
+            if ((Utils.IsOfType<GridPawn>(e) || Utils.IsOfType<CharacterPawnTemplate>(e))
                 && e.AllowedEffect == (DragDropEffects.Move | DragDropEffects.Copy))
             {
                 e.Effect = DragDropEffects.Copy;
@@ -467,7 +468,7 @@ namespace RpgGridUserControls
             Type t;
             var pt = new Point(drgevent.X, drgevent.Y);
 
-            if (IsOfType<GridPawn>(drgevent, out t))
+            if (Utils.IsOfType<GridPawn>(drgevent, out t))
             {
                 var ctrl = (GridPawn)drgevent.Data.GetData(t);
                 //var ptClient = this.PointToClient(new Point(drgevent.X, drgevent.Y));
@@ -475,7 +476,7 @@ namespace RpgGridUserControls
                 var contained = DragDropAdding(ctrl, pt);
                 OnPawnDragDropped(new PawnAndLocationEventArgs(ctrl, contained, ctrl.PositionAtNoZoom));
             }
-            else if(IsOfType<CharacterPawnTemplate>(drgevent, out t))
+            else if(Utils.IsOfType<CharacterPawnTemplate>(drgevent, out t))
             {
                 var ctrl = ((CharacterPawnTemplate)drgevent.Data.GetData(t)).Build();
                 //var ptClient = this.PointToClient(new Point(drgevent.X, drgevent.Y));
@@ -502,31 +503,6 @@ namespace RpgGridUserControls
             InvalidatePawnsImage();
 
             return res;
-        }
-
-        private bool IsOfType<T>(DragEventArgs e, out Type type)
-        {
-            Type parent = typeof(T);
-            var types = Assembly.GetExecutingAssembly().GetTypes(); // Maybe select some other assembly here, depending on what you need
-            var inheritingTypes = types.Where(t => parent.IsAssignableFrom(t));
-
-            foreach (var item in inheritingTypes)
-            {
-                if (e.Data.GetDataPresent(item))
-                {
-                    type = item;
-                    return true;
-                }
-            }
-
-            type = null;
-            return false;
-        }
-
-        private bool IsOfType<T>(DragEventArgs e)
-        {
-            Type dummy;
-            return IsOfType<T>(e, out dummy);
         }
 
         protected void OnGridImageChangedByDialog(ImageEventArgs iE)

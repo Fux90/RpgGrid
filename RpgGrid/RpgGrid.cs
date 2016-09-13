@@ -1,5 +1,4 @@
-﻿#define PATCH_OVERLAPPING_NAMES
-#define STRANGE_EXCEPTION_ON_PAWN_RECEIVING_ANALYSIS
+﻿#define STRANGE_EXCEPTION_ON_PAWN_RECEIVING_ANALYSIS
 #define STRANGE_EXCEPTION_ON_MAP_RECEIVING_ANALYSIS
 
 using NetUtils;
@@ -208,7 +207,35 @@ namespace RpgGrid
 #endregion
             }
         }
-        public PawnManager MainPawnManager { get; private set; }
+
+        private PawnManager mainPawnManager;
+        public PawnManager MainPawnManager
+        {
+            get
+            {
+                return mainPawnManager;
+            }
+
+            private set
+            {
+                mainPawnManager = value;
+
+                mainPawnManager.SavePawn += (s, e) =>
+                {
+                    using (var sDlg = new SaveFileDialog())
+                    {
+                        sDlg.InitialDirectory = Path.Combine(Application.StartupPath, ResourceManager.Current.PawnsFolder);
+                        sDlg.Filter = "Pawn|" + ResourceManager.pawnFilePattern;
+
+                        var result = sDlg.ShowDialog();
+                        if (result == DialogResult.OK)
+                        {
+                            ResourceManager.Current.SavePawn(e.Pawn, sDlg.FileName);
+                        }
+                    }
+                };
+            }
+        }
 
         private GridPawn lastTouchedPawn;
         public GridPawn LastTouchedPawn
@@ -278,57 +305,6 @@ namespace RpgGrid
             }
         }
         #endregion
-
-        #region PATHS
-
-        private string mapsFolder;
-        public string MapsFolder
-        {
-            get
-            {
-                return CreateIfNotExistAndGetFolder(ref mapsFolder);
-            }
-
-            set
-            {
-                mapsFolder = value;
-            }
-        }
-        
-        private string CreateDefaultMapFolder()
-        {
-            return Path.Combine("Data", "Maps");
-        }
-
-        private string CreateIfNotExistAndGetFolder(ref string folder)
-        {
-            if (folder == null)
-            {
-                folder = CreateDefaultMapFolder();
-            }
-            
-            if (!Directory.Exists(folder))
-            {
-                Directory.CreateDirectory(folder);
-            }
-
-            return folder;
-        }
-
-        #endregion
-
-        private BinaryFormatter binaryFormatter;
-        private BinaryFormatter BinaryFormatter
-        {
-            get
-            {
-                if(binaryFormatter == null)
-                {
-                    binaryFormatter = new BinaryFormatter();
-                }
-                return binaryFormatter;
-            }
-        }
 
         public RpgGrid( Form viewContainer,
                         Grid mainGrid,
@@ -426,14 +402,14 @@ namespace RpgGrid
             else
             {
                 var name = Path.ChangeExtension(tmpMapName, Grid.metricInfoExt);
-                var outpath = Path.Combine(MapsFolder, name);
+                var outpath = Path.Combine(ResourceManager.Current.MapsFolder, name);
 #if DEBUG && PATCH_OVERLAPPING_NAMES
                 if(File.Exists(outpath))
                 {
                     var noExtName = Path.GetFileNameWithoutExtension(name);
                     var ext = Path.GetExtension(outpath);
-                    var count = Directory.GetFiles(MapsFolder, noExtName + "*" + ext).Length;
-                    outpath = Path.Combine(MapsFolder, String.Format("{0}_{1}{2}", noExtName, count, ext));
+                    var count = Directory.GetFiles(ResourceManager.Current.MapsFolder, noExtName + "*" + ext).Length;
+                    outpath = Path.Combine(ResourceManager.Current.MapsFolder, String.Format("{0}_{1}{2}", noExtName, count, ext));
                 }
 #endif
                 var content = GetStringFromByteArray(buffer);
@@ -456,43 +432,19 @@ namespace RpgGrid
             else
             {
                 var name = Path.ChangeExtension(tmpMapName, "png");
-                var outpath = Path.Combine(MapsFolder, name);
-
-#if DEBUG && PATCH_OVERLAPPING_NAMES
-                if (File.Exists(outpath))
-                {
-                    var noExtName = Path.GetFileNameWithoutExtension(name);
-                    var ext = Path.GetExtension(outpath);
-                    var count = Directory.GetFiles(MapsFolder, noExtName + "*" + ext).Length;
-                    outpath = Path.Combine(MapsFolder, String.Format("{0}_{1}{2}", noExtName, count, ext));
-                }
-#endif
 
 #if DEBUG && STRANGE_EXCEPTION_ON_MAP_RECEIVING_ANALYSIS
                 try
                 {
 #endif
-                    using (var ms = new MemoryStream(buffer))
-                    {
-                        using (var fs = new FileStream(outpath, FileMode.OpenOrCreate))
-                        {
-                            ms.WriteTo(fs);
-                            fs.Flush();
-                            fs.Close();
-                        }
-
-                        ms.Close();
-                        ms.Flush();
-                    }
-
-                    MainGrid.ImagePath = outpath;
+                    MainGrid.ImagePath = ResourceManager.Current.SaveMap(buffer, name);
                     tmpMapName = null;
 #if DEBUG
                     OnVerboseDebugging(new VerboseDebugArgs(String.Format("Received map: {0}x{1}", MainGrid.Image.Width, MainGrid.Image.Height)));
 #endif
 #if DEBUG && STRANGE_EXCEPTION_ON_MAP_RECEIVING_ANALYSIS
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     OnVerboseDebugging(new VerboseDebugArgs(ex.Message));
                 }
@@ -510,7 +462,7 @@ namespace RpgGrid
                 try
                 {
 #endif
-                    var pawns = (GridPawn[])BinaryFormatter.Deserialize(ms);
+                    var pawns = (GridPawn[])Utils.BinaryFormatter.Deserialize(ms);
                     MainPawnManager.LoadPawns(pawns);
 #if DEBUG
                     OnVerboseDebugging(new VerboseDebugArgs(String.Format("Received pawns: {0} bytes, {1} items", buffer.Length, pawns.Length)));
@@ -533,7 +485,7 @@ namespace RpgGrid
 
             using (var ms = new MemoryStream())
             {
-                BinaryFormatter.Serialize(ms, pawns);
+                Utils.BinaryFormatter.Serialize(ms, pawns);
 #if DEBUG
                 OnVerboseDebugging(new VerboseDebugArgs(String.Format("Sent pawns: {0} items, {1} bytes", pawns.Length, ms.Length)));
 #endif
@@ -550,7 +502,7 @@ namespace RpgGrid
                 try
                 {
 #endif
-                    var templates = (CharacterPawnTemplate[])BinaryFormatter.Deserialize(ms);
+                    var templates = (CharacterPawnTemplate[])Utils.BinaryFormatter.Deserialize(ms);
                     MainPawnManager.LoadPawnTemplates(templates);
 #if DEBUG
                     OnVerboseDebugging(new VerboseDebugArgs(String.Format("Received templates: {0} bytes, {1} items", buffer.Length, templates.Length)));
@@ -573,7 +525,7 @@ namespace RpgGrid
 
             using (var ms = new MemoryStream())
             {
-                BinaryFormatter.Serialize(ms, templates);
+                Utils.BinaryFormatter.Serialize(ms, templates);
 #if DEBUG
                 OnVerboseDebugging(new VerboseDebugArgs(String.Format("Sent templates: {0} items, {1} bytes", templates.Length, ms.Length)));
 #endif
@@ -618,7 +570,7 @@ namespace RpgGrid
                 using (var ms = new MemoryStream())
                 {
                     LastTouchedPawn.NormalizeUniqueID();
-                    BinaryFormatter.Serialize(ms, LastTouchedPawn);
+                    Utils.BinaryFormatter.Serialize(ms, LastTouchedPawn);
 #if DEBUG
                     OnVerboseDebugging(new VerboseDebugArgs("Pawn was generated: sent integrally"));
 #endif
@@ -628,7 +580,7 @@ namespace RpgGrid
             else
             {
                 var ms = new MemoryStream(buffer);
-                var pawn = (GridPawn)BinaryFormatter.Deserialize(ms);
+                var pawn = (GridPawn)Utils.BinaryFormatter.Deserialize(ms);
                 LastTouchedPawn = pawn;
                 MainGrid.AddIfNotPresent(pawn);
 #if DEBUG
@@ -646,7 +598,7 @@ namespace RpgGrid
                 // Telling that pawn is moved
                 using (var ms = new MemoryStream())
                 {
-                    BinaryFormatter.Serialize(ms, LastPositionOfGivenPawn);
+                    Utils.BinaryFormatter.Serialize(ms, LastPositionOfGivenPawn);
 #if DEBUG
                     OnVerboseDebugging(new VerboseDebugArgs(String.Format("Sent movement: {0} in ({1};{2})", LastPositionOfGivenPawn.Obj, LastPositionOfGivenPawn.Obj.X, LastPositionOfGivenPawn.Obj.Y)));
 #endif
@@ -657,7 +609,7 @@ namespace RpgGrid
             {
                 using (var ms = new MemoryStream(buffer))
                 {
-                    var locationOfMoved = (TaggedObject<Point, string>)BinaryFormatter.Deserialize(ms);
+                    var locationOfMoved = (TaggedObject<Point, string>)Utils.BinaryFormatter.Deserialize(ms);
                     var movedPawn = MainGrid.GetByUniqueID(locationOfMoved.Tag);
                     if (movedPawn != null)
                     {

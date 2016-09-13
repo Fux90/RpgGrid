@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace UtilsData
 {
@@ -28,7 +31,47 @@ namespace UtilsData
                                     now.Hour, now.Minute, now.Second);
         }
 
-         #region DESERIALIZATION
+
+        private static BinaryFormatter binaryFormatter;
+        public static BinaryFormatter BinaryFormatter
+        {
+            get
+            {
+                if (binaryFormatter == null)
+                {
+                    binaryFormatter = new BinaryFormatter();
+                }
+                return binaryFormatter;
+            }
+        }
+
+        public static bool IsOfType<T>(DragEventArgs e, out Type type)
+        {
+            Type parent = typeof(T);
+            var types = AppDomain.CurrentDomain.GetAssemblies().SelectMany(assembly => assembly.GetTypes());
+            //var types = Assembly.GetExecutingAssembly().GetTypes(); // Maybe select some other assembly here, depending on what you need
+            var inheritingTypes = types.Where(t => parent.IsAssignableFrom(t));
+
+            foreach (var item in inheritingTypes)
+            {
+                if (e.Data.GetDataPresent(item))
+                {
+                    type = item;
+                    return true;
+                }
+            }
+
+            type = null;
+            return false;
+        }
+
+        public static bool IsOfType<T>(DragEventArgs e)
+        {
+            Type dummy;
+            return IsOfType<T>(e, out dummy);
+        }
+
+        #region DESERIALIZATION
 
         public static string deserializeString(byte[] buffer, StringDeserializationMethod strConversion)
         {

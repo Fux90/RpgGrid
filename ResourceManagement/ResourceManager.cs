@@ -1,13 +1,18 @@
-﻿using RpgGridUserControls;
+﻿#define PATCH_OVERLAPPING_NAMES
+
+using RpgGridUserControls;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using UtilsData;
 
 namespace ResourceManagement
 {
@@ -28,9 +33,92 @@ namespace ResourceManagement
 
         public bool ParallelExecution { get; set; }
 
+        #region PATHS
+
+        private string pawnsFolder;
+        public string PawnsFolder
+        {
+            get
+            {
+                if (pawnsFolder == null || pawnsFolder == "")
+                {
+                    pawnsFolder = Path.Combine(Application.StartupPath, "Data", "Pawns");
+                }
+                return pawnsFolder;
+            }
+        }
+
+        private string templatesFolder;
+        public string TemplatesFolder
+        {
+            get
+            {
+                if (templatesFolder == null || templatesFolder == "")
+                {
+                    templatesFolder = Path.Combine("Data", "Templates");
+                }
+
+                return templatesFolder;
+            }
+        }
+
+        private string mapsFolder;
+        public string MapsFolder
+        {
+            get
+            {
+                if (mapsFolder == null || mapsFolder == "")
+                {
+                    mapsFolder = Path.Combine("Data", "Maps");
+                }
+
+                return mapsFolder;
+            }
+        }
+
+        #endregion
+
+        private const string pawnExt = "pwn";
+        private const string templateExt = "tpl";
+
+        public const string pawnFilePattern = "*." + pawnExt;
+        public const string templateFilePattern = "*." + templateExt;
+
+        private string[] folderTree;
+        private string[] FolderTree
+        {
+            get
+            {
+                if (folderTree == null)
+                {
+                    folderTree = new string[]
+                    {
+                        MapsFolder,
+                        PawnsFolder,
+                        TemplatesFolder,
+                    };
+                }
+
+                return folderTree;
+            }
+        }
+
         private ResourceManager()
         {
-            ParallelExecution = true;   
+            ParallelExecution = true;
+
+            CreateFolderTree();   
+        }
+
+        private void CreateFolderTree()
+        {
+            for (int i = 0; i < FolderTree.Length; i++)
+            {
+                if (!Directory.Exists(FolderTree[i]))
+                {
+                    Directory.CreateDirectory (FolderTree[i]);
+                }
+            }
         }
 
         public delegate void GridPawnResultCallback(GridPawn[] pawns);
@@ -39,19 +127,9 @@ namespace ResourceManagement
 
         public GridPawn[] RetrievePawns()
         {
-            // TODO: retrieve images from zip file and info from XML/db/whatever
-            //return new GridPawn[]
-            //{
-            //    new CharacterPawn()
-            //    {
-            //        CurrentPf = 59,
-            //        MaxPf = 60,
-            //        Image = Image.FromFile(@"character1.png"),
-            //        //ModSize = RpgGridUserControls.GridPawn.RpgSize.Large_Long,
-            //    }
-            //};
+            var filePawns = Directory.GetFiles(PawnsFolder, pawnFilePattern);
 
-            var pawns = new GridPawn[30];
+            var pawns = new GridPawn[filePawns.Length];
 
             var partition = Partitioner.Create(0, pawns.Length);
             var parOption = new ParallelOptions()
@@ -62,17 +140,27 @@ namespace ResourceManagement
             Parallel.ForEach(partition, parOption, p => {
                 for (int i = p.Item1; i < p.Item2; i++)
                 {
-                    pawns[i] = new CharacterPawn()
-                    {
-                        CurrentPf = 59,
-                        MaxPf = 60,
-                        Image = Image.FromFile(@"character1.png"),
-                        ModSize = i > 10 ? RpgGridUserControls.GridPawn.RpgSize.Large : RpgGridUserControls.GridPawn.RpgSize.Medium,
-                    };
+                    //pawns[i] = new CharacterPawn()
+                    //{
+                    //    CurrentPf = 59,
+                    //    MaxPf = 60,
+                    //    Image = Image.FromFile(@"character1.png"),
+                    //    ModSize = i > 10 ? RpgGridUserControls.GridPawn.RpgSize.Large : RpgGridUserControls.GridPawn.RpgSize.Medium,
+                    //};
+
+                    pawns[i] = RetrievePawnFromFile (filePawns[i]);
                 };
             });
 
             return pawns;
+        }
+
+        public GridPawn RetrievePawnFromFile(string pawnFile)
+        {
+            using (var fs = new FileStream(pawnFile, FileMode.OpenOrCreate))
+            {
+                return (CharacterPawn)Utils.BinaryFormatter.Deserialize(fs);
+            }
         }
 
         public CharacterPawnTemplate[] RetrievePawnTemplates()
@@ -93,6 +181,21 @@ namespace ResourceManagement
             });
 
             return pawns;
+        }
+
+        public void SavePawn(CharacterPawn pawn, string path)
+        {
+            //var path = Path.ChangeExtension(Path.Combine(PawnsFolder, pawn.UniqueID), pawnExt);
+
+            using (var fs = new FileStream(path, FileMode.OpenOrCreate))
+            {
+                Utils.BinaryFormatter.Serialize(fs, pawn);
+            }
+        }
+
+        public void SaveTemplate(CharacterPawnTemplate template)
+        {
+            throw new NotImplementedException();
         }
 
         public void AsyncRetrievePawns(GridPawnResultCallback callback, ErrorCallback onError = null)
@@ -143,6 +246,36 @@ namespace ResourceManagement
             };
 
             bw.RunWorkerAsync();
+        }
+
+        public string SaveMap(byte[] buffer, string name)
+        {
+            var outpath = Path.Combine(ResourceManager.Current.MapsFolder, name);
+
+#if DEBUG && PATCH_OVERLAPPING_NAMES
+                if (File.Exists(outpath))
+                {
+                    var noExtName = Path.GetFileNameWithoutExtension(name);
+                    var ext = Path.GetExtension(outpath);
+                    var count = Directory.GetFiles(ResourceManager.Current.MapsFolder, noExtName + "*" + ext).Length;
+                    outpath = Path.Combine(ResourceManager.Current.MapsFolder, String.Format("{0}_{1}{2}", noExtName, count, ext));
+                }
+#endif
+
+            using (var ms = new MemoryStream(buffer))
+            {
+                using (var fs = new FileStream(outpath, FileMode.OpenOrCreate))
+                {
+                    ms.WriteTo(fs);
+                    fs.Flush();
+                    fs.Close();
+                }
+
+                ms.Close();
+                ms.Flush();
+            }
+
+            return outpath;
         }
     }
 }

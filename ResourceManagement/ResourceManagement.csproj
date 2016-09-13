@@ -50,6 +50,10 @@
       <Project>{75eaa645-a279-47fb-be18-e28c70d4a0fb}</Project>
       <Name>RpgGridUserControls</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Utils\Utils.csproj">
+      <Project>{6277fa98-7371-4497-8d71-18e7a52d15e0}</Project>
+      <Name>Utils</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

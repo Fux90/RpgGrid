@@ -20,7 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -74,6 +74,10 @@
       <DependentUpon>GridPawnController.cs</DependentUpon>
     </Compile>
     <Compile Include="GridPawnValueChanger.cs" />
+    <Compile Include="PawnSaver.cs" />
+    <Compile Include="PawnSaver.Designer.cs">
+      <DependentUpon>PawnSaver.cs</DependentUpon>
+    </Compile>
     <Compile Include="TemplateContainer.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -144,6 +148,10 @@
       <Project>{6277fa98-7371-4497-8d71-18e7a52d15e0}</Project>
       <Name>Utils</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Images\1117551-floppy.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
