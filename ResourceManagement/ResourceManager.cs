@@ -285,14 +285,19 @@ namespace ResourceManagement
 
             using (var ms = new MemoryStream(buffer))
             {
-                using (var fs = new FileStream(outpath, FileMode.OpenOrCreate))
-                {
-                    ms.WriteTo(fs);
-                    fs.Flush();
-                    fs.Close();
-                }
+                ms.Position = 0;
+                var img = Image.FromStream(ms);
+                //Utils.ShowImage(img);
+                img.Save(outpath);
 
-                //ms.Close();
+                //using (var fs = new FileStream(outpath, FileMode.OpenOrCreate))
+                //{
+                //    ms.WriteTo(fs);
+                //    fs.Flush();
+                //    fs.Close();
+                //}
+
+                ms.Close();
                 //ms.Flush();
             }
 

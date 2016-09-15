@@ -1,6 +1,7 @@
 ﻿#define PATCH_OVERLAPPING_NAMES
 #define STRANGE_EXCEPTION_ON_PAWN_RECEIVING_ANALYSIS
 #define STRANGE_EXCEPTION_ON_MAP_RECEIVING_ANALYSIS
+#define DUMP_IMAGE_BUFFER_TO_FILE
 
 using NetUtils;
 using ResourceManagement;
@@ -412,16 +413,22 @@ namespace RpgGrid
             using (var ms = new MemoryStream())
             {
                 MainGrid.Image.Save(ms, ImageFormat.Png);
-
-                //ms.Position = 0;
-                //var tmp = Image.FromStream(ms);
-                //Utils.ShowImage(tmp);
+                ms.Position = 0;
 
                 var imageBuffer = ms.ToArray();
 #if DEBUG
                 OnVerboseDebugging(new VerboseDebugArgs(String.Format("Sent map: {0}x{1}", MainGrid.Image.Width, MainGrid.Image.Height)));
                 OnVerboseDebugging(new VerboseDebugArgs(String.Format("Buffer map: {0}", imageBuffer.Length)));
 #endif
+#if DEBUG && DUMP_IMAGE_BUFFER_TO_FILE
+                var strB = new StringBuilder();
+                for (int i = 0; i < imageBuffer.Length; i++)
+                {
+                    strB.AppendLine(imageBuffer[i].ToString());
+                }
+                File.WriteAllText("send_img_dump.txt", strB.ToString());
+#endif
+                
                 return new DataRes(imageBuffer);
             }
         }
@@ -481,6 +488,14 @@ namespace RpgGrid
 #if DEBUG && STRANGE_EXCEPTION_ON_MAP_RECEIVING_ANALYSIS
                 try
                 {
+#endif
+#if DEBUG && DUMP_IMAGE_BUFFER_TO_FILE
+                    var strB = new StringBuilder();
+                    for (int i = 0; i < buffer.Length; i++)
+                    {
+                        strB.AppendLine(buffer[i].ToString());
+                    }
+                    File.WriteAllText("save_img_dump.txt", strB.ToString());
 #endif
                     MainGrid.ImagePath = ResourceManager.Current.SaveMap(buffer, name);
                     tmpMapName = null;

@@ -12,6 +12,9 @@ using System.ComponentModel;
 using System.Windows.Forms;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Drawing;
+using System.IO;
+using UtilsData;
 
 namespace NetUtils
 {
@@ -184,7 +187,7 @@ namespace NetUtils
         [CommandBehaviour(Commands.CloseChannel)]
         public void CloseBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
         {
-            MessageBox.Show("They want me to be closed");
+            //MessageBox.Show("They want me to be closed");
             tcpClient.Client.Send(Commands.ClosedChannel.ToByteArray());
             tcpClient.Client.Shutdown(SocketShutdown.Both);
             tcpClient.Client.Close();
@@ -405,8 +408,16 @@ namespace NetUtils
             tcpClient.Client.Receive(checkpoint);
 
             var mapData = Model.ProcessData(MAP_SENDING, null);
+
+            //var ms = new MemoryStream(mapData.Buffer);
+            //var img = Image.FromStream(ms);
+            //Utils.ShowImage(img);
+            //img.Save(tcpClient.GetStream(), System.Drawing.Imaging.ImageFormat.Png);
+
+            var empty = DataRes.Empty;
             tcpClient.Client.Send(mapData.Length);
             tcpClient.Client.Send(mapData.Buffer);
+            //tcpClient.Client.Send(empty.Length);
 
             tcpClient.Client.Receive(checkpoint);
         }
@@ -448,6 +459,9 @@ namespace NetUtils
 
         private void ReceiveMapData(TcpClient tcpClient)
         {
+            //var img = Image.FromStream(tcpClient.GetStream());
+            //MessageBox.Show("image " + img.Size);
+
             byte[] sizeBuf = new byte[sizeof(int)];
             tcpClient.Client.Receive(sizeBuf);
             byte[] buffer = new byte[BitConverter.ToInt32(sizeBuf, 0)];
