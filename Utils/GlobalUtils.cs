@@ -94,7 +94,7 @@ namespace UtilsData
             return strConversion(buffer);
         }
 
-        public static int derializeInt32(byte[] buffer)
+        public static int deserializeInt32(byte[] buffer)
         {
             return BitConverter.ToInt32(buffer, 0);
         }

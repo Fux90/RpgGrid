@@ -284,7 +284,7 @@ namespace RpgGridUserControls
                     return Utils.deserializeImage(buffer);
                 case ChangeableItems.MaxPf:
                 case ChangeableItems.Pf:
-                    return Utils.derializeInt32(buffer);
+                    return Utils.deserializeInt32(buffer);
                 case ChangeableItems.Name:
                 case ChangeableItems.Notes:
                     return Utils.deserializeString(buffer, strConversion);

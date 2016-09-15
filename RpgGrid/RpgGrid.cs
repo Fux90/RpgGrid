@@ -28,7 +28,7 @@ namespace RpgGrid
 #endif
 
         #region CONTROLS
-        public Form ViewContainer { get; private set; }
+        public FrmMain ViewContainer { get; private set; }
 
         public ResourceManager ResourceManager{ get; private set; }
         private Grid mainGrid;
@@ -345,7 +345,7 @@ namespace RpgGrid
         }
         #endregion
 
-        public RpgGrid( Form viewContainer,
+        public RpgGrid( FrmMain viewContainer,
                         Grid mainGrid,
                         PawnManager mainPawnManager,
                         GridPawnValueController gridPawnController)
@@ -904,6 +904,18 @@ namespace RpgGrid
 //#endif
 //                return DataRes.Empty;
 //            }
+        }
+
+        [ResponseMethods(Connections.CLOSE_CLIENT)]
+        private DataRes CloseById(byte[] buffer)
+        {
+            var sockID = Utils.deserializeInt32(buffer);
+            ViewContainer.ClickCloseButtonById(sockID);
+
+#if DEBUG
+            OnVerboseDebugging(new VerboseDebugArgs(String.Format("[Closing] -> #{0}", sockID)));
+#endif
+            return DataRes.Empty;
         }
 
         [ResponseMethods(Connections.MESSAGE)]

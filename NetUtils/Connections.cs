@@ -18,6 +18,8 @@ using UtilsData;
 
 namespace NetUtils
 {
+    public delegate void OnLeavingBehaviour();
+
     public static class CommandsExt
     {
         public static byte[] ToByteArray(this Connections.Commands cmd)
@@ -53,6 +55,8 @@ namespace NetUtils
         public const string PAWN_BORDER_COLOR = "pawnBOrderColor";
         public const string PAWN_REMOVED = "pawnRemoved";
         public const string PAWN_DELETED = "pawnDeleted";
+
+        public const string CLOSE_CLIENT = "closeClient";
 
         public const string MESSAGE = "message";
         public const string WARNING = "warning";
@@ -187,11 +191,20 @@ namespace NetUtils
         [CommandBehaviour(Commands.CloseChannel)]
         public void CloseBehaviour(TcpClient tcpClient, BackgroundWorker bwListener)
         {
-            //MessageBox.Show("They want me to be closed");
-            tcpClient.Client.Send(Commands.ClosedChannel.ToByteArray());
-            tcpClient.Client.Shutdown(SocketShutdown.Both);
-            tcpClient.Client.Close();
-            tcpClient.Close();
+            if (this.clientTCP != null)
+            {
+                //MessageBox.Show("They want me to be closed");
+                tcpClient.Client.Send(Commands.ClosedChannel.ToByteArray());
+                tcpClient.Client.Shutdown(SocketShutdown.Both);
+                tcpClient.Client.Close();
+                tcpClient.Close();
+            }
+            else
+            {
+                var id = this.serverSocks.Where(pair => pair.Value == tcpClient).Select(pair => pair.Key).Single();
+                // Find a way to press close button
+                Model.ProcessData(CLOSE_CLIENT, Utils.serializeInt32(id));
+            }
         }
 
         [CommandBehaviour(Commands.ClosedChannel)]
@@ -794,13 +807,18 @@ namespace NetUtils
             return bwWaitForConnection;
         }
 
-        public void AcceptInvite(IPAddress serverAddress, int serverPort)
+        public void AcceptInvite(IPAddress serverAddress, int serverPort, out OnLeavingBehaviour whatToDoOnLeaveClick)
         {
             clientTCP = new TcpClient();
             clientTCP.Connect(new IPEndPoint(serverAddress, serverPort));
-
+            
             if(clientTCP.Connected)
             {
+                whatToDoOnLeaveClick = () =>
+                {
+                    clientTCP.Client.Send(Commands.CloseChannel.ToByteArray());
+                };
+
                 StartListeningThread(clientTCP);
 #if DEBUG
                 //clientTCP.Client.Send(Commands.Ping.ToByteArray());
@@ -813,9 +831,9 @@ namespace NetUtils
             }
         }
 
-        public void AcceptInvite(string serverAddress, string serverPort)
+        public void AcceptInvite(string serverAddress, string serverPort, out OnLeavingBehaviour whatToDoOnLeaveClick)
         {
-            AcceptInvite(IPAddress.Parse(serverAddress), int.Parse(serverPort));
+            AcceptInvite(IPAddress.Parse(serverAddress), int.Parse(serverPort), out whatToDoOnLeaveClick);
         }
 
         public void CloseByID(int sockID)

@@ -12,6 +12,8 @@ namespace RpgGrid
 {
     public partial class FrmMain : Form
     {
+        private const string baseClosingButtonName = "btnClosing#";
+
         RpgGrid grid;
 #if DEBUG && VERBOSE_DEBUGGING
         Form frmVerboseDebugging;
@@ -233,7 +235,7 @@ namespace RpgGrid
             BackgroundWorker waitPlayerBw;
             Button closeConnectionBtn;
             var inviteInfo = Connections.Current.InvitePlayer(out sockID, out waitPlayerBw, out closeConnectionBtn);
-            ManageCloseConnectionButton(closeConnectionBtn, inviteInfo);
+            ManageCloseConnectionButton(closeConnectionBtn, sockID, inviteInfo);
             SendMail(txtMyMail.Text, txtPlayer.Text, inviteInfo, sockID, waitPlayerBw);
         }
 
@@ -315,18 +317,26 @@ namespace RpgGrid
             }
         }
 
+        private OnLeavingBehaviour whatToDoOnLeaveClick;
+
         private void btnAcceptInvite_Click(object sender, EventArgs e)
         {
-            Connections.Current.AcceptInvite(txtIpServer.Text, txtPortServer.Text);
+            Connections.Current.AcceptInvite(txtIpServer.Text, txtPortServer.Text, out whatToDoOnLeaveClick);
 
             AfterAcceptInviteOperations();
         }
 
         private void btnLeave_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Leaved (TODO: Implement closing socket...)");
-
-            AfterLeaveInviteOperations();
+            if (whatToDoOnLeaveClick != null)
+            {
+                whatToDoOnLeaveClick();
+                AfterLeaveInviteOperations();
+            }
+            else
+            {
+                MessageBox.Show("Behaviour on closing is null");
+            }
         }
 
         private void AfterLeaveInviteOperations()
@@ -356,11 +366,13 @@ namespace RpgGrid
             waitPlayerBw.RunWorkerAsync();
             lblConnectionAddress.Text = String.Format("Address {0}", inviteInfo);
 
-            ManageCloseConnectionButton(closeConnectionBtn, inviteInfo);
+            ManageCloseConnectionButton(closeConnectionBtn, sockID, inviteInfo);
         }
 
-        private void ManageCloseConnectionButton(Button closeConnectionBtn, string inviteInfo)
+        private void ManageCloseConnectionButton(Button closeConnectionBtn, int sockID, string inviteInfo)
         {
+            closeConnectionBtn.Name = String.Format("{0}{1}", baseClosingButtonName, sockID);
+
             grpConnections.Controls.Add(closeConnectionBtn);
             closeConnectionBtn.Dock = DockStyle.Top;
             closeConnectionBtn.Text = String.Format("Awaiting on {0}...", inviteInfo);
@@ -381,6 +393,24 @@ namespace RpgGrid
         private void chkPawnController_CheckedChanged(object sender, EventArgs e)
         {
             tableLayoutPanel1.ColumnStyles[0].Width = chkPawnController.Checked ? 388 : 0;
+        }
+
+        public void ClickCloseButtonById(int sockID)
+        {
+            var btnName = String.Format("{0}{1}", baseClosingButtonName, sockID);
+            var btn = (Button)grpConnections.Controls[btnName];
+
+            if (btn != null)
+            {
+                btn.PerformClick();
+            }
+            else
+            {
+                MessageBox.Show(String.Format("No button labeled {0}"),
+                                "ATTENTION",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Exclamation);
+            }
         }
     }
 }
