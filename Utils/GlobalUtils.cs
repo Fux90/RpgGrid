@@ -105,6 +105,12 @@ namespace UtilsData
             return Image.FromStream(ms);
         }
 
+        public static Image deserializeImageRaw(byte[] buffer)
+        {
+            var ms = new MemoryStream(buffer);
+            return Image.FromStream(ms);
+        }
+
         #endregion
 
         #region SERIALIZATION
@@ -123,9 +129,37 @@ namespace UtilsData
         {
             using (var ms = new MemoryStream())
             {
-                value.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                value.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
                 return ms.ToArray();
             }
+        }
+
+        public static byte[] serializeImageRaw(Image value)
+        {
+            var ms = new MemoryStream();
+            {
+                value.Save(ms, value.RawFormat);
+                return ms.ToArray();
+            }
+        }
+
+        public static string ConvertImageToBase64String(Image image)
+        {
+            using (var ms = new MemoryStream())
+            {
+                image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                var imageBytes = ms.ToArray();
+                string base64String = Convert.ToBase64String(imageBytes);
+                return base64String;
+            }
+        }
+
+        public static Image ConvertBase64StringToImage(string base64String)
+        {
+            var imageBytes = Convert.FromBase64String(base64String);
+            var ms = new MemoryStream(imageBytes);
+            var image = Image.FromStream(ms);
+            return image;
         }
 
         #endregion

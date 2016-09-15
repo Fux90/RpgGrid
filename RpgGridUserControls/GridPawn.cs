@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using UtilsData;
 
 namespace RpgGridUserControls
 {
@@ -27,6 +28,7 @@ namespace RpgGridUserControls
         private const string UniqueIDSerializationName = "uID";
 
         private float SquarePixelSize { get; set; }
+        protected bool Serialization { get; private set; }
 
         public enum RpgSize
         {
@@ -77,7 +79,9 @@ namespace RpgGridUserControls
             UniqueID = info.GetString(UniqueIDSerializationName);
             Name = info.GetString(NameSerializationKey);
 
-            Image = (Image)info.GetValue(ImageSerializationName, typeof(Image));
+            //Image = (Image)info.GetValue(ImageSerializationName, typeof(/*Image*/));
+            Image = Utils.ConvertBase64StringToImage((string)info.GetValue(ImageSerializationName, typeof(string)));
+
             SizeAtNoZoom = (SizeF)info.GetValue(SizeAtNoZoomSerializationName, typeof(SizeF));
             PositionAtNoZoom = (Point)info.GetValue(PositionAtNoZoomSerializationName, typeof(Point));
 
@@ -138,6 +142,15 @@ namespace RpgGridUserControls
         }
 
         public abstract Image Image { get; set; }
+
+        protected byte[] ImageByte
+        {
+            get
+            {
+                return Utils.serializeImageRaw(Image);
+            }
+        }
+
         public SizeF SizeAtNoZoom { get; private set; }
         public Point PositionAtNoZoom { get; private set; }
         //public abstract Point PositionAtNoZoomNoMargin { get; }
@@ -297,15 +310,20 @@ namespace RpgGridUserControls
 
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
+            Serialization = true;
+
             info.AddValue(UniqueIDSerializationName, UniqueID, typeof(string)); 
 
             info.AddValue(NameSerializationKey, Name, typeof(string));
-            info.AddValue(ImageSerializationName,Image,typeof(Image));
+            //info.AddValue(ImageSerializationName, Image, typeof(Image));
+            info.AddValue(ImageSerializationName, Utils.ConvertImageToBase64String(Image), typeof(String));
             info.AddValue(SizeAtNoZoomSerializationName,SizeAtNoZoom,typeof(SizeF));
             info.AddValue(PositionAtNoZoomSerializationName,PositionAtNoZoom,typeof(Point));
 
             info.AddValue(ModSizeSerializationName,ModSize,typeof(RpgSize));
             info.AddValue(IsSquaredSerializationName,IsSquared,typeof(bool));
+
+            Serialization = false;
         }
 
         public bool IsTemplateGenerated()

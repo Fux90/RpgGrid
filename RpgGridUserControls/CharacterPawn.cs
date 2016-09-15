@@ -111,15 +111,18 @@ namespace RpgGridUserControls
         private Dictionary<GridDirections, Rectangle> pointFace;
 
         private Image image;
+        private Image imageFull;
+        
         public override Image Image
         {
             get
             {
-                return image;
+                return Serialization ? imageFull : image; // Serialization ? imageFull : image;
             }
 
             set
             {
+                imageFull = value;
                 var sem = new Semaphore(0, 1);
                 RpgGridControlUtils.ApplyCircleMask((Bitmap)value, (res) =>
                 {
