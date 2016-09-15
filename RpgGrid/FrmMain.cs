@@ -4,6 +4,7 @@ using MailSenderLib;
 using NetUtils;
 using RpgGridUserControls.Utilities;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Forms;
 
@@ -74,6 +75,8 @@ namespace RpgGrid
             //grid1.ImagePath = @"placeholder.png";
             grid1.PawnListener = this.gridPawnController1;
             grid1.PawnController = this.gridPawnController1;
+
+            DisableAllButMap();
         }
 
         // TODO: Move to RpgGrid class?
@@ -248,6 +251,7 @@ namespace RpgGrid
         {
             if(chkMaster.Checked)
             {
+                EnableAllButMap();
                 ShowMasterControls();
                 HidePlayerControls();
             }
@@ -255,6 +259,59 @@ namespace RpgGrid
             {
                 HideMasterControls();
                 ShowPlayerControls();
+                DisableAllButMap();
+            }
+        }
+
+        private Dictionary<Control, bool> exceptions;
+        private Dictionary<Control, bool> Exceptions
+        {
+            get
+            {
+                if (exceptions == null)
+                {
+                    exceptions = new Dictionary<Control, bool>()
+                    {
+                        { grid1, true },
+                        { chkMaster, true },
+                        { chkToggleGrid, true },
+                    };
+
+                    for (int i = 0; i < grpPlayer.Controls.Count; i++)
+                    {
+                        exceptions[grpPlayer.Controls[i]] = true;
+                    }
+                }
+
+                return exceptions;
+            }
+        }
+
+        private void DisableAllButMap()
+        {
+            SetControlEnableTo(this, false);
+        }
+
+        private void EnableAllButMap()
+        {
+            SetControlEnableTo(this, true);
+        }
+
+        private void SetControlEnableTo(Control ctrl, bool value)
+        {
+            if (!Exceptions.ContainsKey(ctrl))
+            {
+                if (ctrl.HasChildren)
+                {
+                    for (int i = 0; i < ctrl.Controls.Count; i++)
+                    {
+                        SetControlEnableTo(ctrl.Controls[i], value);
+                    }
+                }
+                else
+                {
+                    ctrl.Enabled = value;
+                }
             }
         }
 

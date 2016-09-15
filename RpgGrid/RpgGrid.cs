@@ -492,7 +492,7 @@ namespace RpgGrid
                 }
                 catch (Exception ex)
                 {
-                    OnVerboseDebugging(new VerboseDebugArgs(ex.Message));
+                    OnVerboseDebugging(new VerboseDebugArgs("ReceiveMapData: " + ex.Message));
                 }
 #endif
             }
@@ -530,26 +530,30 @@ namespace RpgGrid
         [ResponseMethods(Connections.PAWNS_RECEIVING)]
         private DataRes ReceivePawns(byte[] buffer)
         {
-            using (var ms = new MemoryStream(buffer))
+            if (buffer.Length > 0)
             {
-#if DEBUG && STRANGE_EXCEPTION_ON_PAWN_RECEIVING_ANALYSIS
-                try
+                using (var ms = new MemoryStream(buffer))
                 {
+#if DEBUG && STRANGE_EXCEPTION_ON_PAWN_RECEIVING_ANALYSIS
+                    try
+                    {
 #endif
-                    var pawns = (GridPawn[])Utils.BinaryFormatter.Deserialize(ms);
-                    MainPawnManager.LoadPawns(pawns);
+                        var pawns = (GridPawn[])Utils.BinaryFormatter.Deserialize(ms);
+                        MainPawnManager.LoadPawns(pawns);
 #if DEBUG
-                    OnVerboseDebugging(new VerboseDebugArgs(String.Format("Received pawns: {0} bytes, {1} items", buffer.Length, pawns.Length)));
+                        OnVerboseDebugging(new VerboseDebugArgs(String.Format("Received pawns: {0} bytes, {1} items", buffer.Length, pawns.Length)));
 #endif
 #if DEBUG && STRANGE_EXCEPTION_ON_PAWN_RECEIVING_ANALYSIS
-                }
-                catch (Exception ex)
-                {
-                    Message(GetBytesFromString(ex.Message));
-                }
+                    }
+                    catch (Exception ex)
+                    {
+                        Message(GetBytesFromString("ReceivePawns: " + ex.Message));
+                    }
 #endif
-                return DataRes.Empty;
+                }
             }
+
+            return DataRes.Empty;
         }
         
         [ResponseMethods(Connections.PAWNS_SENDING)]
@@ -592,7 +596,7 @@ namespace RpgGrid
                 }
                 catch (Exception ex)
                 {
-                    Message(GetBytesFromString(ex.Message));
+                    Message(GetBytesFromString("ReceiveTemplates: " + ex.Message));
                 }
 #endif
                 return DataRes.Empty;
