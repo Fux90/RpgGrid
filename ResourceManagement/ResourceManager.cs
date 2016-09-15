@@ -131,26 +131,30 @@ namespace ResourceManagement
 
             var pawns = new GridPawn[filePawns.Length];
 
-            var partition = Partitioner.Create(0, pawns.Length);
-            var parOption = new ParallelOptions()
+            if (pawns.Length > 0)
             {
-                MaxDegreeOfParallelism = ParallelExecution ? -1 : 1
-            };
-
-            Parallel.ForEach(partition, parOption, p => {
-                for (int i = p.Item1; i < p.Item2; i++)
+                var partition = Partitioner.Create(0, pawns.Length);
+                var parOption = new ParallelOptions()
                 {
-                    //pawns[i] = new CharacterPawn()
-                    //{
-                    //    CurrentPf = 59,
-                    //    MaxPf = 60,
-                    //    Image = Image.FromFile(@"character1.png"),
-                    //    ModSize = i > 10 ? RpgGridUserControls.GridPawn.RpgSize.Large : RpgGridUserControls.GridPawn.RpgSize.Medium,
-                    //};
-
-                    pawns[i] = RetrievePawnFromFile (filePawns[i]);
+                    MaxDegreeOfParallelism = ParallelExecution ? -1 : 1
                 };
-            });
+
+                Parallel.ForEach(partition, parOption, p =>
+                {
+                    for (int i = p.Item1; i < p.Item2; i++)
+                    {
+                        //pawns[i] = new CharacterPawn()
+                        //{
+                        //    CurrentPf = 59,
+                        //    MaxPf = 60,
+                        //    Image = Image.FromFile(@"character1.png"),
+                        //    ModSize = i > 10 ? RpgGridUserControls.GridPawn.RpgSize.Large : RpgGridUserControls.GridPawn.RpgSize.Medium,
+                        //};
+
+                        pawns[i] = RetrievePawnFromFile(filePawns[i]);
+                    };
+                });
+            }
 
             return pawns;
         }
@@ -169,19 +173,23 @@ namespace ResourceManagement
 
             var templates = new CharacterPawnTemplate[fileTemplates.Length];
 
-            var partition = Partitioner.Create(0, templates.Length);
-            var parOption = new ParallelOptions()
+            if (templates.Length > 0)
             {
-                MaxDegreeOfParallelism = ParallelExecution ? -1 : 1
-            };
-
-            Parallel.ForEach(partition, parOption, p => {
-                for (int i = p.Item1; i < p.Item2; i++)
+                var partition = Partitioner.Create(0, templates.Length);
+                var parOption = new ParallelOptions()
                 {
-                    //templates[i] = CharacterPawnTemplate.Builder.Create();
-                    templates[i] = RetrieveTemplateFromFile(fileTemplates[i]);
+                    MaxDegreeOfParallelism = ParallelExecution ? -1 : 1
                 };
-            });
+
+                Parallel.ForEach(partition, parOption, p =>
+                {
+                    for (int i = p.Item1; i < p.Item2; i++)
+                    {
+                        //templates[i] = CharacterPawnTemplate.Builder.Create();
+                        templates[i] = RetrieveTemplateFromFile(fileTemplates[i]);
+                    };
+                });
+            }
 
             return templates;
         }
@@ -284,8 +292,8 @@ namespace ResourceManagement
                     fs.Close();
                 }
 
-                ms.Close();
-                ms.Flush();
+                //ms.Close();
+                //ms.Flush();
             }
 
             return outpath;

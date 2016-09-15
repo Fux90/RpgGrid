@@ -37,8 +37,10 @@ namespace NetUtils
         public const string PAWNS_RECEIVING = "pawnsRec";
         public const string TEMPLATES_SENDING = "templatesSend";
         public const string TEMPLATES_RECEIVING = "templatesRec";
+        public const string CREATED_NEW_PAWN = "createdNewPawn";
         public const string PAWN_ADDED_TO_GRID = "pawnAddedToGrid";
         public const string PAWN_CLIENT_LOCATION = "pawnClientLocation";
+        public const string CREATED_NEW_TEMPLATE = "createdNewTemplate";
         public const string TEMPLATE_ADDED_TO_GRID = "templateAddedToGrid";
         public const string MOVED_PAWN_IN_GRID = "pawnMoved";
         public const string PAWN_THAT_CHANGED = "pawnThatChanged";
@@ -75,6 +77,8 @@ namespace NetUtils
             MapReceived,
             PawnsReceived,
             Templatesreceived,
+            CreateNewPawn,
+            CreateNewTemplate,
             AddPawnToGrid,
             AddPawnFromTemplateToGrid,
             MovePawnTo,
@@ -239,6 +243,17 @@ namespace NetUtils
             Model.ShowProcessing();
 
             ReceiveMap(tcpClient);
+
+            Model.EndShowProcessing();
+            bwListener.RunWorkerAsync();
+        }
+
+        [CommandBehaviour(Commands.CreateNewPawn)]
+        public void OnCreatedNewPawn(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            Model.ShowProcessing();
+
+            ReceiveNewPawn(tcpClient);
 
             Model.EndShowProcessing();
             bwListener.RunWorkerAsync();
@@ -449,6 +464,18 @@ namespace NetUtils
         {
             SendPawns(tcpClient, checkpoint);
             SendTemplates(tcpClient, checkpoint);
+        }
+
+        private void ReceiveNewPawn(TcpClient tcpClient)
+        {
+            byte[] sizeBuf = new byte[sizeof(int)];
+            tcpClient.Client.Receive(sizeBuf);
+            byte[] buffer = new byte[BitConverter.ToInt32(sizeBuf, 0)];
+            if (buffer.Length > 0)
+            {
+                tcpClient.Client.Receive(buffer);
+                Model.ProcessData(CREATED_NEW_PAWN, buffer);
+            }
         }
 
         private void SendPawns(TcpClient tcpClient, byte[] checkpoint)

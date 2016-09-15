@@ -71,6 +71,22 @@ namespace UtilsData
             return IsOfType<T>(e, out dummy);
         }
 
+        public static void ShowImage(Image img)
+        {
+            var frm = new Form();
+            frm.MinimizeBox = false;
+            frm.MaximizeBox = false;
+
+            var pic = new PictureBox();
+            pic.SizeMode = PictureBoxSizeMode.Zoom;
+            pic.Dock = DockStyle.Fill;
+            pic.Image = img;
+
+            frm.Controls.Add(pic);
+
+            frm.ShowDialog();
+        }
+
         #region DESERIALIZATION
 
         public static string deserializeString(byte[] buffer, StringDeserializationMethod strConversion)

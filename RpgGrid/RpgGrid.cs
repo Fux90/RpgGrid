@@ -1,4 +1,5 @@
-﻿#define STRANGE_EXCEPTION_ON_PAWN_RECEIVING_ANALYSIS
+﻿#define PATCH_OVERLAPPING_NAMES
+#define STRANGE_EXCEPTION_ON_PAWN_RECEIVING_ANALYSIS
 #define STRANGE_EXCEPTION_ON_MAP_RECEIVING_ANALYSIS
 
 using NetUtils;
@@ -178,7 +179,7 @@ namespace RpgGrid
                     }
                 };
 #endregion
-                #region BACKGROUND_IMAGE_CHANGED
+#region BACKGROUND_IMAGE_CHANGED
                 mainGrid.BackgroundImageChanged += (s, e) =>
                 {
                     for (int i = 0; i < mainGrid.Controls.Count; i++)
@@ -208,6 +209,9 @@ namespace RpgGrid
             }
         }
 
+        private CharacterPawn LastCreatedPawn;
+        private CharacterPawnTemplate LastCreatedPawnTemplate;
+
         private PawnManager mainPawnManager;
         public PawnManager MainPawnManager
         {
@@ -220,6 +224,7 @@ namespace RpgGrid
             {
                 mainPawnManager = value;
 
+#region NEW AND SAVING PAWN
                 mainPawnManager.SavePawn += (s, e) =>
                 {
                     using (var sDlg = new SaveFileDialog())
@@ -238,8 +243,15 @@ namespace RpgGrid
                 mainPawnManager.CreateNewPawn += (s, e) =>
                 {
                     mainPawnManager.LoadPawn(e.Pawn);
+                    LastCreatedPawn = e.Pawn;
+#if DEBUG
+                    OnVerboseDebugging(new VerboseDebugArgs("Broadcasted new pawn to clients"));
+#endif
+                    Connections.Current.Broadcast(  Connections.Commands.CreateNewPawn,
+                                                    Connections.CREATED_NEW_PAWN);
                 };
-
+#endregion
+#region NEW AND SAVING TEMPLATE
                 mainPawnManager.SaveTemplate += (s, e) =>
                 {
                     using (var sDlg = new SaveFileDialog())
@@ -259,6 +271,7 @@ namespace RpgGrid
                 {
                     MessageBox.Show("TODO - Create a Template");
                 };
+#endregion
             }
         }
 
@@ -398,7 +411,12 @@ namespace RpgGrid
         {
             using (var ms = new MemoryStream())
             {
-                MainGrid.Image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                MainGrid.Image.Save(ms, MainGrid.Image.RawFormat);
+                
+                //ms.Position = 0;
+                //var tmp = Image.FromStream(ms);
+                //Utils.ShowImage(tmp);
+
 #if DEBUG
                 OnVerboseDebugging(new VerboseDebugArgs(String.Format("Sent map: {0}x{1}", MainGrid.Image.Width, MainGrid.Image.Height)));
 #endif
@@ -438,10 +456,10 @@ namespace RpgGrid
                 }
 #endif
                 var content = GetStringFromByteArray(buffer);
-
                 File.WriteAllText(outpath, content);
 #if DEBUG
                 OnVerboseDebugging(new VerboseDebugArgs(String.Format("Received extra info: {0}", outpath)));
+                OnVerboseDebugging(new VerboseDebugArgs("Sending map extra info: " + Environment.NewLine + content));
 #endif
             }
             return DataRes.Empty;
@@ -476,6 +494,34 @@ namespace RpgGrid
 #endif
             }
             return DataRes.Empty;
+        }
+
+        [ResponseMethods(Connections.CREATED_NEW_PAWN)]
+        private DataRes CreatedNewPawn(byte[] buffer)
+        {
+            if (buffer == null)
+            {
+                using (var ms = new MemoryStream())
+                {
+                    Utils.BinaryFormatter.Serialize(ms, LastCreatedPawn);
+#if DEBUG
+                    OnVerboseDebugging(new VerboseDebugArgs(String.Format("Send new created pawn: ID {0}", LastCreatedPawn.UniqueID)));
+#endif
+                    return new DataRes(ms.ToArray());
+                }
+            }
+            else
+            {
+                using (var ms = new MemoryStream(buffer))
+                {
+                    var pawn = (CharacterPawn)Utils.BinaryFormatter.Deserialize(ms);
+                    MainPawnManager.LoadPawn(pawn);
+#if DEBUG
+                    OnVerboseDebugging(new VerboseDebugArgs(String.Format("Received new created pawn: ID {0}", pawn.UniqueID)));
+#endif
+                    return DataRes.Empty;
+                }
+            }
         }
 
         [ResponseMethods(Connections.PAWNS_RECEIVING)]
