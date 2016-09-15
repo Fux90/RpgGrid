@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 namespace NetUtils
 {
     public delegate DataRes CommunicationDataProcessing(byte[] buffer);
-
+    
     public class DataRes
     {
+        private readonly byte[] emptyBuffer = new byte[] { };
+
         public byte[] Buffer { get; private set; }
         public byte[] Length { get; private set; }
 
@@ -32,7 +34,7 @@ namespace NetUtils
                 Length = BitConverter.GetBytes(buffer.Length);
             }
 
-            Buffer = buffer;
+            Buffer = buffer != null ? buffer : emptyBuffer;
         }
     }
 

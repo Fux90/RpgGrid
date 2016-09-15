@@ -411,16 +411,18 @@ namespace RpgGrid
         {
             using (var ms = new MemoryStream())
             {
-                MainGrid.Image.Save(ms, MainGrid.Image.RawFormat);
-                
+                MainGrid.Image.Save(ms, ImageFormat.Png);
+
                 //ms.Position = 0;
                 //var tmp = Image.FromStream(ms);
                 //Utils.ShowImage(tmp);
 
+                var imageBuffer = ms.ToArray();
 #if DEBUG
                 OnVerboseDebugging(new VerboseDebugArgs(String.Format("Sent map: {0}x{1}", MainGrid.Image.Width, MainGrid.Image.Height)));
+                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Buffer map: {0}", imageBuffer.Length)));
 #endif
-                return new DataRes(ms.ToArray());
+                return new DataRes(imageBuffer);
             }
         }
 
@@ -484,6 +486,7 @@ namespace RpgGrid
                     tmpMapName = null;
 #if DEBUG
                     OnVerboseDebugging(new VerboseDebugArgs(String.Format("Received map: {0}x{1}", MainGrid.Image.Width, MainGrid.Image.Height)));
+                    OnVerboseDebugging(new VerboseDebugArgs(String.Format("Buffer map: {0}", buffer.Length)));
 #endif
 #if DEBUG && STRANGE_EXCEPTION_ON_MAP_RECEIVING_ANALYSIS
                 }
@@ -554,13 +557,20 @@ namespace RpgGrid
         {
             var pawns = this.MainPawnManager.GetPawns();
 
-            using (var ms = new MemoryStream())
+            if (pawns != null && pawns.Length > 0)
             {
-                Utils.BinaryFormatter.Serialize(ms, pawns);
+                using (var ms = new MemoryStream())
+                {
+                    Utils.BinaryFormatter.Serialize(ms, pawns);
 #if DEBUG
-                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Sent pawns: {0} items, {1} bytes", pawns.Length, ms.Length)));
+                    OnVerboseDebugging(new VerboseDebugArgs(String.Format("Sent pawns: {0} items, {1} bytes", pawns.Length, ms.Length)));
 #endif
-                return new DataRes(ms.ToArray());
+                    return new DataRes(ms.ToArray());
+                }
+            }
+            else
+            {
+                return DataRes.Empty;
             }
         }
 
@@ -594,13 +604,20 @@ namespace RpgGrid
         {
             var templates = this.MainPawnManager.GetPawnTemplates();
 
-            using (var ms = new MemoryStream())
+            if (templates != null && templates.Length > 0)
             {
-                Utils.BinaryFormatter.Serialize(ms, templates);
+                using (var ms = new MemoryStream())
+                {
+                    Utils.BinaryFormatter.Serialize(ms, templates);
 #if DEBUG
-                OnVerboseDebugging(new VerboseDebugArgs(String.Format("Sent templates: {0} items, {1} bytes", templates.Length, ms.Length)));
+                    OnVerboseDebugging(new VerboseDebugArgs(String.Format("Sent templates: {0} items, {1} bytes", templates.Length, ms.Length)));
 #endif
-                return new DataRes(ms.ToArray());
+                    return new DataRes(ms.ToArray());
+                }
+            }
+            else
+            {
+                return DataRes.Empty;
             }
         }
 
