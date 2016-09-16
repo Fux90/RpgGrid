@@ -105,12 +105,6 @@ namespace UtilsData
             return Image.FromStream(ms);
         }
 
-        public static Image deserializeImageRaw(byte[] buffer)
-        {
-            var ms = new MemoryStream(buffer);
-            return Image.FromStream(ms);
-        }
-
         #endregion
 
         #region SERIALIZATION
@@ -134,21 +128,15 @@ namespace UtilsData
             }
         }
 
-        public static byte[] serializeImageRaw(Image value)
-        {
-            var ms = new MemoryStream();
-            {
-                value.Save(ms, value.RawFormat);
-                return ms.ToArray();
-            }
-        }
-
         public static string ConvertImageToBase64String(Image image)
         {
-            using (var ms = new MemoryStream())
+            using (MemoryStream ms = new MemoryStream())
             {
-                image.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
-                var imageBytes = ms.ToArray();
+                // Convert Image to byte[]
+                image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                byte[] imageBytes = ms.ToArray();
+
+                // Convert byte[] to Base64 String
                 string base64String = Convert.ToBase64String(imageBytes);
                 return base64String;
             }
@@ -156,27 +144,15 @@ namespace UtilsData
 
         public static Image ConvertBase64StringToImage(string base64String)
         {
-            var strB = new StringBuilder();
-            try
-            {
-                var imageBytes = Convert.FromBase64String(base64String);
-                var ms = new MemoryStream(imageBytes);
-                var image = Image.FromStream(ms);
+            // Convert Base64 String to byte[]
+            byte[] imageBytes = Convert.FromBase64String(base64String);
+            MemoryStream ms = new MemoryStream(imageBytes, 0,
+              imageBytes.Length);
 
-                strB.AppendLine(imageBytes != null ? imageBytes.ToString() : "No imageBytes");
-                strB.AppendLine(ms != null ? ms.ToString() : "No ms");
-
-                return image;
-            }
-            catch(Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-
-                
-                MessageBox.Show(strB.ToString());
-
-                return new Bitmap(128, 128);
-            }
+            // Convert byte[] to Image
+            ms.Write(imageBytes, 0, imageBytes.Length);
+            Image image = Image.FromStream(ms, true);
+            return image;
         }
 
         #endregion

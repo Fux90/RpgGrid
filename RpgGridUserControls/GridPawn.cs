@@ -79,8 +79,9 @@ namespace RpgGridUserControls
             UniqueID = info.GetString(UniqueIDSerializationName);
             Name = info.GetString(NameSerializationKey);
 
-            //Image = (Image)info.GetValue(ImageSerializationName, typeof(/*Image*/));
-            Image = Utils.ConvertBase64StringToImage((string)info.GetValue(ImageSerializationName, typeof(string)));
+            Image = (Image)info.GetValue(ImageSerializationName, typeof(Image));
+            //var strImage = (string)info.GetValue(ImageSerializationName, typeof(string));
+            //Image = Utils.ConvertBase64StringToImage(strImage);
 
             SizeAtNoZoom = (SizeF)info.GetValue(SizeAtNoZoomSerializationName, typeof(SizeF));
             PositionAtNoZoom = (Point)info.GetValue(PositionAtNoZoomSerializationName, typeof(Point));
@@ -143,11 +144,11 @@ namespace RpgGridUserControls
 
         public abstract Image Image { get; set; }
 
-        protected byte[] ImageByte
+        protected string ImageString
         {
             get
             {
-                return Utils.serializeImageRaw(Image);
+                return Utils.ConvertImageToBase64String(Image);
             }
         }
 
@@ -315,8 +316,9 @@ namespace RpgGridUserControls
             info.AddValue(UniqueIDSerializationName, UniqueID, typeof(string)); 
 
             info.AddValue(NameSerializationKey, Name, typeof(string));
-            //info.AddValue(ImageSerializationName, Image, typeof(Image));
-            info.AddValue(ImageSerializationName, Utils.ConvertImageToBase64String(Image), typeof(String));
+            info.AddValue(ImageSerializationName, Image, typeof(Image));
+            //var strImage = Utils.ConvertImageToBase64String(Image);
+            //info.AddValue(ImageSerializationName, strImage, typeof(String));
             info.AddValue(SizeAtNoZoomSerializationName,SizeAtNoZoom,typeof(SizeF));
             info.AddValue(PositionAtNoZoomSerializationName,PositionAtNoZoom,typeof(Point));
 

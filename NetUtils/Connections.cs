@@ -32,6 +32,8 @@ namespace NetUtils
     {
         #region COMMUNICATION_SEMANTICS
 
+        public const string CANCEL_MAP = "cancelMap";
+
         public const string MAP_NAME_SENDING = "mapNameSend";
         public const string MAP_EXTRAINFO_SENDING = "mapExtraSend";
         public const string MAP_SENDING = "mapSend";
@@ -77,6 +79,7 @@ namespace NetUtils
         public enum Commands : byte
         {
             Done,
+            Reset,
             Ping,
             Pong,
             InitialDataRequested,
@@ -421,18 +424,17 @@ namespace NetUtils
             tcpClient.Client.Receive(checkpoint);
 
             var mapData = Model.ProcessData(MAP_SENDING, null);
-
-            //var ms = new MemoryStream(mapData.Buffer);
-            //var img = Image.FromStream(ms);
-            //Utils.ShowImage(img);
-            //img.Save(tcpClient.GetStream(), System.Drawing.Imaging.ImageFormat.Png);
-
-            var empty = DataRes.Empty;
+            
             tcpClient.Client.Send(mapData.Length);
             tcpClient.Client.Send(mapData.Buffer);
-            //tcpClient.Client.Send(empty.Length);
-
+            
             tcpClient.Client.Receive(checkpoint);
+
+            if ((Connections.Commands)checkpoint[0] == Commands.Reset)
+            {
+                SendMap(tcpClient, checkpoint);
+                MessageBox.Show("Resent map to client");
+            }
         }
 
         private void ReceiveMap(TcpClient tcpClient)
@@ -488,6 +490,8 @@ namespace NetUtils
                 catch(Exception ex)
                 {
                     MessageBox.Show("TODO: request again for map");
+                    tcpClient.Client.Send(Commands.Reset.ToByteArray());
+                    Model.ProcessData(CANCEL_MAP, null);
                 }
             }
 
@@ -507,8 +511,18 @@ namespace NetUtils
             byte[] buffer = new byte[BitConverter.ToInt32(sizeBuf, 0)];
             if (buffer.Length > 0)
             {
-                tcpClient.Client.Receive(buffer);
-                Model.ProcessData(CREATED_NEW_PAWN, buffer);
+                Model.ShowProcessing();
+
+                var clientStream = tcpClient.GetStream();
+                var pawn = Utils.BinaryFormatter.Deserialize(clientStream);
+
+                //tcpClient.Client.Receive(buffer);
+                var ms = new MemoryStream();
+                Utils.BinaryFormatter.Serialize(ms, pawn);
+                var imgBuffer = ms.ToArray();
+                Model.ProcessData(CREATED_NEW_PAWN, imgBuffer);
+
+                Model.EndShowProcessing();
             }
         }
 
