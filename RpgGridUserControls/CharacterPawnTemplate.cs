@@ -19,6 +19,13 @@ namespace RpgGridUserControls
     {
         public class Builder : CharacterPawnTemplate
         {
+            public static string BuildName;
+            public static Image BuildImage;
+            public static GridPawn.RpgSize BuildSize;
+            public static int BuildNumHitDice;
+            public static DiceTypes BuildHealthDie;
+            public static Statistics BuildDefaultStatistics;
+
             public static CharacterPawnTemplate Create()
             {
                 return new CharacterPawnTemplate()
@@ -349,6 +356,7 @@ namespace RpgGridUserControls
             strB.AppendLine(DefaultSize.ToString());
             strB.AppendFormat("{0}{1}", NumHitDice, HealthDie.ToString());
             strB.AppendLine(DefaultStatistics.ToString());
+            strB.AppendLine();
 
             return strB.ToString();
         }

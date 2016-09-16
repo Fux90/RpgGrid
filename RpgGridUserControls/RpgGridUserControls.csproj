@@ -60,6 +60,14 @@
     <Compile Include="CharacterPawnTemplate.Designer.cs">
       <DependentUpon>CharacterPawnTemplate.cs</DependentUpon>
     </Compile>
+    <Compile Include="CharacterPawnTemplateController.cs" />
+    <Compile Include="CharacterPawnTemplateListener.cs" />
+    <Compile Include="CharacterPawnTemplateValueController.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CharacterPawnTemplateValueController.Designer.cs">
+      <DependentUpon>CharacterPawnTemplateValueController.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormCharacterPawnCreation.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -147,6 +155,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="CharacterPawnTemplate.resx">
       <DependentUpon>CharacterPawnTemplate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CharacterPawnTemplateValueController.resx">
+      <DependentUpon>CharacterPawnTemplateValueController.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="FormCharacterPawnCreation.resx">
       <DependentUpon>FormCharacterPawnCreation.cs</DependentUpon>

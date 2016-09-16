@@ -230,12 +230,12 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Name";
             // 
-            // GridPawnController
+            // GridPawnValueController
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.grpMain);
-            this.Name = "GridPawnController";
+            this.Name = "GridPawnValueController";
             this.Size = new System.Drawing.Size(377, 292);
             this.grpMain.ResumeLayout(false);
             this.tableLayoutPanel3.ResumeLayout(false);
