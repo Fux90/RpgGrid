@@ -47,6 +47,8 @@ namespace RpgGridUserControls
 
         protected override void OnClick(EventArgs e)
         {
+            base.OnClick(e);
+
             var frm = new FormCharacterPawnTemplateCreation();
             var result = frm.ShowDialog();
 

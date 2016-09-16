@@ -11,6 +11,11 @@ namespace RpgGridUserControls
 {
     public abstract class BackgroundedItem : UserControl
     {
+        private Brush clickBrush = new SolidBrush(Color.FromArgb(100, Color.Yellow));
+        private Brush disabledBrush = new SolidBrush(Color.FromArgb(100, Color.Gray));
+
+        private bool clicked;
+
         protected abstract string ImageResource { get; }
 
         private Image backgroundImage;
@@ -29,6 +34,20 @@ namespace RpgGridUserControls
             }
         }
 
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            clicked = true;
+            this.Invalidate();
+            base.OnMouseDown(e);
+        }
+
+        protected override void OnClick(EventArgs e)
+        {
+            clicked = false;
+            this.Invalidate();
+            base.OnClick(e);
+        }
+
         protected override void OnPaintBackground(PaintEventArgs e)
         {
             base.OnPaintBackground(e);
@@ -37,6 +56,21 @@ namespace RpgGridUserControls
             {
                 var g = e.Graphics;
                 g.DrawImage(BackgroundImage, ClientRectangle);
+            }
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+            var g = e.Graphics;
+
+            if (Enabled == false)
+            {
+                g.FillRectangle(disabledBrush, this.ClientRectangle);
+            }
+            else if (clicked)
+            {
+                g.FillRectangle(clickBrush, this.ClientRectangle);
             }
         }
     }

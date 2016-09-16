@@ -520,6 +520,8 @@ namespace RpgGrid
         {
             if (buffer == null)
             {
+                ShowProcessing();
+
                 using (var ms = new MemoryStream())
                 {
                     Utils.BinaryFormatter.Serialize(ms,  LastCreatedPawn);
@@ -527,6 +529,7 @@ namespace RpgGrid
 #if DEBUG
                     OnVerboseDebugging(new VerboseDebugArgs(String.Format("Send new created pawn: ID {0}", LastCreatedPawn.UniqueID)));
 #endif
+                    EndShowProcessing();
                     return new DataRes(ms.ToArray());
                 }
             }
