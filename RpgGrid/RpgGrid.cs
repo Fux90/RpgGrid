@@ -508,6 +508,7 @@ namespace RpgGrid
                 catch (Exception ex)
                 {
                     OnVerboseDebugging(new VerboseDebugArgs("ReceiveMapData: " + ex.Message));
+                    throw ex;
                 }
 #endif
             }
@@ -521,7 +522,8 @@ namespace RpgGrid
             {
                 using (var ms = new MemoryStream())
                 {
-                    Utils.BinaryFormatter.Serialize(ms, LastCreatedPawn);
+                    Utils.BinaryFormatter.Serialize(ms,  LastCreatedPawn);
+
 #if DEBUG
                     OnVerboseDebugging(new VerboseDebugArgs(String.Format("Send new created pawn: ID {0}", LastCreatedPawn.UniqueID)));
 #endif
@@ -530,7 +532,7 @@ namespace RpgGrid
             }
             else
             {
-                using (var ms = new MemoryStream(buffer))
+                var ms = new MemoryStream(buffer);
                 {
                     var pawn = (CharacterPawn)Utils.BinaryFormatter.Deserialize(ms);
                     MainPawnManager.LoadPawn(pawn);

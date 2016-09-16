@@ -147,7 +147,7 @@ namespace UtilsData
         {
             using (var ms = new MemoryStream())
             {
-                image.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                image.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
                 var imageBytes = ms.ToArray();
                 string base64String = Convert.ToBase64String(imageBytes);
                 return base64String;
@@ -156,10 +156,27 @@ namespace UtilsData
 
         public static Image ConvertBase64StringToImage(string base64String)
         {
-            var imageBytes = Convert.FromBase64String(base64String);
-            var ms = new MemoryStream(imageBytes);
-            var image = Image.FromStream(ms);
-            return image;
+            var strB = new StringBuilder();
+            try
+            {
+                var imageBytes = Convert.FromBase64String(base64String);
+                var ms = new MemoryStream(imageBytes);
+                var image = Image.FromStream(ms);
+
+                strB.AppendLine(imageBytes != null ? imageBytes.ToString() : "No imageBytes");
+                strB.AppendLine(ms != null ? ms.ToString() : "No ms");
+
+                return image;
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+
+                
+                MessageBox.Show(strB.ToString());
+
+                return new Bitmap(128, 128);
+            }
         }
 
         #endregion

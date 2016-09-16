@@ -481,7 +481,14 @@ namespace NetUtils
             if (buffer.Length > 0)
             {
                 tcpClient.Client.Receive(buffer);
-                Model.ProcessData(MAP_RECEIVING, buffer);
+                try
+                {
+                    Model.ProcessData(MAP_RECEIVING, buffer);
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show("TODO: request again for map");
+                }
             }
 
             tcpClient.Client.Send(Commands.Done.ToByteArray());
