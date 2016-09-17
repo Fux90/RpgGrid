@@ -132,6 +132,11 @@ namespace RpgGridUserControls
             pawnContainer1.LoadPawns(gridPawns);
         }
 
+        public void LoadPawnTemplate(CharacterPawnTemplate gridPawnTemplate)
+        {
+            LoadPawnTemplates(new CharacterPawnTemplate[] { gridPawnTemplate });
+        }
+
         public void LoadPawnTemplates(CharacterPawnTemplate[] gridPawnTemplates)
         {
             templateContainer1.LoadPawns(gridPawnTemplates);

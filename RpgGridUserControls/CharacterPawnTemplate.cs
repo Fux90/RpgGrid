@@ -19,27 +19,177 @@ namespace RpgGridUserControls
     {
         public class Builder : CharacterPawnTemplate
         {
-            public static string BuildName;
-            public static Image BuildImage;
-            public static GridPawn.RpgSize BuildSize;
-            public static int BuildNumHitDice;
-            public static DiceTypes BuildHealthDie;
-            public static Statistics BuildDefaultStatistics;
+            private static string buildName;
+            private static Image buildImage;
+            private static GridPawn.RpgSize buildSize;
+            private static int buildNumHitDice;
+            private static DiceTypes buildHealthDie;
+            private static Statistics buildDefaultStatistics;
+
+            static Builder()
+            {
+                SetDefults();
+            }
+
+            #region DEFAULTS
+            
+            private static void SetDefults()
+            {
+                SetDefaultName();
+                SetDefaultImage();
+                SetDefaultSize();
+                SetDefaultNumHitDice();
+                SetDefaultHealthDie();
+                SetDefaultStatistics();
+            }
+
+            private static void SetDefaultName()
+            {
+                BuildName = "Nog";
+            }
+
+            private static void SetDefaultImage()
+            {
+                // Change with resource
+                BuildImage = Image.FromFile(@"character2.jpg");
+            }
+
+            private static void SetDefaultSize()
+            {
+                BuildSize = GridPawn.RpgSize.Medium;
+            }
+
+            private static void SetDefaultNumHitDice()
+            {
+                buildNumHitDice = 1;
+            }
+
+            private static void SetDefaultHealthDie()
+            {
+                BuildHealthDie = DiceTypes.d8;
+            }
+
+            private static void SetDefaultStatistics()
+            {
+                BuildStatistics = new Statistics(null, new Dictionary<StatsType, int>()
+                {
+                    {StatsType.Strength, 14},
+                    {StatsType.Constitution, 12},
+                });
+            }
+
+            #endregion
+
+            #region PROPERTIES
+
+            public static string BuildName
+            {
+                get
+                {
+                    return buildName;
+                }
+
+                set
+                {
+                    buildName = value;
+                    var invalidName = buildName == null || buildName == "";
+
+                    if (invalidName)
+                    {
+                        buildName = "Npg";
+                    }
+                }
+            }
+
+            public static Image BuildImage
+            {
+                get
+                {
+                    return buildImage;
+                }
+
+                set
+                {
+                    buildImage = value;
+                    var invalidImage = buildImage == null;
+
+                    if (invalidImage)
+                    {
+                        buildImage = Image.FromFile(@"character2.jpg");
+                    }
+                }
+            }
+
+            public static GridPawn.RpgSize BuildSize
+            {
+                get
+                {
+                    return buildSize;
+                }
+
+                set
+                {
+                    buildSize = value;
+                }
+            }
+
+            public static int BuildNumHitDice
+            {
+                get
+                {
+                    return buildNumHitDice;
+                }
+
+                set
+                {
+                    buildNumHitDice = value;
+                    var invalidNumHitDice = buildNumHitDice < 1;
+
+                    if (invalidNumHitDice)
+                    {
+                        buildNumHitDice = 1;
+                    }
+                }
+            }
+
+            public static DiceTypes BuildHealthDie
+            {
+                get
+                {
+                    return buildHealthDie;
+                }
+
+                set
+                {
+                    buildHealthDie = value;
+                }
+            }
+
+            public static Statistics BuildStatistics
+            {
+                get
+                {
+                    return buildDefaultStatistics;
+                }
+
+                set
+                {
+                    buildDefaultStatistics = value;
+                }
+            }
+
+            #endregion
 
             public static CharacterPawnTemplate Create()
             {
                 return new CharacterPawnTemplate()
                 {
-                    DefaultName = "Npg",
-                    DefaultImage = Image.FromFile(@"character2.jpg"),
-                    DefaultSize = GridPawn.RpgSize.Medium,
-                    NumHitDice = 1,
-                    HealthDie = DiceTypes.d8,
-                    DefaultStatistics = new Statistics(null, new Dictionary<StatsType, int>()
-                    {
-                        {StatsType.Strength, 14},
-                        {StatsType.Constitution, 12},
-                    }),
+                    DefaultName = BuildName,
+                    DefaultImage = BuildImage,
+                    DefaultSize = BuildSize,
+                    NumHitDice = BuildNumHitDice,
+                    HealthDie = BuildHealthDie,
+                    DefaultStatistics = BuildStatistics,
                 };
             }
         }

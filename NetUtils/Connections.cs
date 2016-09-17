@@ -289,6 +289,17 @@ namespace NetUtils
             bwListener.RunWorkerAsync();
         }
 
+        [CommandBehaviour(Commands.CreateNewTemplate)]
+        public void OnCreatedNewPawnTemplate(TcpClient tcpClient, BackgroundWorker bwListener)
+        {
+            Model.ShowProcessing();
+
+            ReceiveNewPawnTemplate(tcpClient);
+
+            Model.EndShowProcessing();
+            bwListener.RunWorkerAsync();
+        }
+
         [CommandBehaviour(Commands.Templatesreceived)]
         public void OnTemplatesReceived(TcpClient tcpClient, BackgroundWorker bwListener)
         {
@@ -519,8 +530,8 @@ namespace NetUtils
                 //tcpClient.Client.Receive(buffer);
                 var ms = new MemoryStream();
                 Utils.BinaryFormatter.Serialize(ms, pawn);
-                var imgBuffer = ms.ToArray();
-                Model.ProcessData(CREATED_NEW_PAWN, imgBuffer);
+                var pawnBuffer = ms.ToArray();
+                Model.ProcessData(CREATED_NEW_PAWN, pawnBuffer);
 
                 Model.EndShowProcessing();
             }
@@ -574,6 +585,28 @@ namespace NetUtils
             }
 
             tcpClient.Client.Send(Commands.Done.ToByteArray());
+        }
+
+        private void ReceiveNewPawnTemplate(TcpClient tcpClient)
+        {
+            byte[] sizeBuf = new byte[sizeof(int)];
+            tcpClient.Client.Receive(sizeBuf);
+            byte[] buffer = new byte[BitConverter.ToInt32(sizeBuf, 0)];
+            if (buffer.Length > 0)
+            {
+                Model.ShowProcessing();
+
+                var clientStream = tcpClient.GetStream();
+                var template = Utils.BinaryFormatter.Deserialize(clientStream);
+
+                //tcpClient.Client.Receive(buffer);
+                var ms = new MemoryStream();
+                Utils.BinaryFormatter.Serialize(ms, template);
+                var templateBuffer = ms.ToArray();
+                Model.ProcessData(CREATED_NEW_TEMPLATE, templateBuffer);
+
+                Model.EndShowProcessing();
+            }
         }
 
         private void PawnAddedToGrid(TcpClient tcpClient)

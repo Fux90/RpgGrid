@@ -270,7 +270,13 @@ namespace RpgGrid
 
                 mainPawnManager.CreateNewTemplate += (s, e) =>
                 {
-                    MessageBox.Show("TODO - Create a Template");
+                    mainPawnManager.LoadPawnTemplate(e.Template);
+                    LastCreatedPawnTemplate = e.Template;
+#if DEBUG
+                    OnVerboseDebugging(new VerboseDebugArgs("Broadcasted new template to clients"));
+#endif
+                    Connections.Current.Broadcast(Connections.Commands.CreateNewTemplate,
+                                                    Connections.CREATED_NEW_TEMPLATE);
                 };
 #endregion
             }
@@ -595,6 +601,38 @@ namespace RpgGrid
             else
             {
                 return DataRes.Empty;
+            }
+        }
+
+        [ResponseMethods(Connections.CREATED_NEW_TEMPLATE)]
+        private DataRes CreatedNewPawnTemplate(byte[] buffer)
+        {
+            if (buffer == null)
+            {
+                ShowProcessing();
+
+                using (var ms = new MemoryStream())
+                {
+                    Utils.BinaryFormatter.Serialize(ms, LastCreatedPawnTemplate);
+
+#if DEBUG
+                    OnVerboseDebugging(new VerboseDebugArgs("Send new created template"));
+#endif
+                    EndShowProcessing();
+                    return new DataRes(ms.ToArray());
+                }
+            }
+            else
+            {
+                var ms = new MemoryStream(buffer);
+                {
+                    var template = (CharacterPawnTemplate)Utils.BinaryFormatter.Deserialize(ms);
+                    MainPawnManager.LoadPawnTemplate(template);
+#if DEBUG
+                    OnVerboseDebugging(new VerboseDebugArgs("Received new created template"));
+#endif
+                    return DataRes.Empty;
+                }
             }
         }
 

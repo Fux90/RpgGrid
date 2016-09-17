@@ -24,6 +24,7 @@ namespace RpgGridUserControls
         private void btnOk_Click(object sender, EventArgs e)
         {
             DialogResult = DialogResult.OK;
+            CreatedPawnTemplate = CharacterPawnTemplate.Builder.Create();
         }
 
         private void btnCancel_Click(object sender, EventArgs e)

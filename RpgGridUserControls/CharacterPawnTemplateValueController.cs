@@ -19,8 +19,6 @@ namespace RpgGridUserControls
         public CharacterPawnTemplateValueController()
         {
             InitializeComponent();
-            InitComboSize();
-            InitTextBoxBehaviours();
         }
 
         private void InitComboSize()
@@ -31,6 +29,16 @@ namespace RpgGridUserControls
                 cmbSizes.Items.Add(rpgSizes[i]);
             }
             cmbSizes.SelectedIndex = 0;
+        }
+
+        private void InitComboDiceTypes()
+        {
+            var diceTypes = (DiceTypes[])Enum.GetValues(typeof(DiceTypes));
+            for (int i = 0; i < diceTypes.Length; i++)
+            {
+                cmbDiceType.Items.Add(diceTypes[i]);
+            }
+            cmbDiceType.SelectedIndex = 0;
         }
 
         #region EVENTS
@@ -46,23 +54,48 @@ namespace RpgGridUserControls
             {
                 txtName,
                 txtNotes,
+                txtNumHitDice,
             };
 
             for (int i = 0; i < readonlyTextboxes.Length; i++)
             {
-                readonlyTextboxes[i].ReadOnly = true;
+                var txt = readonlyTextboxes[i];
+
+                txt.ReadOnly = true;
+                txt.MouseClick += txt_MouseClick;
+                txt.KeyDown += txt_KeyDown;
             }
 
             behavioursByTextBox[txtName] = (txt) =>
             {
                 SetName(txt.Text);
             };
+
+            behavioursByTextBox[txtNumHitDice] = (txt) =>
+            {
+                setIntValue(txt, (v) => SetNumHitDice(v));
+            };
+        }
+
+        private void CharacterPawnTemplateValueController_Load(object sender, EventArgs e)
+        {
+            InitComboSize();
+            InitComboDiceTypes();
+            InitTextBoxBehaviours();
+
+            ShowAll();
         }
 
         private void cmbSizes_SelectedIndexChanged(object sender, EventArgs e)
         {
-                var newSize = (GridPawn.RpgSize)cmbSizes.SelectedIndex;
-                SetSize(newSize);
+            var newSize = (GridPawn.RpgSize)cmbSizes.SelectedIndex;
+            SetSize(newSize);
+        }
+
+        private void cmbDiceType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var newDiceType = (DiceTypes)cmbDiceType.SelectedIndex;
+            SetBuildHealthDie(newDiceType);
         }
 
         private void txt_KeyDown(object sender, KeyEventArgs e)
@@ -98,7 +131,6 @@ namespace RpgGridUserControls
 
                     if (oDlg.ShowDialog() == DialogResult.OK)
                     {
-                        //currentPawn.Image = Image.FromFile(oDlg.FileName);
                         SetImage(Image.FromFile(oDlg.FileName));
                         ShowImage();
                     }
@@ -155,7 +187,7 @@ namespace RpgGridUserControls
 
         public void SetDefaultStatistics(Statistics statistics)
         {
-            CharacterPawnTemplate.Builder.BuildDefaultStatistics = statistics;
+            CharacterPawnTemplate.Builder.BuildStatistics = statistics;
         }
 
         #endregion
@@ -190,12 +222,12 @@ namespace RpgGridUserControls
 
         public void ShowNumHitDice()
         {
-            
+            txtNumHitDice.Text = CharacterPawnTemplate.Builder.BuildNumHitDice.ToString();
         }
 
         public void ShowBuildHealthDie()
         {
-            
+            cmbDiceType.SelectedIndex = (int)CharacterPawnTemplate.Builder.BuildHealthDie;
         }
 
         public void ShowDefaultStatistics()

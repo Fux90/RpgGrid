@@ -31,20 +31,23 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.txtNotes = new System.Windows.Forms.TextBox();
             this.picTemplate = new System.Windows.Forms.PictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
-            this.txtName = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
             this.cmbSizes = new System.Windows.Forms.ComboBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.txtName = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.txtNotes = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.txtNumHitDice = new System.Windows.Forms.TextBox();
+            this.cmbDiceType = new System.Windows.Forms.ComboBox();
             this.groupBox1.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
-            this.groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picTemplate)).BeginInit();
             this.panel1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
@@ -88,6 +91,67 @@
             this.tableLayoutPanel2.Size = new System.Drawing.Size(367, 140);
             this.tableLayoutPanel2.TabIndex = 0;
             // 
+            // picTemplate
+            // 
+            this.picTemplate.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.picTemplate.Location = new System.Drawing.Point(3, 3);
+            this.picTemplate.Name = "picTemplate";
+            this.picTemplate.Size = new System.Drawing.Size(120, 134);
+            this.picTemplate.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.picTemplate.TabIndex = 0;
+            this.picTemplate.TabStop = false;
+            this.picTemplate.Click += new System.EventHandler(this.picPawn_Click);
+            // 
+            // panel1
+            // 
+            this.panel1.Controls.Add(this.cmbDiceType);
+            this.panel1.Controls.Add(this.txtNumHitDice);
+            this.panel1.Controls.Add(this.label2);
+            this.panel1.Controls.Add(this.cmbSizes);
+            this.panel1.Controls.Add(this.label3);
+            this.panel1.Controls.Add(this.txtName);
+            this.panel1.Controls.Add(this.label1);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(129, 3);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(235, 134);
+            this.panel1.TabIndex = 1;
+            // 
+            // cmbSizes
+            // 
+            this.cmbSizes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbSizes.FormattingEnabled = true;
+            this.cmbSizes.Location = new System.Drawing.Point(44, 62);
+            this.cmbSizes.Name = "cmbSizes";
+            this.cmbSizes.Size = new System.Drawing.Size(181, 21);
+            this.cmbSizes.TabIndex = 8;
+            this.cmbSizes.SelectedIndexChanged += new System.EventHandler(this.cmbSizes_SelectedIndexChanged);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(3, 65);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(27, 13);
+            this.label3.TabIndex = 5;
+            this.label3.Text = "Size";
+            // 
+            // txtName
+            // 
+            this.txtName.Location = new System.Drawing.Point(44, 9);
+            this.txtName.Name = "txtName";
+            this.txtName.Size = new System.Drawing.Size(181, 20);
+            this.txtName.TabIndex = 4;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(3, 12);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(35, 13);
+            this.label1.TabIndex = 1;
+            this.label1.Text = "Name";
+            // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.txtNotes);
@@ -108,60 +172,31 @@
             this.txtNotes.Size = new System.Drawing.Size(361, 168);
             this.txtNotes.TabIndex = 0;
             // 
-            // picTemplate
+            // label2
             // 
-            this.picTemplate.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.picTemplate.Location = new System.Drawing.Point(3, 3);
-            this.picTemplate.Name = "picTemplate";
-            this.picTemplate.Size = new System.Drawing.Size(120, 134);
-            this.picTemplate.TabIndex = 0;
-            this.picTemplate.TabStop = false;
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(3, 39);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(23, 13);
+            this.label2.TabIndex = 9;
+            this.label2.Text = "HD";
             // 
-            // panel1
+            // txtNumHitDice
             // 
-            this.panel1.Controls.Add(this.cmbSizes);
-            this.panel1.Controls.Add(this.label3);
-            this.panel1.Controls.Add(this.txtName);
-            this.panel1.Controls.Add(this.label1);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(129, 3);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(235, 134);
-            this.panel1.TabIndex = 1;
+            this.txtNumHitDice.Location = new System.Drawing.Point(44, 36);
+            this.txtNumHitDice.Name = "txtNumHitDice";
+            this.txtNumHitDice.Size = new System.Drawing.Size(57, 20);
+            this.txtNumHitDice.TabIndex = 10;
             // 
-            // label1
+            // cmbDiceType
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 12);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(35, 13);
-            this.label1.TabIndex = 1;
-            this.label1.Text = "Name";
-            // 
-            // txtName
-            // 
-            this.txtName.Location = new System.Drawing.Point(44, 9);
-            this.txtName.Name = "txtName";
-            this.txtName.Size = new System.Drawing.Size(181, 20);
-            this.txtName.TabIndex = 4;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(3, 57);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(27, 13);
-            this.label3.TabIndex = 5;
-            this.label3.Text = "Size";
-            // 
-            // cmbSizes
-            // 
-            this.cmbSizes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cmbSizes.FormattingEnabled = true;
-            this.cmbSizes.Location = new System.Drawing.Point(44, 54);
-            this.cmbSizes.Name = "cmbSizes";
-            this.cmbSizes.Size = new System.Drawing.Size(181, 21);
-            this.cmbSizes.TabIndex = 8;
+            this.cmbDiceType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbDiceType.FormattingEnabled = true;
+            this.cmbDiceType.Location = new System.Drawing.Point(107, 36);
+            this.cmbDiceType.Name = "cmbDiceType";
+            this.cmbDiceType.Size = new System.Drawing.Size(118, 21);
+            this.cmbDiceType.TabIndex = 11;
+            this.cmbDiceType.SelectedIndexChanged += new System.EventHandler(this.cmbDiceType_SelectedIndexChanged);
             // 
             // CharacterPawnTemplateValueController
             // 
@@ -170,14 +205,15 @@
             this.Controls.Add(this.groupBox1);
             this.Name = "CharacterPawnTemplateValueController";
             this.Size = new System.Drawing.Size(379, 358);
+            this.Load += new System.EventHandler(this.CharacterPawnTemplateValueController_Load);
             this.groupBox1.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picTemplate)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -195,5 +231,8 @@
         private System.Windows.Forms.TextBox txtName;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ComboBox cmbSizes;
+        private System.Windows.Forms.ComboBox cmbDiceType;
+        private System.Windows.Forms.TextBox txtNumHitDice;
+        private System.Windows.Forms.Label label2;
     }
 }
